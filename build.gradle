@@ -1,0 +1,132 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.apache.tools.ant.filters.ReplaceTokens
+
+plugins {
+	id 'eclipse'
+	id 'java-library'
+    id 'maven-publish'
+    id "com.github.ben-manes.versions" version "0.39.0"
+    id "com.github.johnrengelman.shadow" version "7.0.0"
+}
+
+version = new Version(major: 1, minor: 23, revision: 0)
+group = 'io.github.romvoid95'
+archivesBaseName = 'JDATools'
+
+sourceSets {
+	test {
+		java.srcDirs += 'src/test/java'
+		compileClasspath += main.compileClasspath
+		runtimeClasspath += main.runtimeClasspath
+	}
+}
+
+apply from: 'dependencies.gradle'
+
+dependencies {
+	api jda()
+	implementation slf4j()
+	implementation okhttp()
+	implementation findbugs()
+	implementation guava()
+	implementation json()
+}
+
+task sourcesForRelease(type: Copy) {
+	from('src/main/java') {
+		filter(ReplaceTokens, tokens: [
+			VERSION_MAJOR:		version.major,
+			VERSION_MINOR:    	version.minor,
+			VERSION_REVISION:	version.revision
+		])
+	}
+	into 'build/filteredSrc'
+}
+
+compileJava {
+	source = sourcesForRelease.destinationDir
+	classpath = sourceSets.main.compileClasspath
+
+	dependsOn sourcesForRelease
+}
+
+def configureJar = { Object jarConfig, String classifier = '' ->
+	jarConfig.baseName = archivesBaseName
+	jarConfig.version = version.toString()
+	jarConfig.classifier = classifier
+	jarConfig.extension = 'jar'
+
+	jarConfig.manifest {
+		it.attributes(
+				'Implementation-Title': archivesBaseName,
+				'Implementation-Version': version.toString()
+		)
+	}
+}
+
+def configureJavadoc = { Object jDocConfig ->
+	jDocConfig.options {
+		it.author()
+		it.encoding = 'UTF-8'
+		it.memberLevel = JavadocMemberLevel.PROTECTED
+		it.tags 'apiNote:a:API Note:', 'implSpec:a:Implementation Requirements:', 'implNote:a:Implementation Note:'
+	}
+}
+
+configurations {
+    implementation {
+        description = 'implementation'
+        transitive = true
+    }
+}
+
+javadoc {
+	destinationDir = file("$buildDir/docs/")
+	source = sourceSets.main.allJava
+	classpath = configurations.runtimeClasspath
+	configureJavadoc(it)
+}
+
+jar {
+	destinationDir = file("$buildDir/libs/")
+	configureJar(it)
+}
+
+shadowJar {
+	destinationDir = file("$buildDir/libs/")
+	configureJar(it, 'all')
+}
+
+task sourceJar(type: Jar) {
+	group = 'build'
+	dependsOn classes
+	from sourceSets.main.allSource
+	destinationDir = file("$buildDir/libs/")
+	configureJar(it, 'sources')
+}
+
+task javadocJar(type: Jar) {
+    group = 'documentation'
+}
+
+build {
+	dependsOn { javadocJar }
+	dependsOn { sourceJar }
+	dependsOn { shadowJar }
+}
+
+artifacts {
+	archives javadocJar
+	archives sourceJar
+	archives shadowJar
+}
+
+apply from: 'deploy.gradle'
+
+class Version {
+	String major, minor, revision
+
+	String toString() {
+		"${major}.${minor}.${revision}"
+	}
+}
