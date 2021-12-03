@@ -2,16 +2,20 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
-	id 'eclipse'
-	id 'java-library'
-    id 'maven-publish'
-    id "com.github.ben-manes.versions" version "0.39.0"
-    id "com.github.johnrengelman.shadow" version "7.0.0"
+	id("eclipse")
+	id("java-library")
+	id("maven-publish")
+	id "com.github.ben-manes.versions" version "0.39.0"
+	id "com.github.johnrengelman.shadow" version "7.0.0"
 }
 
-version = new Version(major: 1, minor: 23, revision: 0)
-group = 'io.github.romvoid95'
+version = "2.0.0"
+group = 'com.readonlydev'
 archivesBaseName = 'JDATools'
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+def javaVersion = JavaVersion.VERSION_17
 
 sourceSets {
 	test {
@@ -23,21 +27,34 @@ sourceSets {
 
 apply from: 'dependencies.gradle'
 
-dependencies {
-	api jda()
-	implementation slf4j()
-	implementation okhttp()
-	implementation findbugs()
-	implementation guava()
-	implementation json()
+repositories {
+	mavenCentral()
 }
+
+dependencies {
+	implementation 	jda()
+	implementation 	slf4j()
+	implementation 	lang3()
+	implementation 	json()
+	compileOnly 'org.projectlombok:lombok:1.18.22'
+	annotationProcessor 'org.projectlombok:lombok:1.18.22'
+	
+	testCompileOnly 'org.projectlombok:lombok:1.18.22'
+	testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
+}
+
+def projectVersion = version.toString()
+if(projectVersion.endsWith("SNAPSHOT")) {
+	projectVersion = projectVersion.replace("-", ".")
+}
+def splitVerison = projectVersion.tokenize(".")
 
 task sourcesForRelease(type: Copy) {
 	from('src/main/java') {
 		filter(ReplaceTokens, tokens: [
-			VERSION_MAJOR:		version.major,
-			VERSION_MINOR:    	version.minor,
-			VERSION_REVISION:	version.revision
+			MAJOR:		splitVerison.get(0),
+			MINOR:    	splitVerison.get(1),
+			PATCH:		splitVerison.get(2)
 		])
 	}
 	into 'build/filteredSrc'
@@ -50,83 +67,151 @@ compileJava {
 	dependsOn sourcesForRelease
 }
 
-def configureJar = { Object jarConfig, String classifier = '' ->
-	jarConfig.baseName = archivesBaseName
-	jarConfig.version = version.toString()
-	jarConfig.classifier = classifier
-	jarConfig.extension = 'jar'
-
-	jarConfig.manifest {
-		it.attributes(
-				'Implementation-Title': archivesBaseName,
-				'Implementation-Version': version.toString()
-		)
-	}
-}
-
-def configureJavadoc = { Object jDocConfig ->
-	jDocConfig.options {
-		it.author()
-		it.encoding = 'UTF-8'
-		it.memberLevel = JavadocMemberLevel.PROTECTED
-		it.tags 'apiNote:a:API Note:', 'implSpec:a:Implementation Requirements:', 'implNote:a:Implementation Note:'
-	}
-}
-
 configurations {
-    implementation {
-        description = 'implementation'
-        transitive = true
-    }
+	implementation {
+		description = 'implementation'
+		transitive = true
+	}
+}
+
+def setMainManifestProps = { Manifest manifest->
+	manifest.mainAttributes ([
+		'Implementation-Title':     archivesBaseName,
+		'Implementation-Version':   version,
+		'Implementation-Vendor':    'ReadOnly Development',
+		'Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+	])
+}
+
+task fullBuild {
+	group 'jdatools'
+	dependsOn 'clean'
+	dependsOn 'build'
+	tasks.findByName('build').mustRunAfter 'clean'
+}
+
+task fullPublishBuild {
+	group 'jdatools'
+    dependsOn 'clean'
+    dependsOn 'build'
+    dependsOn 'publish'
+    tasks.findByName('build').mustRunAfter 'clean'
+    tasks.findByName('publish').mustRunAfter 'build'
 }
 
 javadoc {
 	destinationDir = file("$buildDir/docs/")
 	source = sourceSets.main.allJava
-	classpath = configurations.runtimeClasspath
-	configureJavadoc(it)
+	classpath += configurations.compileClasspath
+}
+
+def majorJavaVersion = javaVersion.getMajorVersion()
+
+javadoc.options {
+	docTitle = windowTitle = archivesBaseName + ' | ' + projectVersion
+	encoding = 'UTF-8'
+	memberLevel = JavadocMemberLevel.PROTECTED
+	tags 'apiNote:a:API Note:', 'implSpec:a:Implementation Requirements:', 'implNote:a:Implementation Note:'
+	links = ["https://docs.oracle.com/javase/${majorJavaVersion}/docs/api/".toString()]
+}
+
+java {
+	withSourcesJar()
 }
 
 jar {
-	destinationDir = file("$buildDir/libs/")
-	configureJar(it)
+	archiveClassifier.set('lite')
+	archiveBaseName.set(project.archivesBaseName + '-Lite')
+	manifest(setMainManifestProps)
 }
 
 shadowJar {
-	destinationDir = file("$buildDir/libs/")
-	configureJar(it, 'all')
+	archiveClassifier.set('')
 }
 
-task sourceJar(type: Jar) {
-	group = 'build'
-	dependsOn classes
-	from sourceSets.main.allSource
-	destinationDir = file("$buildDir/libs/")
-	configureJar(it, 'sources')
-}
-
-task javadocJar(type: Jar) {
-    group = 'documentation'
+task javadocJar(type: Jar, dependsOn: javadoc) {
+	from javadoc.destinationDir
+	archiveBaseName.set(project.archivesBaseName + '-Javadocs')
+	classifier = 'javadoc'
 }
 
 build {
+	dependsOn { clean }
 	dependsOn { javadocJar }
-	dependsOn { sourceJar }
 	dependsOn { shadowJar }
 }
 
 artifacts {
+	archives jar
+	archives sourcesJar
 	archives javadocJar
-	archives sourceJar
 	archives shadowJar
 }
 
-apply from: 'deploy.gradle'
+apply from: 'gradle/secrets.gradle'
+loadSecrets()
 
-class Version {
-	String major, minor, revision
+publishing {
+	publications {
+		jdaTools(MavenPublication) {
+			groupId = project.group
+			version = project.version
+			artifactId = 'jdatools'
+		
+			artifact jar
+			artifact sourcesJar
+			artifact javadocJar
+			artifact shadowJar
+			
+			pom {
+				name = 			project.ARTIFACT_ID
+				packaging = 	project.PACKAGING
+				description = 	project.DESCRIPTION
+				inceptionYear = project.INCEPTION_YEAR
+				url = 			project.URL
+	
+				licenses {
+					license {
+						name = 			project.LICENSE_NAME
+						url = 			project.LICENSE_URL
+						distribution = 	project.LICENSE_DIST
+					}
+				}
+				
+				scm {
+					url = 					project.SCM_URL
+					connection = 			project.SCM_CONNECTION
+					developerConnection = 	project.SCM_DEV_CONNECTION
+				}
+	
+				issueManagement {
+					system = 	project.ISSUE_SYSTEM
+					url = 		project.ISSUE_URL
+				}
+	
+				developers {
+					developer {				
+						id = 		project.DEVELOPER_ID
+						name = 		project.DEVELOPER_NAME
+						email = 	project.DEVELOPER_EMAIL
+					}
+				}
+			}
+		}
+	}
 
-	String toString() {
-		"${major}.${minor}.${revision}"
+	repositories {
+		maven {
+			def releasesRepoUrl = "https://maven.readonlydev.com/release"
+			def snapshotsRepoUrl = "https://maven.readonlydev.com/snapshot"
+			url = project.version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+			credentials {
+				username = project.ext.username
+				password = project.ext.password
+			}
+			authentication {
+				basic(BasicAuthentication)
+			}
+		}
 	}
 }
