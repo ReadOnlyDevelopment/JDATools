@@ -95,7 +95,7 @@ public interface OAuth2Client {
 	 * of when the session is provided.
 	 * <p>
 	 * Note that this can only be performed for Sessions who have the necessary
-	 * {@link io.github.romvoid95.oauth2.Scope#GUILDS 'guilds'} scope. <br>
+	 * {@link com.readonlydev.oauth2.Scope#GUILDS 'guilds'} scope. <br>
 	 * Trying to call this using a Session without the scope will cause a
 	 * {@link com.readonlydev.oauth2.exceptions.MissingScopeException
 	 * MissingScopeException} to be thrown.
