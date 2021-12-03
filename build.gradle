@@ -202,17 +202,22 @@ publishing {
 	}
 
 	repositories {
-		maven {
-			def releasesRepoUrl = "https://maven.readonlydev.com/release"
-			def snapshotsRepoUrl = "https://maven.readonlydev.com/snapshot"
-			url = project.version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-			credentials {
-				username = project.ext.username
-				password = project.ext.password
+		if(project.ext.username != 'PLACEHOLDER') {
+			maven {
+				def releasesRepoUrl = "https://maven.readonlydev.com/release"
+				def snapshotsRepoUrl = "https://maven.readonlydev.com/snapshot"
+				url = project.version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+				credentials {
+					username = project.ext.username
+					password = project.ext.password
+				}
+				authentication {
+					basic(BasicAuthentication)
+				}
 			}
-			authentication {
-				basic(BasicAuthentication)
-			}
+		} else {
+			mavenLocal()
 		}
+		
 	}
 }
