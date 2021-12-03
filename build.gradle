@@ -108,11 +108,12 @@ javadoc {
 def majorJavaVersion = javaVersion.getMajorVersion()
 
 javadoc.options {
+	addStringOption('Xdoclint:none', '-quiet')
 	docTitle = windowTitle = archivesBaseName + ' | ' + projectVersion
 	encoding = 'UTF-8'
 	memberLevel = JavadocMemberLevel.PROTECTED
 	tags 'apiNote:a:API Note:', 'implSpec:a:Implementation Requirements:', 'implNote:a:Implementation Note:'
-	links = ["https://docs.oracle.com/javase/${majorJavaVersion}/docs/api/".toString()]
+	links = ["https://docs.oracle.com/en/java/javase/${majorJavaVersion}/docs/api".toString()]
 }
 
 java {
@@ -164,36 +165,36 @@ publishing {
 			artifact shadowJar
 			
 			pom {
-				name = 			"{$ARTIFACT_ID}"
-				packaging = 	"{$PACKAGING}"
-				description = 	"{$DESCRIPTION}"
-				inceptionYear = "{$INCEPTION_YEAR}"
-				url = 			"{$URL}"
+				name = 			'jdatools'
+				packaging = 	'jar'
+				description = 	'JDA Utility'
+				inceptionYear = '2021'
+				url = 			'https://github.com/ReadOnlyDevelopment/JDATools'
 	
 				licenses {
 					license {
-						name = 			"{$LICENSE_NAME}"
-						url = 			"{$LICENSE_URL}"
-						distribution = 	"{$LICENSE_DIST}"
+						name = 			'MIT'
+						url = 			'https://github.com/ReadOnlyDevelopment/JDATools/master/LICENSE'
+						distribution = 	'repo'
 					}
 				}
 				
 				scm {
-					url = 					"{$SCM_URL}"
-					connection = 			"{$SCM_CONNECTION}"
-					developerConnection = 	"{$SCM_DEV_CONNECTION}"
+					url = 					'https://github.com/ReadOnlyDevelopment/JDATools'
+					connection = 			'scm:git:git://github.com/ReadOnlyDevelopment/JDATools.git'
+					developerConnection = 	'scm:git:git@github.com:ReadOnlyDevelopment/JDATools.git'
 				}
 	
 				issueManagement {
-					system = 	"{$ISSUE_SYSTEM}"
-					url = 		"{$ISSUE_URL}"
+					system = 	'github'
+					url = 		'https://github.com/ReadOnlyDevelopment/JDATools/issues'
 				}
 	
 				developers {
 					developer {				
-						id = 		"{$DEVELOPER_ID}"
-						name = 		"{$DEVELOPER_NAME}"
-						email = 	"{$DEVELOPER_EMAIL}"
+						id = 		'romvoid95'
+						name = 		'ROM'
+						email = 	'romvoid95@readonlydev.com'
 					}
 				}
 			}

@@ -16,7 +16,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 
 /**
- * A frame for wrapping an {@link io.github.romvoid95.waiter.EventWaiter
+ * A frame for wrapping an {@link com.readonlydev.common.waiter.EventWaiter
  * EventWaiter} into a "action, reaction" menu that waits on forms of user input
  * such as reactions, or key-phrases.
  * <p>
@@ -35,7 +35,7 @@ import net.dv8tion.jda.api.entities.User;
  * improved by the implementation of a companion builder may be helpful (see the
  * documentation on {@link Menu.Builder Menu.Builder} for more info).
  *
- * @see io.github.romvoid95.waiter.EventWaiter
+ * @see com.readonlydev.common.waiter.EventWaiter
  * @see Menu.Builder
  *
  * @implNote While the standard JDATools implementations of this and Menu
@@ -188,7 +188,7 @@ public abstract class Menu {
 		public abstract V build();
 
 		/**
-		 * Sets the {@link io.github.romvoid95.waiter.EventWaiter EventWaiter} that will
+		 * Sets the {@link com.readonlydev.common.waiter.EventWaiter EventWaiter} that will
 		 * do {@link com.readonlydev.menu.Menu Menu} operations.
 		 * <p>
 		 * <b>NOTE:</b> All Menus will only work with an EventWaiter set! <br>
