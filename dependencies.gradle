@@ -7,20 +7,15 @@ repositories {
 }
 
 ext {
-	jdaVersion = '4.3.0_+'
+	jdaVersion = '[5.0,)'
 	slf4jVersion = '1.7.25'
-	okhttpVersion = '3.13.0'
-	findbugsVersion = '3.0.2'
-	guavaVersion = '30.1-jre'
 	jsonVersion = '20160810'
-	
+	lang3Version = '3.12.0'
 
 	dependencies {
-		jda = { [group: 'net.dv8tion', name: 'JDA', version: jdaVersion] }
+		jda = { [group: 'net.dv8tion', name: 'JDA', version: jdaVersion, transitive: true] }
+		lang3 = { [group: 'org.apache.commons', name: 'commons-lang3', version: lang3Version ] }
 		slf4j = { [group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion] }
-		okhttp = { [group: 'com.squareup.okhttp3', name: 'okhttp', version: okhttpVersion] }
-		findbugs = { [group: 'com.google.code.findbugs', name: 'jsr305', version: findbugsVersion] }
-		guava = { [group: 'com.google.guava', name: 'guava', version: guavaVersion] }
 		json = { [group: 'org.json', name: 'json', version: jsonVersion] }
 	}
 }
