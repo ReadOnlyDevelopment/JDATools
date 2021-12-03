@@ -838,7 +838,7 @@ public abstract class Command {
 		 * </ul>
 		 * <p>
 		 * <b>NOTE:</b> This will automatically default back to
-		 * {@link io.github.romvoid95.command.Command.CooldownScope#CHANNEL
+		 * {@link com.readonlydev.cmd.Command.CooldownScope#CHANNEL
 		 * CooldownScope.CHANNEL} when called in a private channel. This is done in
 		 * order to prevent internal {@link java.lang.NullPointerException
 		 * NullPointerException}s from being thrown while generating cooldown keys!
@@ -856,7 +856,7 @@ public abstract class Command {
 		 * </ul>
 		 * <p>
 		 * <b>NOTE:</b> This will automatically default back to
-		 * {@link io.github.romvoid95.command.Command.CooldownScope#CHANNEL
+		 * {@link com.readonlydev.cmd.Command.CooldownScope#CHANNEL
 		 * CooldownScope.CHANNEL} when called in a private channel. This is done in
 		 * order to prevent internal {@link java.lang.NullPointerException
 		 * NullPointerException}s from being thrown while generating cooldown keys!
@@ -872,7 +872,7 @@ public abstract class Command {
 		 * </ul>
 		 * <p>
 		 * <b>NOTE:</b> This will automatically default back to
-		 * {@link io.github.romvoid95.command.Command.CooldownScope#GLOBAL
+		 * {@link com.readonlydev.cmd.Command.CooldownScope#GLOBAL
 		 * CooldownScope.GLOBAL} when {@link net.dv8tion.jda.api.JDA#getShardInfo()
 		 * JDA#getShardInfo()} returns {@code null}. This is done in order to prevent
 		 * internal {@link java.lang.NullPointerException NullPointerException}s from
@@ -890,7 +890,7 @@ public abstract class Command {
 		 * </ul>
 		 * <p>
 		 * <b>NOTE:</b> This will automatically default back to
-		 * {@link io.github.romvoid95.command.Command.CooldownScope#USER
+		 * {@link com.readonlydev.cmd.Command.CooldownScope#USER
 		 * CooldownScope.USER} when {@link net.dv8tion.jda.api.JDA#getShardInfo()
 		 * JDA#getShardInfo()} returns {@code null}. This is done in order to prevent
 		 * internal {@link java.lang.NullPointerException NullPointerException}s from
