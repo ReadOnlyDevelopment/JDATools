@@ -164,36 +164,36 @@ publishing {
 			artifact shadowJar
 			
 			pom {
-				name = 			project.ARTIFACT_ID
-				packaging = 	project.PACKAGING
-				description = 	project.DESCRIPTION
-				inceptionYear = project.INCEPTION_YEAR
-				url = 			project.URL
+				name = 			"{$ARTIFACT_ID}"
+				packaging = 	"{$PACKAGING}"
+				description = 	"{$DESCRIPTION}"
+				inceptionYear = "{$INCEPTION_YEAR}"
+				url = 			"{$URL}"
 	
 				licenses {
 					license {
-						name = 			project.LICENSE_NAME
-						url = 			project.LICENSE_URL
-						distribution = 	project.LICENSE_DIST
+						name = 			"{$LICENSE_NAME}"
+						url = 			"{$LICENSE_URL}"
+						distribution = 	"{$LICENSE_DIST}"
 					}
 				}
 				
 				scm {
-					url = 					project.SCM_URL
-					connection = 			project.SCM_CONNECTION
-					developerConnection = 	project.SCM_DEV_CONNECTION
+					url = 					"{$SCM_URL}"
+					connection = 			"{$SCM_CONNECTION}"
+					developerConnection = 	"{$SCM_DEV_CONNECTION}"
 				}
 	
 				issueManagement {
-					system = 	project.ISSUE_SYSTEM
-					url = 		project.ISSUE_URL
+					system = 	"{$ISSUE_SYSTEM}"
+					url = 		"{$ISSUE_URL}"
 				}
 	
 				developers {
 					developer {				
-						id = 		project.DEVELOPER_ID
-						name = 		project.DEVELOPER_NAME
-						email = 	project.DEVELOPER_EMAIL
+						id = 		"{$DEVELOPER_ID}"
+						name = 		"{$DEVELOPER_NAME}"
+						email = 	"{$DEVELOPER_EMAIL}"
 					}
 				}
 			}
