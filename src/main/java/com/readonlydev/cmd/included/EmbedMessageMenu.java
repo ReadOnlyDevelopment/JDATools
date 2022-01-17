@@ -9,7 +9,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-import com.readonlydev.cmd.CommandEvent;
 import com.readonlydev.common.waiter.EventWaiter;
 import com.readonlydev.menu.Menu;
 
@@ -42,15 +41,6 @@ class EmbedMessageMenu extends Menu {
 	private Guild currentGuild;
 	private MessageEmbed currentEmbed;
 
-	/**
-	 * @param waiter
-	 * @param event
-	 * @param text
-	 * @param finalAction
-	 * @param guildMap
-	 * @param botInstance
-	 * @return
-	 */
 	protected EmbedMessageMenu(EventWaiter waiter, Set<User> users, Set<Role> roles, long timeout, TimeUnit unit,
 			BiFunction<Integer, Integer, String> text, Consumer<Message> finalAction, Map<MessageEmbed, Guild> guildMap,
 			JDA botInstance) {
@@ -192,19 +182,11 @@ class EmbedMessageMenu extends Menu {
 		return mbuilder.build();
 	}
 
-	/**
-	 * The {@link com.jagrosh.jdautilities.menu.Menu.Builder Menu.Builder} for a
-	 * {@link com.jagrosh.jdautilities.menu.EmbedPaginator EmbedPaginator}.
-	 *
-	 * @author Andre_601
-	 */
 	public static class Builder extends Menu.Builder<Builder, EmbedMessageMenu> {
 
 		private BiFunction<Integer, Integer, String> text = (page, pages) -> null;
 		private Consumer<Message> finalAction = m -> m.delete().queue();
 		private JDA botInstance = null;
-
-		private CommandEvent commandEvent = null;
 
 		private Map<MessageEmbed, Guild> guildMap = new LinkedHashMap<>();
 
@@ -217,11 +199,6 @@ class EmbedMessageMenu extends Menu {
 			return new EmbedMessageMenu(waiter, users, roles, timeout, unit, text, finalAction, guildMap, botInstance);
 		}
 
-		public Builder setCommandEvent(CommandEvent event) {
-			this.commandEvent = event;
-			return this;
-		}
-
 		public Builder setJda(JDA botInstance) {
 			this.botInstance = botInstance;
 			return this;
@@ -229,7 +206,7 @@ class EmbedMessageMenu extends Menu {
 
 		/**
 		 * Sets the text of the {@link net.dv8tion.jda.api.entities.Message Message} to
-		 * be displayed when the {@link com.jagrosh.jdautilities.menu.EmbedPaginator
+		 * be displayed when the {@link com.readonlydev.menu.EmbedPaginator
 		 * EmbedPaginator} is built.
 		 *
 		 * @param text The Message content to be displayed above the embed when the
@@ -263,7 +240,7 @@ class EmbedMessageMenu extends Menu {
 
 		/**
 		 * Sets the {@link java.util.function.Consumer Consumer} to perform if the
-		 * {@link com.jagrosh.jdautilities.menu.EmbedPaginator EmbedPaginator} times
+		 * {@link com.readonlydev.menu.EmbedPaginator EmbedPaginator} times
 		 * out.
 		 *
 		 * @param finalAction The Consumer action to perform if the EmbedPaginator times

@@ -5,11 +5,12 @@ plugins {
 	id("eclipse")
 	id("java-library")
 	id("maven-publish")
+	id("signing")
 	id "com.github.ben-manes.versions" version "0.39.0"
 	id "com.github.johnrengelman.shadow" version "7.0.0"
 }
 
-version = "2.0.0"
+version = "2.0.1"
 group = 'com.readonlydev'
 archivesBaseName = 'JDATools'
 
@@ -32,10 +33,10 @@ repositories {
 }
 
 dependencies {
-	implementation 	jda()
-	implementation 	slf4j()
-	implementation 	lang3()
-	implementation 	json()
+	implementation jda()
+	implementation slf4j()
+	implementation lang3()
+	implementation json()
 	compileOnly 'org.projectlombok:lombok:1.18.22'
 	annotationProcessor 'org.projectlombok:lombok:1.18.22'
 	
@@ -116,24 +117,23 @@ javadoc.options {
 	links = ["https://docs.oracle.com/en/java/javase/${majorJavaVersion}/docs/api".toString()]
 }
 
-java {
-	withSourcesJar()
-}
-
 jar {
 	archiveClassifier.set('lite')
-	archiveBaseName.set(project.archivesBaseName + '-Lite')
 	manifest(setMainManifestProps)
 }
 
 shadowJar {
-	archiveClassifier.set('')
+  	classifier = ''
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-	from javadoc.destinationDir
-	archiveBaseName.set(project.archivesBaseName + '-Javadocs')
 	classifier = 'javadoc'
+	from javadoc.destinationDir
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
 }
 
 build {
@@ -149,75 +149,90 @@ artifacts {
 	archives shadowJar
 }
 
-apply from: 'gradle/secrets.gradle'
-loadSecrets()
+signing {
+    sign configurations.archives
+}
 
 publishing {
 	publications {
-		jdaTools(MavenPublication) {
+		mavenJava(MavenPublication) {
+			customizePom(pom)
+		
 			groupId = project.group
 			version = project.version
 			artifactId = 'jdatools'
-		
+			
 			artifact jar
 			artifact sourcesJar
 			artifact javadocJar
 			artifact shadowJar
-			
-			pom {
-				name = 			'jdatools'
-				packaging = 	'jar'
-				description = 	'JDA Utility'
-				inceptionYear = '2021'
-				url = 			'https://github.com/ReadOnlyDevelopment/JDATools'
-	
-				licenses {
-					license {
-						name = 			'MIT'
-						url = 			'https://github.com/ReadOnlyDevelopment/JDATools/master/LICENSE'
-						distribution = 	'repo'
-					}
-				}
-				
-				scm {
-					url = 					'https://github.com/ReadOnlyDevelopment/JDATools'
-					connection = 			'scm:git:git://github.com/ReadOnlyDevelopment/JDATools.git'
-					developerConnection = 	'scm:git:git@github.com:ReadOnlyDevelopment/JDATools.git'
-				}
-	
-				issueManagement {
-					system = 	'github'
-					url = 		'https://github.com/ReadOnlyDevelopment/JDATools/issues'
-				}
-	
-				developers {
-					developer {				
-						id = 		'romvoid95'
-						name = 		'ROM'
-						email = 	'romvoid95@readonlydev.com'
-					}
-				}
-			}
+
 		}
 	}
 
 	repositories {
-		if(project.ext.username != 'PLACEHOLDER') {
-			maven {
-				def releasesRepoUrl = "https://maven.readonlydev.com/release"
-				def snapshotsRepoUrl = "https://maven.readonlydev.com/snapshot"
-				url = project.version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-				credentials {
-					username = project.ext.username
-					password = project.ext.password
-				}
-				authentication {
-					basic(BasicAuthentication)
-				}
+		maven {
+			def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+			def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+			url = project.version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+			credentials {
+				username = ossrhUsername
+				password = ossrhPassword
 			}
-		} else {
-			mavenLocal()
 		}
-		
 	}
+	
+	signing {
+    	publishing.publications.each {
+    	    sign it
+    	}
+    }
+}
+
+def customizePom(pom) {
+    pom.withXml {
+        def root = asNode()
+
+        // eliminate test-scoped dependencies (no need in maven central POMs)
+        root.dependencies.removeAll { dep ->
+            dep.scope == "test"
+        }
+
+        root.children().last() + {
+            resolveStrategy = Closure.DELEGATE_FIRST
+
+            description 'JDA Utility Library'
+            name 'JDATools'
+            url 'https://github.com/ReadOnlyDevelopment/JDATools'
+            issueManagement {
+                system 'GitHub'
+                url 'https://github.com/ReadOnlyDevelopment/JDATools/issues'
+            }
+            licenses {
+                license {
+					name 'MIT'
+					url 'https://github.com/ReadOnlyDevelopment/JDATools/master/LICENSE'
+					distribution 'repo'
+                }
+            }
+            scm {
+				url 'https://github.com/ReadOnlyDevelopment/JDATools'
+				connection 'scm:git:git://github.com/ReadOnlyDevelopment/JDATools.git'
+				developerConnection 'scm:git:git@github.com:ReadOnlyDevelopment/JDATools.git'
+            }
+            developers {
+                developer {
+                    name 'ROMVoid95'
+                    id 'romvoid95'
+					email 'romvoid95@readonlydev.com'
+                }
+            }
+        }
+    }
+}
+
+model {
+    tasks.generatePomFileForMavenJavaPublication {
+        destination = file("$buildDir/generated-pom.xml")
+    }
 }

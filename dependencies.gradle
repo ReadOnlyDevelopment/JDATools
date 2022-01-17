@@ -7,7 +7,7 @@ repositories {
 }
 
 ext {
-	jdaVersion = '[4.3,)'
+	jdaVersion = '[5.0,)'
 	slf4jVersion = '1.7.25'
 	jsonVersion = '20160810'
 	lang3Version = '3.12.0'
