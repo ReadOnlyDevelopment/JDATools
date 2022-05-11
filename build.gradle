@@ -1,16 +1,16 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.apache.tools.ant.filters.ReplaceTokens
+import com.vanniktech.maven.publish.SonatypeHost
 
 plugins {
-	id("eclipse")
-	id("java-library")
-	id("maven-publish")
-	id("signing")
-	id "com.github.ben-manes.versions" version "0.39.0"
-	id "com.github.johnrengelman.shadow" version "7.0.0"
+    id 'eclipse'
+    id 'java-library'
+    id "com.vanniktech.maven.publish" version "0.19.0"
+    id "com.github.ben-manes.versions" version "0.42.0"
+    id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
-version = "2.0.1"
+version = "2.1.4"
 group = 'com.readonlydev'
 archivesBaseName = 'JDATools'
 
@@ -19,220 +19,123 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 def javaVersion = JavaVersion.VERSION_17
 
 sourceSets {
-	test {
-		java.srcDirs += 'src/test/java'
-		compileClasspath += main.compileClasspath
-		runtimeClasspath += main.runtimeClasspath
-	}
+    test {
+        java.srcDirs += 'src/test/java'
+        compileClasspath += main.compileClasspath
+        runtimeClasspath += main.runtimeClasspath
+    }
 }
 
 apply from: 'dependencies.gradle'
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation jda()
-	implementation slf4j()
-	implementation lang3()
-	implementation json()
-	compileOnly 'org.projectlombok:lombok:1.18.22'
-	annotationProcessor 'org.projectlombok:lombok:1.18.22'
-	
-	testCompileOnly 'org.projectlombok:lombok:1.18.22'
-	testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
+    implementation jda()
+    implementation log4j()
+    implementation lang3()
+    implementation json()
+    implementation reflections()
+    compileOnly 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
+
+    testCompileOnly 'org.projectlombok:lombok:1.18.24'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
 }
 
 def projectVersion = version.toString()
 if(projectVersion.endsWith("SNAPSHOT")) {
-	projectVersion = projectVersion.replace("-", ".")
+    projectVersion = projectVersion.replace("-", ".")
 }
 def splitVerison = projectVersion.tokenize(".")
 
 task sourcesForRelease(type: Copy) {
-	from('src/main/java') {
-		filter(ReplaceTokens, tokens: [
-			MAJOR:		splitVerison.get(0),
-			MINOR:    	splitVerison.get(1),
-			PATCH:		splitVerison.get(2)
-		])
-	}
-	into 'build/filteredSrc'
+    from('src/main/java') {
+        filter(ReplaceTokens, tokens: [
+            MAJOR:	splitVerison.get(0),
+            MINOR:    	splitVerison.get(1),
+            PATCH:      splitVerison.get(2)
+        ])
+    }
+    into 'build/filteredSrc'
 }
 
-compileJava {
-	source = sourcesForRelease.destinationDir
-	classpath = sourceSets.main.compileClasspath
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+    source = sourcesForRelease.destinationDir
+    classpath = sourceSets.main.compileClasspath
 
-	dependsOn sourcesForRelease
+    dependsOn sourcesForRelease
 }
 
 configurations {
-	implementation {
-		description = 'implementation'
-		transitive = true
-	}
+    implementation {
+        description = 'implementation'
+        transitive = true
+    }
 }
 
 def setMainManifestProps = { Manifest manifest->
-	manifest.mainAttributes ([
-		'Implementation-Title':     archivesBaseName,
-		'Implementation-Version':   version,
-		'Implementation-Vendor':    'ReadOnly Development',
-		'Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-	])
+    manifest.mainAttributes ([
+        'Implementation-Title':     archivesBaseName,
+        'Implementation-Version':   version,
+        'Implementation-Vendor':    'ReadOnly Development',
+        'Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+    ])
 }
 
 task fullBuild {
-	group 'jdatools'
-	dependsOn 'clean'
-	dependsOn 'build'
-	tasks.findByName('build').mustRunAfter 'clean'
-}
-
-task fullPublishBuild {
-	group 'jdatools'
+    group 'jdatools'
     dependsOn 'clean'
     dependsOn 'build'
-    dependsOn 'publish'
     tasks.findByName('build').mustRunAfter 'clean'
-    tasks.findByName('publish').mustRunAfter 'build'
-}
-
-javadoc {
-	destinationDir = file("$buildDir/docs/")
-	source = sourceSets.main.allJava
-	classpath += configurations.compileClasspath
 }
 
 def majorJavaVersion = javaVersion.getMajorVersion()
 
-javadoc.options {
-	addStringOption('Xdoclint:none', '-quiet')
-	docTitle = windowTitle = archivesBaseName + ' | ' + projectVersion
-	encoding = 'UTF-8'
-	memberLevel = JavadocMemberLevel.PROTECTED
-	tags 'apiNote:a:API Note:', 'implSpec:a:Implementation Requirements:', 'implNote:a:Implementation Note:'
-	links = ["https://docs.oracle.com/en/java/javase/${majorJavaVersion}/docs/api".toString()]
+javadoc {
+    options.addBooleanOption('html5', true)
+    options.addStringOption('Xdoclint:none', '-quiet')
+    options.setWindowTitle(archivesBaseName + ' | ' + projectVersion)
+    options.setDocTitle(archivesBaseName + ' | ' + projectVersion)
+    options.setEncoding('UTF-8')
+    options.setMemberLevel(JavadocMemberLevel.PROTECTED)
+    options.tags 'apiNote:a:API Note:', 'implSpec:a:Implementation Requirements:', 'implNote:a:Implementation Note:'
+    options.links = [
+        "https://docs.oracle.com/en/java/javase/${majorJavaVersion}/docs/api".toString()
+    ]
+
+    destinationDir = file("$buildDir/docs/")
+    source = sourceSets.main.allJava
+    classpath += configurations.compileClasspath
 }
 
 jar {
-	archiveClassifier.set('lite')
-	manifest(setMainManifestProps)
+    archiveClassifier.set('lite')
+    manifest(setMainManifestProps)
 }
 
 shadowJar {
-  	classifier = ''
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-	classifier = 'javadoc'
-	from javadoc.destinationDir
-}
-
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
+    classifier = ''
 }
 
 build {
-	dependsOn { clean }
-	dependsOn { javadocJar }
-	dependsOn { shadowJar }
+    dependsOn { clean }
+    dependsOn { javadocJar }
+    dependsOn { shadowJar }
 }
 
-artifacts {
-	archives jar
-	archives sourcesJar
-	archives javadocJar
-	archives shadowJar
+mavenPublishing {
+    publishToMavenCentral(SonatypeHost.S01)
+    signAllPublications()
+    pomFromGradleProperties()
 }
 
-signing {
-    sign configurations.archives
-}
-
-publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			customizePom(pom)
-		
-			groupId = project.group
-			version = project.version
-			artifactId = 'jdatools'
-			
-			artifact jar
-			artifact sourcesJar
-			artifact javadocJar
-			artifact shadowJar
-
-		}
-	}
-
-	repositories {
-		maven {
-			def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-			def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-			url = project.version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-			credentials {
-				username = ossrhUsername
-				password = ossrhPassword
-			}
-		}
-	}
-	
-	signing {
-    	publishing.publications.each {
-    	    sign it
-    	}
-    }
-}
-
-def customizePom(pom) {
-    pom.withXml {
-        def root = asNode()
-
-        // eliminate test-scoped dependencies (no need in maven central POMs)
-        root.dependencies.removeAll { dep ->
-            dep.scope == "test"
-        }
-
-        root.children().last() + {
-            resolveStrategy = Closure.DELEGATE_FIRST
-
-            description 'JDA Utility Library'
-            name 'JDATools'
-            url 'https://github.com/ReadOnlyDevelopment/JDATools'
-            issueManagement {
-                system 'GitHub'
-                url 'https://github.com/ReadOnlyDevelopment/JDATools/issues'
-            }
-            licenses {
-                license {
-					name 'MIT'
-					url 'https://github.com/ReadOnlyDevelopment/JDATools/master/LICENSE'
-					distribution 'repo'
-                }
-            }
-            scm {
-				url 'https://github.com/ReadOnlyDevelopment/JDATools'
-				connection 'scm:git:git://github.com/ReadOnlyDevelopment/JDATools.git'
-				developerConnection 'scm:git:git@github.com:ReadOnlyDevelopment/JDATools.git'
-            }
-            developers {
-                developer {
-                    name 'ROMVoid95'
-                    id 'romvoid95'
-					email 'romvoid95@readonlydev.com'
-                }
-            }
-        }
-    }
-}
-
-model {
-    tasks.generatePomFileForMavenJavaPublication {
-        destination = file("$buildDir/generated-pom.xml")
-    }
+task fullRelease {
+    group 'jdatools'
+    dependsOn 'publish'
+    dependsOn 'closeAndReleaseRepository'
+    tasks.findByName('closeAndReleaseRepository').mustRunAfter 'publish'
 }

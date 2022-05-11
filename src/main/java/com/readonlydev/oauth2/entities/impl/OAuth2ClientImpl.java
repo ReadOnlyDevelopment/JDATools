@@ -37,10 +37,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-/**
- *
- *
- */
 public class OAuth2ClientImpl implements OAuth2Client {
 	private final long clientId;
 	private final String clientSecret;
@@ -91,9 +87,9 @@ public class OAuth2ClientImpl implements OAuth2Client {
 
 			@Override
 			protected RequestBody getBody() {
-				return RequestBody.create(MediaType.parse("application/x-www-form-urlencoded"),
-						oAuth2URL.compileQueryParams(clientId, EncodingUtil.encodeUTF8(redirectUri), code, clientSecret,
-								Scope.join(true, scopes)));
+				return RequestBody.create(oAuth2URL.compileQueryParams(clientId, EncodingUtil.encodeUTF8(redirectUri),
+						code, clientSecret, Scope.join(true, scopes)),
+						MediaType.parse("application/x-www-form-urlencoded"));
 			}
 
 			@Override

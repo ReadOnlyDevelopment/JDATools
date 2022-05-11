@@ -21,8 +21,8 @@ import java.util.List;
  * Discord API.
  * <p>
  * OAuth2Client's are made using a
- * {@link com.readonlydev.oauth2.OAuth2Client.Builder OAuth2Client.Builder},
- * and sessions can be appended using
+ * {@link com.readonlydev.oauth2.OAuth2Client.Builder OAuth2Client.Builder}, and
+ * sessions can be appended using
  * {@link OAuth2Client#startSession(String, String, String, Scope...)}.
  */
 public interface OAuth2Client {
@@ -36,7 +36,7 @@ public interface OAuth2Client {
 	 * fragment and {@link com.readonlydev.oauth2.Scope Scopes}.
 	 *
 	 * @param redirectUri The redirect URI.
-	 * @param scopes The provided scopes.
+	 * @param scopes      The provided scopes.
 	 *
 	 * @return The generated authorization URL.
 	 */
@@ -55,32 +55,33 @@ public interface OAuth2Client {
 	 * {@link InvalidStateException InvalidStateException} to signify it has been
 	 * consumed.
 	 *
-	 * @param code The code for the Session to start.
-	 * @param state The state for the Session to start.
+	 * @param code       The code for the Session to start.
+	 * @param state      The state for the Session to start.
 	 * @param identifier The identifier for the Session to start.
-	 * @param scopes The provided scopes.
+	 * @param scopes     The provided scopes.
 	 *
-	 * @return A {@link com.readonlydev.oauth2.requests.OAuth2Action
-	 * OAuth2Action} for the Session to start.
+	 * @return A {@link com.readonlydev.oauth2.requests.OAuth2Action OAuth2Action}
+	 *         for the Session to start.
 	 *
 	 * @throws InvalidStateException If the state, when consumed by this client's
-	 * StateController, results in a {@code null}
-	 * redirect URI.
+	 *                               StateController, results in a {@code null}
+	 *                               redirect URI.
 	 */
 	@CheckReturnValue
-	OAuth2Action<Session> startSession(String code, String state, String identifier, Scope... scopes) throws InvalidStateException;
+	OAuth2Action<Session> startSession(String code, String state, String identifier, Scope... scopes)
+			throws InvalidStateException;
 
 	/**
-	 * Requests a {@link com.readonlydev.oauth2.entities.OAuth2User OAuth2User}
-	 * from the {@link com.readonlydev.oauth2.session.Session Session}.
+	 * Requests a {@link com.readonlydev.oauth2.entities.OAuth2User OAuth2User} from
+	 * the {@link com.readonlydev.oauth2.session.Session Session}.
 	 * <p>
 	 * All Sessions should handle an individual Discord User, and as such this
 	 * method retrieves data on that User when the session is provided.
 	 *
 	 * @param session The Session to get a OAuth2User for.
 	 *
-	 * @return A {@link com.readonlydev.oauth2.requests.OAuth2Action
-	 * OAuth2Action} for the OAuth2User to be retrieved.
+	 * @return A {@link com.readonlydev.oauth2.requests.OAuth2Action OAuth2Action}
+	 *         for the OAuth2User to be retrieved.
 	 */
 	@CheckReturnValue
 	OAuth2Action<OAuth2User> getUser(Session session);
@@ -102,16 +103,15 @@ public interface OAuth2Client {
 	 *
 	 * @param session The Session to get OAuth2Guilds for.
 	 *
-	 * @return A {@link com.readonlydev.oauth2.requests.OAuth2Action
-	 * OAuth2Action} for the OAuth2Guilds to be retrieved.
+	 * @return A {@link com.readonlydev.oauth2.requests.OAuth2Action OAuth2Action}
+	 *         for the OAuth2Guilds to be retrieved.
 	 *
 	 * @throws com.readonlydev.oauth2.exceptions.MissingScopeException If the
-	 * provided
-	 * Session
-	 * does not
-	 * have the
-	 * 'guilds'
-	 * scope.
+	 *                                                                 provided
+	 *                                                                 Session does
+	 *                                                                 not have the
+	 *                                                                 'guilds'
+	 *                                                                 scope.
 	 */
 	@CheckReturnValue
 	OAuth2Action<List<OAuth2Guild>> getGuilds(Session session);
@@ -166,12 +166,12 @@ public interface OAuth2Client {
 		 * @return The OAuth2Client instance build.
 		 *
 		 * @throws java.lang.IllegalArgumentException If either:
-		 * <ul>
-		 * <li>The Client ID is not
-		 * valid.</li>
-		 * <li>The Client Secret is
-		 * empty.</li>
-		 * </ul>
+		 *                                            <ul>
+		 *                                            <li>The Client ID is not
+		 *                                            valid.</li>
+		 *                                            <li>The Client Secret is
+		 *                                            empty.</li>
+		 *                                            </ul>
 		 */
 		public OAuth2Client build() {
 			Checks.check(clientId >= 0, "Client ID is invalid!");
@@ -205,8 +205,7 @@ public interface OAuth2Client {
 
 		/**
 		 * Sets the OAuth2Client's
-		 * {@link com.readonlydev.oauth2.session.SessionController
-		 * SessionController}.
+		 * {@link com.readonlydev.oauth2.session.SessionController SessionController}.
 		 *
 		 * @param sessionController The OAuth2Client's SessionController.
 		 *
@@ -218,8 +217,8 @@ public interface OAuth2Client {
 		}
 
 		/**
-		 * Sets the OAuth2Client's
-		 * {@link com.readonlydev.oauth2.state.StateController StateController}.
+		 * Sets the OAuth2Client's {@link com.readonlydev.oauth2.state.StateController
+		 * StateController}.
 		 *
 		 * @param stateController The OAuth2Client's StateController.
 		 *

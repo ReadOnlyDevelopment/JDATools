@@ -10,8 +10,8 @@ import java.lang.annotation.*;
  * {@link java.lang.annotation.Repeatable @Repeatable} annotation and a
  * similarly named holder annotation for multiple occurrences. <br>
  * {@link com.readonlydev.doc.annotation.docstandard.Error @Error} and
- * {@link com.readonlydev.doc.annotation.docstandard.Errors @Errors} are an example of
- * such practice.
+ * {@link com.readonlydev.doc.annotation.docstandard.Errors @Errors} are an
+ * example of such practice.
  *
  * @see com.readonlydev.doc.annotation.docstandard.Error
  * @see com.readonlydev.doc.annotation.docstandard.Errors

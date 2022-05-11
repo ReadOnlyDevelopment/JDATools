@@ -53,7 +53,7 @@ public class OrderedMenu extends Menu {
 
 	public final static String[] LETTERS = new String[] { "\uD83C\uDDE6", "\uD83C\uDDE7", "\uD83C\uDDE8",
 			"\uD83C\uDDE9", "\uD83C\uDDEA", "\uD83C\uDDEB", "\uD83C\uDDEC", "\uD83C\uDDED", "\uD83C\uDDEE",
-	"\uD83C\uDDEF" };
+			"\uD83C\uDDEF" };
 
 	public final static String CANCEL = "\u274C";
 
@@ -80,19 +80,19 @@ public class OrderedMenu extends Menu {
 	 * @param channel The MessageChannel to send the new Message to
 	 *
 	 * @throws java.lang.IllegalArgumentException If <b>all</b> of the following are
-	 * violated simultaneously:
-	 * <ul>
-	 * <li>Being sent to a
-	 * {@link net.dv8tion.jda.api.entities.TextChannel
-	 * TextChannel}.</li>
-	 * <li>This OrderedMenu does not
-	 * allow typed input.</li>
-	 * <li>The bot doesn't have
-	 * {@link net.dv8tion.jda.api.Permission#MESSAGE_ADD_REACTION
-	 * Permission.MESSAGE_ADD_REACTION}
-	 * in the channel this menu is being
-	 * sent to.</li>
-	 * </ul>
+	 *                                            violated simultaneously:
+	 *                                            <ul>
+	 *                                            <li>Being sent to a
+	 *                                            {@link net.dv8tion.jda.api.entities.TextChannel
+	 *                                            TextChannel}.</li>
+	 *                                            <li>This OrderedMenu does not
+	 *                                            allow typed input.</li>
+	 *                                            <li>The bot doesn't have
+	 *                                            {@link net.dv8tion.jda.api.Permission#MESSAGE_ADD_REACTION
+	 *                                            Permission.MESSAGE_ADD_REACTION}
+	 *                                            in the channel this menu is being
+	 *                                            sent to.</li>
+	 *                                            </ul>
 	 */
 	@Override
 	public void display(MessageChannel channel) {
@@ -114,19 +114,19 @@ public class OrderedMenu extends Menu {
 	 * @param message The Message to display the Menu in
 	 *
 	 * @throws java.lang.IllegalArgumentException If <b>all</b> of the following are
-	 * violated simultaneously:
-	 * <ul>
-	 * <li>Being sent to a
-	 * {@link net.dv8tion.jda.api.entities.TextChannel
-	 * TextChannel}.</li>
-	 * <li>This OrderedMenu does not
-	 * allow typed input.</li>
-	 * <li>The bot doesn't have
-	 * {@link net.dv8tion.jda.api.Permission#MESSAGE_ADD_REACTION
-	 * Permission.MESSAGE_ADD_REACTION}
-	 * in the channel this menu is being
-	 * sent to.</li>
-	 * </ul>
+	 *                                            violated simultaneously:
+	 *                                            <ul>
+	 *                                            <li>Being sent to a
+	 *                                            {@link net.dv8tion.jda.api.entities.TextChannel
+	 *                                            TextChannel}.</li>
+	 *                                            <li>This OrderedMenu does not
+	 *                                            allow typed input.</li>
+	 *                                            <li>The bot doesn't have
+	 *                                            {@link net.dv8tion.jda.api.Permission#MESSAGE_ADD_REACTION
+	 *                                            Permission.MESSAGE_ADD_REACTION}
+	 *                                            in the channel this menu is being
+	 *                                            sent to.</li>
+	 *                                            </ul>
 	 */
 	@Override
 	public void display(Message message) {
@@ -357,20 +357,20 @@ public class OrderedMenu extends Menu {
 		 * @return The OrderedMenu built from this Builder.
 		 *
 		 * @throws java.lang.IllegalArgumentException If one of the following is
-		 * violated:
-		 * <ul>
-		 * <li>No
-		 * {@link com.readonlydev.common.waiter.EventWaiter
-		 * EventWaiter} was set.</li>
-		 * <li>No choices were set.</li>
-		 * <li>More than ten choices were
-		 * set.</li>
-		 * <li>No action
-		 * {@link java.util.function.Consumer
-		 * Consumer} was set.</li>
-		 * <li>Neither text nor description
-		 * were set.</li>
-		 * </ul>
+		 *                                            violated:
+		 *                                            <ul>
+		 *                                            <li>No
+		 *                                            {@link com.readonlydev.common.waiter.EventWaiter
+		 *                                            EventWaiter} was set.</li>
+		 *                                            <li>No choices were set.</li>
+		 *                                            <li>More than ten choices were
+		 *                                            set.</li>
+		 *                                            <li>No action
+		 *                                            {@link java.util.function.Consumer
+		 *                                            Consumer} was set.</li>
+		 *                                            <li>Neither text nor description
+		 *                                            were set.</li>
+		 *                                            </ul>
 		 */
 		@Override
 		public OrderedMenu build() {
@@ -426,7 +426,7 @@ public class OrderedMenu extends Menu {
 		 * reaction option.
 		 *
 		 * @param allow {@code true} if raw text input is allowed, {@code false} if it
-		 * is not
+		 *              is not
 		 *
 		 * @return This builder
 		 */
@@ -440,7 +440,7 @@ public class OrderedMenu extends Menu {
 		 * selected.
 		 *
 		 * @param use {@code true} if the cancel button should be shown, {@code false}
-		 * if it should not
+		 *            if it should not
 		 *
 		 * @return This builder
 		 */
@@ -451,13 +451,13 @@ public class OrderedMenu extends Menu {
 
 		/**
 		 * Sets the text of the {@link net.dv8tion.jda.api.entities.Message Message} to
-		 * be displayed when the {@link com.readonlydev.menu.OrderedMenu
-		 * OrderedMenu} is built.
+		 * be displayed when the {@link com.readonlydev.menu.OrderedMenu OrderedMenu} is
+		 * built.
 		 * <p>
 		 * This is displayed directly above the embed.
 		 *
 		 * @param text The Message content to be displayed above the embed when the
-		 * OrderedMenu is built
+		 *             OrderedMenu is built
 		 *
 		 * @return This builder
 		 */

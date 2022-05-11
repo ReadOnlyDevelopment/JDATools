@@ -25,9 +25,9 @@ import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.internal.utils.Checks;
 
 /**
- * A {@link com.readonlydev.menu.Menu Menu} implementation, nearly identical
- * to {@link com.readonlydev.menu.Paginator Paginator}, that displays an
- * individual image on each page instead of a list of text items.
+ * A {@link com.readonlydev.menu.Menu Menu} implementation, nearly identical to
+ * {@link com.readonlydev.menu.Paginator Paginator}, that displays an individual
+ * image on each page instead of a list of text items.
  * <p>
  * Like Paginator, reaction functions allow the user to traverse to the last
  * page using the left arrow, the next page using the right arrow, and to stop
@@ -327,14 +327,14 @@ public class Slideshow extends Menu {
 		 * @return The Paginator built from this Builder.
 		 *
 		 * @throws java.lang.IllegalArgumentException If one of the following is
-		 * violated:
-		 * <ul>
-		 * <li>No
-		 * {@link com.readonlydev.common.waiter.EventWaiter
-		 * EventWaiter} was set.</li>
-		 * <li>No items were set to
-		 * paginate.</li>
-		 * </ul>
+		 *                                            violated:
+		 *                                            <ul>
+		 *                                            <li>No
+		 *                                            {@link com.readonlydev.common.waiter.EventWaiter
+		 *                                            EventWaiter} was set.</li>
+		 *                                            <li>No items were set to
+		 *                                            paginate.</li>
+		 *                                            </ul>
 		 */
 		@Override
 		public Slideshow build() {
@@ -369,7 +369,7 @@ public class Slideshow extends Menu {
 		 * depending on the page number.
 		 *
 		 * @param colorBiFunction A BiFunction that uses both current and total page
-		 * numbers to get a Color for the MessageEmbed
+		 *                        numbers to get a Color for the MessageEmbed
 		 *
 		 * @return This builder
 		 */
@@ -386,7 +386,7 @@ public class Slideshow extends Menu {
 		 * This is displayed directly above the embed.
 		 *
 		 * @param text The Message content to be displayed above the embed when the
-		 * Slideshow is built
+		 *             Slideshow is built
 		 *
 		 * @return This builder
 		 */
@@ -405,7 +405,7 @@ public class Slideshow extends Menu {
 		 * change depending on the page number.
 		 *
 		 * @param textBiFunction The BiFunction that uses both current and total page
-		 * numbers to get text for the Message
+		 *                       numbers to get text for the Message
 		 *
 		 * @return This builder
 		 */
@@ -440,8 +440,8 @@ public class Slideshow extends Menu {
 		 * MessageEmbed to change depending on the page number.
 		 *
 		 * @param descriptionBiFunction The BiFunction that uses both current and total
-		 * page numbers to get description for the
-		 * MessageEmbed
+		 *                              page numbers to get description for the
+		 *                              MessageEmbed
 		 *
 		 * @return This builder
 		 */
@@ -467,7 +467,7 @@ public class Slideshow extends Menu {
 		 * Sets whether or not the page number will be shown.
 		 *
 		 * @param show {@code true} if the page number should be shown, {@code false} if
-		 * it should not
+		 *             it should not
 		 *
 		 * @return This builder
 		 */
@@ -521,7 +521,7 @@ public class Slideshow extends Menu {
 		 * function to skip multiple pages using alternate forward and backwards
 		 *
 		 * @param bulkSkipNumber The number of pages to skip when the bulk-skip
-		 * reactions are used.
+		 *                       reactions are used.
 		 *
 		 * @return This builder
 		 */
@@ -531,9 +531,8 @@ public class Slideshow extends Menu {
 		}
 
 		/**
-		 * Sets the {@link com.readonlydev.menu.Slideshow Slideshow} to wrap from
-		 * the last page to the first when traversing right and visa versa from the
-		 * left.
+		 * Sets the {@link com.readonlydev.menu.Slideshow Slideshow} to wrap from the
+		 * last page to the first when traversing right and visa versa from the left.
 		 *
 		 * @param wrapPageEnds {@code true} to enable wrapping.
 		 *
@@ -545,8 +544,8 @@ public class Slideshow extends Menu {
 		}
 
 		/**
-		 * Sets the {@link com.readonlydev.menu.Slideshow Slideshow} to allow a
-		 * slide number to be specified by a user via text.
+		 * Sets the {@link com.readonlydev.menu.Slideshow Slideshow} to allow a slide
+		 * number to be specified by a user via text.
 		 * <p>
 		 * Note that setting this doesn't mean that left and right text inputs provided
 		 * via {@link Paginator.Builder#setLeftRightText(String, String)} will be
@@ -554,7 +553,7 @@ public class Slideshow extends Menu {
 		 * {@code null} for one or both of the parameters of that method.
 		 *
 		 * @param allowTextInput {@code true} if the Slideshow will allow slide-number
-		 * text input
+		 *                       text input
 		 *
 		 * @return This builder
 		 */
@@ -564,18 +563,18 @@ public class Slideshow extends Menu {
 		}
 
 		/**
-		 * Sets the {@link com.readonlydev.menu.Slideshow Slideshow} to traverse
-		 * left or right when a provided text input is sent in the form of a Message to
-		 * the {@link net.dv8tion.jda.api.entities.GuildChannel GuildChannel} the menu
-		 * is displayed in.
+		 * Sets the {@link com.readonlydev.menu.Slideshow Slideshow} to traverse left or
+		 * right when a provided text input is sent in the form of a Message to the
+		 * {@link net.dv8tion.jda.api.entities.GuildChannel GuildChannel} the menu is
+		 * displayed in.
 		 * <p>
 		 * If one or both these parameters are provided {@code null} this resets both of
 		 * them and they will no longer be available when the Slideshow is built.
 		 *
-		 * @param left The left text input, causes the Slideshow to traverse one slide
-		 * left
+		 * @param left  The left text input, causes the Slideshow to traverse one slide
+		 *              left
 		 * @param right The right text input, causes the Slideshow to traverse one slide
-		 * right
+		 *              right
 		 *
 		 * @return This builder
 		 */

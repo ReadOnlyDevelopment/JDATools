@@ -109,7 +109,7 @@ public enum Scope {
 	 * @param scopes The scopes to join.
 	 *
 	 * @return A String representing how the scopes should be represented as part of
-	 * an authorization URL.
+	 *         an authorization URL.
 	 */
 	public static String join(Scope... scopes) {
 		return join(false, scopes);
@@ -119,12 +119,12 @@ public enum Scope {
 	 * Joins the specified scopes properly as they should be represented as part of
 	 * an authorization URL.
 	 *
-	 * @param scopes The scopes to join.
+	 * @param scopes  The scopes to join.
 	 * @param bySpace If the scopes should be joined by " " or "%20" (default:
-	 * "%20")
+	 *                "%20")
 	 *
 	 * @return A String representing how the scopes should be represented as part of
-	 * an authorization URL.
+	 *         an authorization URL.
 	 */
 	public static String join(boolean bySpace, Scope... scopes) {
 		if (scopes.length == 0)
@@ -147,7 +147,7 @@ public enum Scope {
 	 * @param scope A text key to get a scope by.
 	 *
 	 * @return The scope matching the provided text key ({@link Scope#UNKNOWN
-	 * UNKNOWN} by default)
+	 *         UNKNOWN} by default)
 	 */
 	public static Scope from(String scope) {
 		for (Scope s : values())

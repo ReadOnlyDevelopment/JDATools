@@ -38,10 +38,10 @@ import net.dv8tion.jda.api.entities.User;
  * @see com.readonlydev.common.waiter.EventWaiter
  * @see Menu.Builder
  *
- * @implNote While the standard JDATools implementations of this and Menu
- * are all handled as {@link net.dv8tion.jda.api.entities.MessageEmbed
- * embeds}, there is no bias or advantage of implementing a custom
- * Menu as a message without an embed.
+ * @implNote While the standard JDATools implementations of this and Menu are
+ *           all handled as {@link net.dv8tion.jda.api.entities.MessageEmbed
+ *           embeds}, there is no bias or advantage of implementing a custom
+ *           Menu as a message without an embed.
  */
 public abstract class Menu {
 	protected final EventWaiter waiter;
@@ -117,9 +117,9 @@ public abstract class Menu {
 	 * provides a full-proof guard against exceptions when validating a User of a
 	 * Menu.
 	 *
-	 * @param user The User to validate.
+	 * @param user  The User to validate.
 	 * @param guild The Guild to validate the User on.<br>
-	 * Can be provided {@code} null safely.
+	 *              Can be provided {@code} null safely.
 	 *
 	 * @return {@code true} if the User is valid, {@code false} otherwise.
 	 */
@@ -162,12 +162,12 @@ public abstract class Menu {
 	 * </pre>
 	 *
 	 * @implNote Before 2.0 this were a separate class known as
-	 * {@code MenuBuilder}.<br>
-	 * Note that while the standard JDATools implementations of this
-	 * and Menu are all handled as
-	 * {@link net.dv8tion.jda.api.entities.MessageEmbed embeds}, there is
-	 * no bias or advantage of implementing a custom Menu as a message
-	 * without an embed.
+	 *           {@code MenuBuilder}.<br>
+	 *           Note that while the standard JDATools implementations of this and
+	 *           Menu are all handled as
+	 *           {@link net.dv8tion.jda.api.entities.MessageEmbed embeds}, there is
+	 *           no bias or advantage of implementing a custom Menu as a message
+	 *           without an embed.
 	 */
 	@SuppressWarnings("unchecked")
 	public abstract static class Builder<T extends Builder<T, V>, V extends Menu> {
@@ -183,13 +183,13 @@ public abstract class Menu {
 		 * After doing this, no modifications of the displayed Menu can be made.
 		 *
 		 * @return The built Menu of corresponding type to this
-		 * {@link com.readonlydev.menu.Menu.Builder}.
+		 *         {@link com.readonlydev.menu.Menu.Builder}.
 		 */
 		public abstract V build();
 
 		/**
-		 * Sets the {@link com.readonlydev.common.waiter.EventWaiter EventWaiter} that will
-		 * do {@link com.readonlydev.menu.Menu Menu} operations.
+		 * Sets the {@link com.readonlydev.common.waiter.EventWaiter EventWaiter} that
+		 * will do {@link com.readonlydev.menu.Menu Menu} operations.
 		 * <p>
 		 * <b>NOTE:</b> All Menus will only work with an EventWaiter set! <br>
 		 * Not setting an EventWaiter means the Menu will not work.
@@ -260,15 +260,15 @@ public abstract class Menu {
 		}
 
 		/**
-		 * Sets the timeout that the {@link com.readonlydev.menu.Menu Menu} should
-		 * stay available.
+		 * Sets the timeout that the {@link com.readonlydev.menu.Menu Menu} should stay
+		 * available.
 		 * <p>
 		 * After this has expired, the a final action in the form of a
 		 * {@link java.lang.Runnable Runnable} may execute.
 		 *
 		 * @param timeout The amount of time for the Menu to stay available
-		 * @param unit The {@link java.util.concurrent.TimeUnit TimeUnit} for the
-		 * timeout
+		 * @param unit    The {@link java.util.concurrent.TimeUnit TimeUnit} for the
+		 *                timeout
 		 *
 		 * @return This builder
 		 */

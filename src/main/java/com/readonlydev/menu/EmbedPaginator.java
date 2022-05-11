@@ -27,10 +27,10 @@ import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.internal.utils.Checks;
 
 /**
- * A {@link com.readonlydev.menu.Menu Menu} implementation, nearly identical
- * to {@link com.readonlydev.menu.Paginator Paginator}, that displays an
- * individual {@link net.dv8tion.jda.api.entities.MessageEmbed MessageEmbed} on
- * each page instead of a list of text items.
+ * A {@link com.readonlydev.menu.Menu Menu} implementation, nearly identical to
+ * {@link com.readonlydev.menu.Paginator Paginator}, that displays an individual
+ * {@link net.dv8tion.jda.api.entities.MessageEmbed MessageEmbed} on each page
+ * instead of a list of text items.
  * <p>
  * Like Paginator, reaction functions allow the user to traverse to the last
  * page using the left arrow, the next page using the right arrow, and to stop
@@ -301,20 +301,20 @@ public class EmbedPaginator extends Menu {
 		private final List<MessageEmbed> embeds = new LinkedList<>();
 
 		/**
-		 * Builds the {@link com.readonlydev.menu.EmbedPaginator EmbedPaginator}
-		 * with this Builder.
+		 * Builds the {@link com.readonlydev.menu.EmbedPaginator EmbedPaginator} with
+		 * this Builder.
 		 *
 		 * @return The Paginator built from this Builder.
 		 *
 		 * @throws java.lang.IllegalArgumentException If one of the following is
-		 * violated:
-		 * <ul>
-		 * <li>No
-		 * {@link com.readonlydev.common.waiter.EventWaiter
-		 * EventWaiter} was set.</li>
-		 * <li>No items were set to
-		 * paginate.</li>
-		 * </ul>
+		 *                                            violated:
+		 *                                            <ul>
+		 *                                            <li>No
+		 *                                            {@link com.readonlydev.common.waiter.EventWaiter
+		 *                                            EventWaiter} was set.</li>
+		 *                                            <li>No items were set to
+		 *                                            paginate.</li>
+		 *                                            </ul>
 		 */
 		@Override
 		public EmbedPaginator build() {
@@ -331,7 +331,7 @@ public class EmbedPaginator extends Menu {
 		 * EmbedPaginator} is built.
 		 *
 		 * @param text The Message content to be displayed above the embed when the
-		 * EmbedPaginator is built.
+		 *             EmbedPaginator is built.
 		 *
 		 * @return This builder
 		 */
@@ -350,7 +350,7 @@ public class EmbedPaginator extends Menu {
 		 * change depending on the page number.
 		 *
 		 * @param textBiFunction The BiFunction that uses both current and total page
-		 * numbers, to get text for the Message
+		 *                       numbers, to get text for the Message
 		 *
 		 * @return This builder
 		 */
@@ -364,7 +364,7 @@ public class EmbedPaginator extends Menu {
 		 * {@link com.readonlydev.menu.EmbedPaginator EmbedPaginator} times out.
 		 *
 		 * @param finalAction The Consumer action to perform if the EmbedPaginator times
-		 * out
+		 *                    out
 		 *
 		 * @return This builder
 		 */
@@ -374,13 +374,12 @@ public class EmbedPaginator extends Menu {
 		}
 
 		/**
-		 * Sets whether the {@link com.readonlydev.menu.EmbedPaginator
-		 * EmbedPaginator} will instantly timeout, and possibly run a provided
-		 * {@link java.lang.Runnable Runnable}, if only a single slide is available to
-		 * display.
+		 * Sets whether the {@link com.readonlydev.menu.EmbedPaginator EmbedPaginator}
+		 * will instantly timeout, and possibly run a provided {@link java.lang.Runnable
+		 * Runnable}, if only a single slide is available to display.
 		 *
 		 * @param waitOnSinglePage {@code true} if the EmbedPaginator will still
-		 * generate
+		 *                         generate
 		 *
 		 * @return This builder
 		 */
@@ -437,7 +436,7 @@ public class EmbedPaginator extends Menu {
 		 * @param items The String list of items to add as MessageEmbeds
 		 *
 		 * @throws java.lang.IllegalArgumentException When one of the provided Strings
-		 * is longer than 2048 characters.
+		 *                                            is longer than 2048 characters.
 		 *
 		 * @return This builder
 		 */
@@ -492,7 +491,7 @@ public class EmbedPaginator extends Menu {
 		 * @param items The String list of items to add
 		 *
 		 * @throws java.lang.IllegalArgumentException When one of the provided Strings
-		 * is longer than 2048 characters.
+		 *                                            is longer than 2048 characters.
 		 *
 		 * @return This builder
 		 */
@@ -508,7 +507,7 @@ public class EmbedPaginator extends Menu {
 		 * backwards reactions.
 		 *
 		 * @param bulkSkipNumber The number of pages to skip when the bulk-skip
-		 * reactions are used.
+		 *                       reactions are used.
 		 *
 		 * @return This builder
 		 */
@@ -518,9 +517,9 @@ public class EmbedPaginator extends Menu {
 		}
 
 		/**
-		 * Sets the {@link com.readonlydev.menu.EmbedPaginator EmbedPaginator} to
-		 * wrap from the last page to the first when traversing right and vice versa
-		 * from the left.
+		 * Sets the {@link com.readonlydev.menu.EmbedPaginator EmbedPaginator} to wrap
+		 * from the last page to the first when traversing right and vice versa from the
+		 * left.
 		 *
 		 * @param wrapPageEnds {@code true} to enable wrapping.
 		 *
@@ -532,8 +531,8 @@ public class EmbedPaginator extends Menu {
 		}
 
 		/**
-		 * Sets the {@link com.readonlydev.menu.EmbedPaginator EmbedPaginator} to
-		 * allow a page number to be specified by a user via text.
+		 * Sets the {@link com.readonlydev.menu.EmbedPaginator EmbedPaginator} to allow
+		 * a page number to be specified by a user via text.
 		 * <p>
 		 * Note that setting this doesn't mean that left and right text inputs provided
 		 * via {@link EmbedPaginator.Builder#setLeftRightText(String, String)} will be
@@ -541,7 +540,7 @@ public class EmbedPaginator extends Menu {
 		 * {@code null} for one or both of the parameters of that method.
 		 *
 		 * @param allowTextInput {@code true} if the EmbedPaginator will allow
-		 * page-number text input.
+		 *                       page-number text input.
 		 *
 		 * @return This builder
 		 */
@@ -559,10 +558,10 @@ public class EmbedPaginator extends Menu {
 		 * If one or both these parameters are provided {@code null} this resets both of
 		 * them and they will no longer be available when the Paginator is built.
 		 *
-		 * @param left The left text input, causes the EmbedPaginator to traverse one
-		 * page left.
+		 * @param left  The left text input, causes the EmbedPaginator to traverse one
+		 *              page left.
 		 * @param right The right text input, causes the EmbedPaginator to traverse one
-		 * page right.
+		 *              page right.
 		 *
 		 * @return This builder
 		 */

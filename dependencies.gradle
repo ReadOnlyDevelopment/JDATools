@@ -1,21 +1,55 @@
 repositories {
-	mavenCentral()
-	maven {
-		name 'm2-dv8tion'
-		url 'https://m2.dv8tion.net/releases'
-	}
+    mavenCentral()
+    maven {
+        name 'm2-dv8tion'
+        url 'https://m2.dv8tion.net/releases'
+    }
 }
 
 ext {
-	jdaVersion = '[5.0,)'
-	slf4jVersion = '1.7.25'
-	jsonVersion = '20160810'
-	lang3Version = '3.12.0'
+    jdaVersion = '[5.0,)'
+    jsonVersion = '20220320'
+    lang3Version = '3.12.0'
+    reflectionsVersion = '0.10.2'
+    log4jVersion = '2.17.2'
 
-	dependencies {
-		jda = { [group: 'net.dv8tion', name: 'JDA', version: jdaVersion, transitive: true] }
-		lang3 = { [group: 'org.apache.commons', name: 'commons-lang3', version: lang3Version ] }
-		slf4j = { [group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion] }
-		json = { [group: 'org.json', name: 'json', version: jsonVersion] }
-	}
+    dependencies {
+        jda = 			{
+            [
+                group: 'net.dv8tion',
+                name: 'JDA',
+                version: jdaVersion
+            ]
+        }
+        lang3 = 		{
+            [
+                group: 'org.apache.commons',
+                name: 'commons-lang3',
+                version: lang3Version
+            ]
+        }
+        log4j = {
+            [
+                group: 'org.apache.logging.log4j',
+                name: 'log4j-core',
+                version: log4jVersion
+
+            ]
+        }
+
+        json = 			{
+            [
+                group: 'org.json',
+                name: 'json',
+                version: jsonVersion
+            ]
+        }
+        reflections = 	{
+            [
+                group: 'org.reflections',
+                name: 'reflections',
+                version: reflectionsVersion
+            ]
+        }
+    }
 }

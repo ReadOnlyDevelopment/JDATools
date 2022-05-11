@@ -25,8 +25,8 @@ import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.internal.utils.Checks;
 
 /**
- * A {@link com.readonlydev.menu.Menu Menu} implementation that paginates a
- * set of one or more text items across one or more pages.
+ * A {@link com.readonlydev.menu.Menu Menu} implementation that paginates a set
+ * of one or more text items across one or more pages.
  * <p>
  * When displayed, a Paginator will add three reactions in the following order:
  * <ul>
@@ -386,14 +386,14 @@ public class Paginator extends Menu {
 		 * @return The Paginator built from this Builder.
 		 *
 		 * @throws java.lang.IllegalArgumentException If one of the following is
-		 * violated:
-		 * <ul>
-		 * <li>No
-		 * {@link com.readonlydev.common.waiter.EventWaiter
-		 * EventWaiter} was set.</li>
-		 * <li>No items were set to
-		 * paginate.</li>
-		 * </ul>
+		 *                                            violated:
+		 *                                            <ul>
+		 *                                            <li>No
+		 *                                            {@link com.readonlydev.common.waiter.EventWaiter
+		 *                                            EventWaiter} was set.</li>
+		 *                                            <li>No items were set to
+		 *                                            paginate.</li>
+		 *                                            </ul>
 		 */
 		@Override
 		public Paginator build() {
@@ -428,7 +428,7 @@ public class Paginator extends Menu {
 		 * depending on the page number.
 		 *
 		 * @param colorBiFunction A BiFunction that uses both current and total page
-		 * numbers to get a Color for the MessageEmbed
+		 *                        numbers to get a Color for the MessageEmbed
 		 *
 		 * @return This builder
 		 */
@@ -445,7 +445,7 @@ public class Paginator extends Menu {
 		 * This is displayed directly above the embed.
 		 *
 		 * @param text The Message content to be displayed above the embed when the
-		 * Paginator is built
+		 *             Paginator is built
 		 *
 		 * @return This builder
 		 */
@@ -464,7 +464,7 @@ public class Paginator extends Menu {
 		 * change depending on the page number.
 		 *
 		 * @param textBiFunction The BiFunction that uses both current and total page
-		 * numbers to get text for the Message
+		 *                       numbers to get text for the Message
 		 *
 		 * @return This builder
 		 */
@@ -508,7 +508,7 @@ public class Paginator extends Menu {
 		 * @param num Always positive, never-zero number of items per page
 		 *
 		 * @throws java.lang.IllegalArgumentException If the provided number is less
-		 * than 1
+		 *                                            than 1
 		 *
 		 * @return This builder
 		 */
@@ -524,7 +524,7 @@ public class Paginator extends Menu {
 		 * Sets whether or not the page number will be shown.
 		 *
 		 * @param show {@code true} if the page number should be shown, {@code false} if
-		 * it should not
+		 *             it should not
 		 *
 		 * @return This builder
 		 */
@@ -537,7 +537,7 @@ public class Paginator extends Menu {
 		 * Sets whether or not the items will be automatically numbered.
 		 *
 		 * @param number {@code true} if the items should be numbered, {@code false} if
-		 * it should not
+		 *               it should not
 		 *
 		 * @return This builder
 		 */
@@ -611,7 +611,7 @@ public class Paginator extends Menu {
 		 * function to skip multiple pages using alternate forward and backwards
 		 *
 		 * @param bulkSkipNumber The number of pages to skip when the bulk-skip
-		 * reactions are used.
+		 *                       reactions are used.
 		 *
 		 * @return This builder
 		 */
@@ -621,9 +621,8 @@ public class Paginator extends Menu {
 		}
 
 		/**
-		 * Sets the {@link com.readonlydev.menu.Paginator Paginator} to wrap from
-		 * the last page to the first when traversing right and visa versa from the
-		 * left.
+		 * Sets the {@link com.readonlydev.menu.Paginator Paginator} to wrap from the
+		 * last page to the first when traversing right and visa versa from the left.
 		 *
 		 * @param wrapPageEnds {@code true} to enable wrapping.
 		 *
@@ -644,7 +643,7 @@ public class Paginator extends Menu {
 		 * {@code null} for one or both of the parameters of that method.
 		 *
 		 * @param allowTextInput {@code true} if the Paginator will allow page-number
-		 * text input
+		 *                       text input
 		 *
 		 * @return This builder
 		 */
@@ -654,18 +653,18 @@ public class Paginator extends Menu {
 		}
 
 		/**
-		 * Sets the {@link com.readonlydev.menu.Paginator Paginator} to traverse
-		 * left or right when a provided text input is sent in the form of a Message to
-		 * the {@link net.dv8tion.jda.api.entities.GuildChannel GuildChannel} the menu
-		 * is displayed in.
+		 * Sets the {@link com.readonlydev.menu.Paginator Paginator} to traverse left or
+		 * right when a provided text input is sent in the form of a Message to the
+		 * {@link net.dv8tion.jda.api.entities.GuildChannel GuildChannel} the menu is
+		 * displayed in.
 		 * <p>
 		 * If one or both these parameters are provided {@code null} this resets both of
 		 * them and they will no longer be available when the Paginator is built.
 		 *
-		 * @param left The left text input, causes the Paginator to traverse one page
-		 * left
+		 * @param left  The left text input, causes the Paginator to traverse one page
+		 *              left
 		 * @param right The right text input, causes the Paginator to traverse one page
-		 * right
+		 *              right
 		 *
 		 * @return This builder
 		 */

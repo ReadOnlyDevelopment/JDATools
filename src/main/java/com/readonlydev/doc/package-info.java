@@ -15,7 +15,7 @@
  */
 
 /**
- * Items in this package pertain to the
- * {@link com.readonlydev.doc.DocGenerator DocGenerator}.
+ * Items in this package pertain to the {@link com.readonlydev.doc.DocGenerator
+ * DocGenerator}.
  */
 package com.readonlydev.doc;

@@ -16,8 +16,8 @@
 
 /**
  * Menus package.<br>
- * Contains the {@link com.readonlydev.menu.Menu Menu} class and all
- * standard implementations of it:
+ * Contains the {@link com.readonlydev.menu.Menu Menu} class and all standard
+ * implementations of it:
  * <ul>
  * <li>{@link com.readonlydev.menu.ButtonMenu ButtonMenu} <br>
  * A menu where users select a choice via "reaction-buttons".</li>

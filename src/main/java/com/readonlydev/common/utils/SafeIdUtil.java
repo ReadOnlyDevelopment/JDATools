@@ -1,5 +1,7 @@
 package com.readonlydev.common.utils;
 
+import lombok.experimental.UtilityClass;
+
 /**
  * A Utilities class for safely checking and converting String IDs to longs
  * usable with {@link net.dv8tion.jda.api.utils.MiscUtil#parseSnowflake(String)
@@ -15,17 +17,18 @@ package com.readonlydev.common.utils;
  * a String is safe to use with {@code MiscUtil.parseSnowflake(String)} as it
  * is.</li>
  * </ul>
- * 
+ *
  * @since 1.2
  */
-public final class SafeIdUtil {
+@UtilityClass
+public class SafeIdUtil {
 	/**
 	 * Safely convert the provided String ID to a {@code long} usable with
 	 * {@link net.dv8tion.jda.api.utils.MiscUtil#parseSnowflake(String)
 	 * MiscUtil.parseSnowflake(String)}.
-	 * 
+	 *
 	 * @param id The String ID to be converted
-	 * 
+	 *
 	 * @return If the String can be converted into a non-negative {@code long}, then
 	 * it will return the conversion. <br>
 	 * However, if one of the following criteria is met, then this method
@@ -42,8 +45,9 @@ public final class SafeIdUtil {
 	public static long safeConvert(String id) {
 		try {
 			long l = Long.parseLong(id.trim());
-			if (l < 0)
+			if (l < 0) {
 				return 0L;
+			}
 			return l;
 		} catch (NumberFormatException e) {
 			return 0L;
@@ -54,9 +58,9 @@ public final class SafeIdUtil {
 	 * Checks if the provided String ID is usable with
 	 * {@link net.dv8tion.jda.api.utils.MiscUtil#parseSnowflake(String)
 	 * MiscUtil.parseSnowflake(String)}.
-	 * 
+	 *
 	 * @param id The String ID to be converted
-	 * 
+	 *
 	 * @return {@code true} if both of the following criteria are not met:
 	 * <ul>
 	 * <li>If the provided String throws a
@@ -75,7 +79,4 @@ public final class SafeIdUtil {
 			return false;
 		}
 	}
-
-	// Prevent instantiation
-	private SafeIdUtil() {}
 }

@@ -24,9 +24,9 @@ import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.internal.utils.Checks;
 
 /**
- * A {@link com.readonlydev.menu.Menu Menu} implementation that creates a
- * listed display of text choices horizontally that users can scroll through
- * using reactions and make selections.
+ * A {@link com.readonlydev.menu.Menu Menu} implementation that creates a listed
+ * display of text choices horizontally that users can scroll through using
+ * reactions and make selections.
  */
 public class SelectionDialog extends Menu {
 	private final List<String> choices;
@@ -67,7 +67,7 @@ public class SelectionDialog extends Menu {
 	 * singleSelectionMode = false)
 	 * 
 	 * @deprecated Use Constructor with extra boolean {@code singleSelectionMode}
-	 * instead
+	 *             instead
 	 */
 	@Deprecated
 	SelectionDialog(EventWaiter waiter, Set<User> users, Set<Role> roles, long timeout, TimeUnit unit,
@@ -109,7 +109,7 @@ public class SelectionDialog extends Menu {
 	 * {@link net.dv8tion.jda.api.entities.MessageChannel MessageChannel}, starting
 	 * with the number selection provided.
 	 * 
-	 * @param channel The MessageChannel to send the new Message to
+	 * @param channel   The MessageChannel to send the new Message to
 	 * @param selection The number selection to start on
 	 */
 	public void showDialog(MessageChannel channel, int selection) {
@@ -126,7 +126,7 @@ public class SelectionDialog extends Menu {
 	 * {@link net.dv8tion.jda.api.entities.Message Message}, starting with the
 	 * number selection provided.
 	 * 
-	 * @param message The Message to display the Menu in
+	 * @param message   The Message to display the Menu in
 	 * @param selection The number selection to start on
 	 */
 	public void showDialog(Message message, int selection) {
@@ -231,22 +231,22 @@ public class SelectionDialog extends Menu {
 		private boolean singleSelectionMode = false;
 
 		/**
-		 * Builds the {@link com.readonlydev.menu.SelectionDialog SelectionDialog}
-		 * with this Builder.
+		 * Builds the {@link com.readonlydev.menu.SelectionDialog SelectionDialog} with
+		 * this Builder.
 		 *
 		 * @return The OrderedMenu built from this Builder.
 		 *
 		 * @throws java.lang.IllegalArgumentException If one of the following is
-		 * violated:
-		 * <ul>
-		 * <li>No
-		 * {@link com.readonlydev.common.waiter.EventWaiter
-		 * EventWaiter} was set.</li>
-		 * <li>No choices were set.</li>
-		 * <li>No action
-		 * {@link java.util.function.Consumer
-		 * Consumer} was set.</li>
-		 * </ul>
+		 *                                            violated:
+		 *                                            <ul>
+		 *                                            <li>No
+		 *                                            {@link com.readonlydev.common.waiter.EventWaiter
+		 *                                            EventWaiter} was set.</li>
+		 *                                            <li>No choices were set.</li>
+		 *                                            <li>No action
+		 *                                            {@link java.util.function.Consumer
+		 *                                            Consumer} was set.</li>
+		 *                                            </ul>
 		 */
 		@Override
 		public SelectionDialog build() {
@@ -281,7 +281,7 @@ public class SelectionDialog extends Menu {
 		 * selection number.
 		 *
 		 * @param color A Function that uses current selection number to get a Color for
-		 * the MessageEmbed
+		 *              the MessageEmbed
 		 *
 		 * @return This builder
 		 */
@@ -298,7 +298,7 @@ public class SelectionDialog extends Menu {
 		 * This is displayed directly above the embed.
 		 *
 		 * @param text The Message content to be displayed above the embed when the
-		 * SelectionDialog is built
+		 *             SelectionDialog is built
 		 *
 		 * @return This builder
 		 */
@@ -316,7 +316,7 @@ public class SelectionDialog extends Menu {
 		 * the selection number.
 		 *
 		 * @param text A Function that uses current selection number to get a text for
-		 * the Message
+		 *             the Message
 		 *
 		 * @return This builder
 		 */
@@ -329,7 +329,7 @@ public class SelectionDialog extends Menu {
 		 * Sets the text to use on either end of the selected item. <br>
 		 * Usage is primarily to mark which item is currently selected.
 		 *
-		 * @param left The left selection end
+		 * @param left  The left selection end
 		 * @param right The right selection end
 		 *
 		 * @return This builder
@@ -345,7 +345,7 @@ public class SelectionDialog extends Menu {
 		 * applied to the selected item. <br>
 		 * Usage is primarily to mark which items are not currently selected.
 		 *
-		 * @param left The left non-selection end
+		 * @param left  The left non-selection end
 		 * @param right The right non-selection end
 		 *
 		 * @return This builder
@@ -361,7 +361,7 @@ public class SelectionDialog extends Menu {
 		 * visa-versa.
 		 *
 		 * @param loop {@code true} if pressing up while at the top selection should
-		 * loop to the bottom, {@code false} if it should not
+		 *             loop to the bottom, {@code false} if it should not
 		 *
 		 * @return This builder
 		 */
@@ -375,7 +375,7 @@ public class SelectionDialog extends Menu {
 		 * false and the menu continues showing choices even after a selection was made.
 		 *
 		 * @param singleSelectionMode {@code true} if the menu should exit after the
-		 * first selection being made
+		 *                            first selection being made
 		 *
 		 * @return This builder
 		 */

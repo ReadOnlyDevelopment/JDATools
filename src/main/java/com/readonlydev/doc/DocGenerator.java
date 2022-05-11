@@ -84,8 +84,7 @@ public class DocGenerator {
 	 * Gets a blank DocGenerator with no conversions loaded, and a cache with the
 	 * specified max-size.
 	 * <p>
-	 * Calls to
-	 * {@link com.readonlydev.doc.DocGenerator#getDocFor(java.lang.Class)},
+	 * Calls to {@link com.readonlydev.doc.DocGenerator#getDocFor(java.lang.Class)},
 	 * {@link com.readonlydev.doc.DocGenerator#getDocFor(java.lang.reflect.Method)},
 	 * and
 	 * {@link com.readonlydev.doc.DocGenerator#getDocForMethods(java.lang.Class)}
@@ -93,7 +92,7 @@ public class DocGenerator {
 	 * reflection overhead for repeated calls.
 	 *
 	 * @param cacheSize The of the cache size that contains previously generated
-	 * CommandDoc to reduce reflection overhead for repeated calls.
+	 *                  CommandDoc to reduce reflection overhead for repeated calls.
 	 */
 	public DocGenerator(int cacheSize) {
 		this("\n\n", cacheSize);
@@ -104,12 +103,11 @@ public class DocGenerator {
 	 * separator, and a cache with the specified max-size.
 	 * <p>
 	 * A separator will be appended to the documentation returned by
-	 * {@link com.readonlydev.doc.DocGenerator#getDocFor(java.lang.Class)}
-	 * inbetween annotation conversions. <br>
+	 * {@link com.readonlydev.doc.DocGenerator#getDocFor(java.lang.Class)} inbetween
+	 * annotation conversions. <br>
 	 * By default this is a double newline ({@literal \n\n}).
 	 * <p>
-	 * Calls to
-	 * {@link com.readonlydev.doc.DocGenerator#getDocFor(java.lang.Class)},
+	 * Calls to {@link com.readonlydev.doc.DocGenerator#getDocFor(java.lang.Class)},
 	 * {@link com.readonlydev.doc.DocGenerator#getDocFor(java.lang.reflect.Method)},
 	 * and
 	 * {@link com.readonlydev.doc.DocGenerator#getDocForMethods(java.lang.Class)}
@@ -118,7 +116,7 @@ public class DocGenerator {
 	 *
 	 * @param separator The separator that occurs inbetween annotation conversions.
 	 * @param cacheSize The of the cache size that contains previously generated
-	 * CommandDoc to reduce reflection overhead for repeated calls.
+	 *                  CommandDoc to reduce reflection overhead for repeated calls.
 	 */
 	public DocGenerator(String separator, int cacheSize) {
 		this.separator = separator;
@@ -176,24 +174,25 @@ public class DocGenerator {
 	 * this DocGenerator.
 	 * <p>
 	 * An example of a custom CommandDoc conversion annotation can be found in the
-	 * {@link com.readonlydev.doc.annotation.DocConverter DocConverter} documentation.
+	 * {@link com.readonlydev.doc.annotation.DocConverter DocConverter}
+	 * documentation.
 	 *
-	 * @param <T> The type of annotation
-	 * @param type The annotation Class type.
+	 * @param <T>             The type of annotation
+	 * @param type            The annotation Class type.
 	 * @param converterParams The parameters necessary to instantiate the proper
-	 * DocConverter. <br>
-	 * DocConverters can have multiple constructors, although
-	 * it's discouraged.
+	 *                        DocConverter. <br>
+	 *                        DocConverters can have multiple constructors, although
+	 *                        it's discouraged.
 	 *
 	 * @throws IllegalArgumentException The annotation class provided is not
-	 * annotated with
-	 * {@link com.readonlydev.doc.ConvertedBy @ConvertedBy},
-	 * or an exception is thrown while
-	 * instantiating the value said ConvertedBy
-	 * annotation. <br>
-	 * <b>NOTE:</b> that a DocConverter
-	 * instantiation will fail if it's type
-	 * parameter is the provided Annotation class.
+	 *                                  annotated with
+	 *                                  {@link com.readonlydev.doc.ConvertedBy @ConvertedBy},
+	 *                                  or an exception is thrown while
+	 *                                  instantiating the value said ConvertedBy
+	 *                                  annotation. <br>
+	 *                                  <b>NOTE:</b> that a DocConverter
+	 *                                  instantiation will fail if it's type
+	 *                                  parameter is the provided Annotation class.
 	 *
 	 * @return This DocGenerator
 	 */
@@ -227,10 +226,11 @@ public class DocGenerator {
 	 * variable to the DocConverter you are providing.
 	 * <p>
 	 * An example of a custom CommandDoc conversion annotation can be found in the
-	 * {@link com.readonlydev.doc.annotation.DocConverter DocConverter} documentation.
+	 * {@link com.readonlydev.doc.annotation.DocConverter DocConverter}
+	 * documentation.
 	 *
-	 * @param <T> The type of annotation.
-	 * @param type The annotation Class type.
+	 * @param <T>       The type of annotation.
+	 * @param type      The annotation Class type.
 	 * @param converter The DocConverter to use.
 	 *
 	 * @return This DocGenerator
@@ -273,7 +273,7 @@ public class DocGenerator {
 							b.append(docMultiple.preface());
 						}
 						b.append(docMultiple.prefixEach())
-						.append(((DocConverter<Annotation>) map.get(key)).read(ans[i]));
+								.append(((DocConverter<Annotation>) map.get(key)).read(ans[i]));
 						if (i < (len - 1)) {
 							b.append(docMultiple.separateBy());
 						} else if (index < lastIndex) {

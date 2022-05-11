@@ -155,18 +155,18 @@ public class ButtonMenu extends Menu {
 		 * @return The OrderedMenu built from this Builder.
 		 *
 		 * @throws java.lang.IllegalArgumentException If one of the following is
-		 * violated:
-		 * <ul>
-		 * <li>No
-		 * {@link com.readonlydev.common.waiter.EventWaiter
-		 * EventWaiter} was set.</li>
-		 * <li>No choices were set.</li>
-		 * <li>No action
-		 * {@link java.util.function.Consumer
-		 * Consumer} was set.</li>
-		 * <li>Neither text nor description
-		 * were set.</li>
-		 * </ul>
+		 *                                            violated:
+		 *                                            <ul>
+		 *                                            <li>No
+		 *                                            {@link com.readonlydev.common.waiter.EventWaiter
+		 *                                            EventWaiter} was set.</li>
+		 *                                            <li>No choices were set.</li>
+		 *                                            <li>No action
+		 *                                            {@link java.util.function.Consumer
+		 *                                            Consumer} was set.</li>
+		 *                                            <li>Neither text nor description
+		 *                                            were set.</li>
+		 *                                            </ul>
 		 */
 		@Override
 		public ButtonMenu build() {
@@ -194,13 +194,13 @@ public class ButtonMenu extends Menu {
 
 		/**
 		 * Sets the text of the {@link net.dv8tion.jda.api.entities.Message Message} to
-		 * be displayed when the {@link com.readonlydev.menu.ButtonMenu ButtonMenu}
-		 * is built.
+		 * be displayed when the {@link com.readonlydev.menu.ButtonMenu ButtonMenu} is
+		 * built.
 		 * <p>
 		 * This is displayed directly above the embed.
 		 *
 		 * @param text The Message content to be displayed above the embed when the
-		 * ButtonMenu is built
+		 *             ButtonMenu is built
 		 *
 		 * @return This builder
 		 */
