@@ -10,8 +10,6 @@ ext {
     jdaVersion = '[5.0,)'
     jsonVersion = '20220320'
     lang3Version = '3.12.0'
-    reflectionsVersion = '0.10.2'
-    log4jVersion = '2.17.2'
 
     dependencies {
         jda = 			{
@@ -28,27 +26,11 @@ ext {
                 version: lang3Version
             ]
         }
-        log4j = {
-            [
-                group: 'org.apache.logging.log4j',
-                name: 'log4j-core',
-                version: log4jVersion
-
-            ]
-        }
-
         json = 			{
             [
                 group: 'org.json',
                 name: 'json',
                 version: jsonVersion
-            ]
-        }
-        reflections = 	{
-            [
-                group: 'org.reflections',
-                name: 'reflections',
-                version: reflectionsVersion
             ]
         }
     }

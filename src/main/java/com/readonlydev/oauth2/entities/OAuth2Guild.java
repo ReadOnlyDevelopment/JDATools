@@ -1,3 +1,4 @@
+
 package com.readonlydev.oauth2.entities;
 
 import java.util.EnumSet;
@@ -8,17 +9,12 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.ISnowflake;
 
 /**
- * OAuth2 representation of a Discord Server/Guild.
- *
- * <p>
- * Note that this is effectively a wrapper for both the Guild info, as well as
- * the info on the user in the guild represented by the session that got this
- * Guild.
- *
- * 
- * 
+ * OAuth2 representation of a Discord Server/Guild. <p> Note that this is
+ * effectively a wrapper for both the Guild info, as well as the info on the
+ * user in the guild represented by the session that got this Guild.
  */
 public interface OAuth2Guild extends ISnowflake {
+
     /**
      * Gets the underlying {@link com.readonlydev.oauth2.OAuth2Client
      * OAuth2Client} that created this OAuth2Guild.
@@ -35,7 +31,8 @@ public interface OAuth2Guild extends ISnowflake {
     String getName();
 
     /**
-     * Gets the Guild's icon ID, or {@code null} if the Guild does not have an icon.
+     * Gets the Guild's icon ID, or {@code null} if the Guild does not have an
+     * icon.
      *
      * @return The Guild's icon ID.
      */
@@ -57,8 +54,8 @@ public interface OAuth2Guild extends ISnowflake {
     int getPermissionsRaw();
 
     /**
-     * Gets the Session User's {@link net.dv8tion.jda.api.Permission Permissions}
-     * for the Guild.
+     * Gets the Session User's {@link net.dv8tion.jda.api.Permission
+     * Permissions} for the Guild.
      *
      * @return The Session User's Permissions for the Guild.
      */
@@ -76,10 +73,11 @@ public interface OAuth2Guild extends ISnowflake {
      * Whether or not the Session User has all of the specified
      * {@link net.dv8tion.jda.api.Permission Permissions} in the Guild.
      *
-     * @param perms The Permissions to check for.
+     * @param perms
+     *        The Permissions to check for.
      *
-     * @return {@code true} if and only if the Session User has all of the specified
-     *         Permissions, {@code false} otherwise.
+     * @return {@code true} if and only if the Session User has all of the
+     *         specified Permissions, {@code false} otherwise.
      */
     boolean hasPermission(Permission... perms);
 }

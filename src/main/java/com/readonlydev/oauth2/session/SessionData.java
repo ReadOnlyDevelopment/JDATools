@@ -1,3 +1,4 @@
+
 package com.readonlydev.oauth2.session;
 
 import java.time.OffsetDateTime;
@@ -8,24 +9,26 @@ import com.readonlydev.oauth2.Scope;
 /**
  * Contains various data necessary for creating a
  * {@link com.readonlydev.oauth2.session.Session Session} using a
- * {@link com.readonlydev.oauth2.session.SessionController
- * SessionController}.
- *
- * 
+ * {@link com.readonlydev.oauth2.session.SessionController SessionController}.
  */
 public class SessionData {
-    private final String identifier, accessToken, refreshToken, tokenType;
-    private final OffsetDateTime expiration;
-    private final Scope[] scopes;
 
-    public SessionData(String identifier, String accessToken, String refreshToken, String tokenType,
-	    OffsetDateTime expiration, Scope[] scopes) {
-	this.identifier = identifier;
-	this.accessToken = accessToken;
-	this.refreshToken = refreshToken;
-	this.tokenType = tokenType;
-	this.expiration = expiration;
-	this.scopes = scopes;
+    private final String         identifier, accessToken, refreshToken,
+            tokenType;
+
+    private final OffsetDateTime expiration;
+
+    private final Scope[]        scopes;
+
+    public SessionData(String identifier, String accessToken,
+            String refreshToken, String tokenType, OffsetDateTime expiration,
+            Scope[] scopes) {
+        this.identifier = identifier;
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+        this.tokenType = tokenType;
+        this.expiration = expiration;
+        this.scopes = scopes;
     }
 
     /**
@@ -34,7 +37,7 @@ public class SessionData {
      * @return The session identifier.
      */
     public String getIdentifier() {
-	return identifier;
+        return identifier;
     }
 
     /**
@@ -43,7 +46,7 @@ public class SessionData {
      * @return The session access token.
      */
     public String getAccessToken() {
-	return accessToken;
+        return accessToken;
     }
 
     /**
@@ -52,7 +55,7 @@ public class SessionData {
      * @return The session refresh token.
      */
     public String getRefreshToken() {
-	return refreshToken;
+        return refreshToken;
     }
 
     /**
@@ -61,7 +64,7 @@ public class SessionData {
      * @return The session token type.
      */
     public String getTokenType() {
-	return tokenType;
+        return tokenType;
     }
 
     /**
@@ -70,7 +73,7 @@ public class SessionData {
      * @return The session expiration time.
      */
     public OffsetDateTime getExpiration() {
-	return expiration;
+        return expiration;
     }
 
     /**
@@ -79,23 +82,27 @@ public class SessionData {
      * @return The session Scopes.
      */
     public Scope[] getScopes() {
-	return scopes;
+        return scopes;
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (!(obj instanceof SessionData))
-	    return false;
+        if (!(obj instanceof SessionData))
+            return false;
 
-	SessionData data = ((SessionData) obj);
+        SessionData data = ((SessionData) obj);
 
-	return getIdentifier().equals(data.getIdentifier()) && getTokenType().equals(data.getTokenType());
+        return getIdentifier().equals(data.getIdentifier())
+                && getTokenType().equals(data.getTokenType());
     }
 
     @Override
     public String toString() {
-	return String.format("SessionData(identifier: %s, access-token: %s, refresh-token: %s, type: %s, expires: %s)",
-		getIdentifier(), getAccessToken(), getRefreshToken(), getTokenType(),
-		getExpiration().format(DateTimeFormatter.RFC_1123_DATE_TIME));
+        return String
+            .format(
+                "SessionData(identifier: %s, access-token: %s, refresh-token: %s, type: %s, expires: %s)",
+                getIdentifier(), getAccessToken(), getRefreshToken(),
+                getTokenType(),
+                getExpiration().format(DateTimeFormatter.RFC_1123_DATE_TIME));
     }
 }

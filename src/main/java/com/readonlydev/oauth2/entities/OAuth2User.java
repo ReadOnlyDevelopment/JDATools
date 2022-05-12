@@ -1,3 +1,4 @@
+
 package com.readonlydev.oauth2.entities;
 
 import net.dv8tion.jda.api.sharding.ShardManager;
@@ -11,16 +12,13 @@ import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.User;
 
 /**
- * OAuth2 representation of a Discord User. <br>
- * More specifically, this is the User that the session is currently managing
- * when retrieved using
+ * OAuth2 representation of a Discord User. <br> More specifically, this is the
+ * User that the session is currently managing when retrieved using
  * {@link com.readonlydev.oauth2.OAuth2Client#getUser(Session)
  * OAuth2Client#getUser}.
- *
- * 
- * 
  */
 public interface OAuth2User extends ISnowflake, IMentionable {
+
     /**
      * Gets the underlying {@link com.readonlydev.oauth2.OAuth2Client
      * OAuth2Client} that created this OAuth2User.
@@ -61,10 +59,8 @@ public interface OAuth2User extends ISnowflake, IMentionable {
     String getName();
 
     /**
-     * Gets the user's email address that is associated with their Discord account.
-     *
-     * <p>
-     * Note that if this user is acquired without the
+     * Gets the user's email address that is associated with their Discord
+     * account. <p> Note that if this user is acquired without the
      * '{@link com.readonlydev.oauth2.Scope#EMAIL email}' OAuth
      * {@link com.readonlydev.oauth2.Scope Scope}, this will throw a
      * {@link com.readonlydev.oauth2.exceptions.MissingScopeException
@@ -72,39 +68,28 @@ public interface OAuth2User extends ISnowflake, IMentionable {
      *
      * @return The user's email.
      *
-     * @throws com.readonlydev.oauth2.exceptions.MissingScopeException If the
-     *                                                                     corresponding
-     *                                                                     {@link OAuth2User#getSession()
-     *                                                                     session}
-     *                                                                     does not
-     *                                                                     have the
-     *                                                                     proper
-     *                                                                     'email'
-     *                                                                     OAuth2
-     *                                                                     scope
+     * @throws com.readonlydev.oauth2.exceptions.MissingScopeException
+     *         If the corresponding {@link OAuth2User#getSession() session} does
+     *         not have the proper 'email' OAuth2 scope
      */
     String getEmail();
 
     /**
      * Returns {@code true} if the user's Discord account has been verified via
-     * email.
+     * email. <p> This is required to send messages in guilds where certain
+     * moderation levels are used.
      *
-     * <p>
-     * This is required to send messages in guilds where certain moderation levels
-     * are used.
-     *
-     * @return {@code true} if the user has verified their account, {@code false}
-     *         otherwise.
+     * @return {@code true} if the user has verified their account,
+     *         {@code false} otherwise.
      */
     boolean isVerified();
 
     /**
-     * Returns {@code true} if this user has multi-factor authentication enabled.
+     * Returns {@code true} if this user has multi-factor authentication
+     * enabled. <p> Some guilds require mfa for administrative actions.
      *
-     * <p>
-     * Some guilds require mfa for administrative actions.
-     *
-     * @return {@code true} if the user has mfa enabled, {@code false} otherwise.
+     * @return {@code true} if the user has mfa enabled, {@code false}
+     *         otherwise.
      */
     boolean isMfaEnabled();
 
@@ -144,8 +129,9 @@ public interface OAuth2User extends ISnowflake, IMentionable {
     String getDefaultAvatarUrl();
 
     /**
-     * Gets the user's avatar URL, or their {@link #getDefaultAvatarUrl() default
-     * avatar URL} if they do not have a custom avatar set on their account.
+     * Gets the user's avatar URL, or their {@link #getDefaultAvatarUrl()
+     * default avatar URL} if they do not have a custom avatar set on their
+     * account.
      *
      * @return The user's effective avatar URL.
      */
@@ -162,16 +148,13 @@ public interface OAuth2User extends ISnowflake, IMentionable {
 
     /**
      * Gets the corresponding {@link net.dv8tion.jda.api.entities.User JDA User}
-     * from the provided instance of {@link net.dv8tion.jda.api.JDA JDA}.
+     * from the provided instance of {@link net.dv8tion.jda.api.JDA JDA}. <p>
+     * Note that there is no guarantee that this will not return {@code null} as
+     * the instance of JDA may not have access to the User. <p> For sharded
+     * bots, use {@link OAuth2User#getJDAUser(ShardManager)}.
      *
-     * <p>
-     * Note that there is no guarantee that this will not return {@code null} as the
-     * instance of JDA may not have access to the User.
-     *
-     * <p>
-     * For sharded bots, use {@link OAuth2User#getJDAUser(ShardManager)}.
-     *
-     * @param jda The instance of JDA to get from.
+     * @param jda
+     *        The instance of JDA to get from.
      *
      * @return A JDA User, possibly {@code null}.
      */
@@ -180,16 +163,12 @@ public interface OAuth2User extends ISnowflake, IMentionable {
     /**
      * Gets the corresponding {@link net.dv8tion.jda.api.entities.User JDA User}
      * from the provided {@link net.dv8tion.jda.api.sharding.ShardManager
-     * ShardManager}.
+     * ShardManager}. <p> Note that there is no guarantee that this will not
+     * return {@code null} as the ShardManager may not have access to the User.
+     * <p> For un-sharded bots, use {@link OAuth2User#getJDAUser(JDA)}.
      *
-     * <p>
-     * Note that there is no guarantee that this will not return {@code null} as the
-     * ShardManager may not have access to the User.
-     *
-     * <p>
-     * For un-sharded bots, use {@link OAuth2User#getJDAUser(JDA)}.
-     *
-     * @param shardManager The ShardManager to get from.
+     * @param shardManager
+     *        The ShardManager to get from.
      *
      * @return A JDA User, possibly {@code null}.
      */

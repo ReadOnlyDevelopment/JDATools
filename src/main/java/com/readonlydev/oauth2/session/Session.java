@@ -1,3 +1,4 @@
+
 package com.readonlydev.oauth2.session;
 
 import java.time.OffsetDateTime;
@@ -6,18 +7,14 @@ import com.readonlydev.oauth2.Scope;
 
 /**
  * Implementable data type used to allow access to data regarding OAuth2
- * sessions.
- *
- * <p>
- * This can be used with a proper {@link com.readonlydev.oauth2.OAuth2Client
- * OAuth2Client} to get information on the logged in
- * {@link com.readonlydev.oauth2.entities.OAuth2User User}, as well as
- * {@link com.readonlydev.oauth2.entities.OAuth2Guild Guilds} they are on.
- *
- * 
- * 
+ * sessions. <p> This can be used with a proper
+ * {@link com.readonlydev.oauth2.OAuth2Client OAuth2Client} to get information
+ * on the logged in {@link com.readonlydev.oauth2.entities.OAuth2User User}, as
+ * well as {@link com.readonlydev.oauth2.entities.OAuth2Guild Guilds} they are
+ * on.
  */
 public interface Session {
+
     /**
      * Gets the session's access token.
      *

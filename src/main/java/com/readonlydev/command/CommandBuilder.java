@@ -1,3 +1,4 @@
+
 package com.readonlydev.command;
 
 import java.util.ArrayList;
@@ -16,42 +17,55 @@ import net.dv8tion.jda.api.Permission;
 
 /**
  * A chain-setter based builder for {@link com.readonlydev.command.Command
- * Commands}.
- * <p>
- * This is more useful for creation of commands "mid-runtime". <br>
- * A good usage would be to create a Command via eval and register it via
+ * Commands}. <p> This is more useful for creation of commands "mid-runtime".
+ * <br> A good usage would be to create a Command via eval and register it via
  * {@link com.readonlydev.api.ClientInterface#addCommand(Command)
- * Client#addCommand(Command)}.
- * <p>
- * While useful during runtime, this is completely inferior to extending Command
- * as a superclass before compilation, and shouldn't be used in place of the
- * ladder.
+ * Client#addCommand(Command)}. <p> While useful during runtime, this is
+ * completely inferior to extending Command as a superclass before compilation,
+ * and shouldn't be used in place of the ladder.
  *
  * @since 1.6
  */
 public class CommandBuilder {
-    private String name = "null";
-    private String help = "no help available";
-    private Category category = null;
-    private List<CommandArgument<?>> arguments = new ArrayList<>();
-    private boolean guildOnly = true;
-    private List<String> requiredRoles = new ArrayList<String>();
-    private boolean ownerCommand = false;
-    private int cooldown = 0;
-    private Permission[] userPermissions = new Permission[0];
-    private Permission[] botPermissions = new Permission[0];
-    private final LinkedList<String> aliases = new LinkedList<>();
-    private final LinkedList<Command> children = new LinkedList<>();
-    private BiConsumer<CommandEvent, Command> helpBiConsumer = null;
-    private boolean usesTopicTags = true;
-    private CooldownScope cooldownScope = CooldownScope.USER;
-    private boolean hidden = false;
+
+    private String                            name            = "null";
+
+    private String                            help            = "no help available";
+
+    private Category                          category        = null;
+
+    private List<CommandArgument<?>>          arguments       = new ArrayList<>();
+
+    private boolean                           guildOnly       = true;
+
+    private List<String>                      requiredRoles   = new ArrayList<String>();
+
+    private boolean                           ownerCommand    = false;
+
+    private int                               cooldown        = 0;
+
+    private Permission[]                      userPermissions = new Permission[0];
+
+    private Permission[]                      botPermissions  = new Permission[0];
+
+    private final LinkedList<String>          aliases         = new LinkedList<>();
+
+    private final LinkedList<Command>         children        = new LinkedList<>();
+
+    private BiConsumer<CommandEvent, Command> helpBiConsumer  = null;
+
+    private boolean                           usesTopicTags   = true;
+
+    private CooldownScope                     cooldownScope   = CooldownScope.USER;
+
+    private boolean                           hidden          = false;
 
     /**
      * Sets the {@link com.readonlydev.command.Command#name name} of the Command
      * built from this CommandBuilder.
      *
-     * @param name The name of the Command to be built.
+     * @param name
+     *        The name of the Command to be built.
      *
      * @return This CommandBuilder
      */
@@ -68,7 +82,8 @@ public class CommandBuilder {
      * Sets the {@link com.readonlydev.command.Command#help help} snippet of the
      * Command built from this CommandBuilder.
      *
-     * @param help The help snippet of the Command to be built.
+     * @param help
+     *        The help snippet of the Command to be built.
      *
      * @return This CommandBuilder
      */
@@ -85,7 +100,8 @@ public class CommandBuilder {
      * Sets the {@link com.readonlydev.command.Command#category category} of the
      * Command built from this CommandBuilder.
      *
-     * @param category The category of the Command to be built.
+     * @param category
+     *        The category of the Command to be built.
      *
      * @return This CommandBuilder
      */
@@ -95,11 +111,13 @@ public class CommandBuilder {
     }
 
     /**
-     * Adds the {@link com.readonlydev.command.arg.CommandArgument CommandArgument} to
-     * the list of {@link com.readonlydev.command.Command#arguments arguments} for
-     * this command.
+     * Adds the {@link com.readonlydev.command.arg.CommandArgument
+     * CommandArgument} to the list of
+     * {@link com.readonlydev.command.Command#arguments arguments} for this
+     * command.
      *
-     * @param CommandArgument The CommandArgument to add
+     * @param CommandArgument
+     *        The CommandArgument to add
      *
      * @return This CommandBuilder.
      */
@@ -109,11 +127,13 @@ public class CommandBuilder {
     }
 
     /**
-     * Adds the specified array of {@link com.readonlydev.command.arg.CommandArgument
-     * CommandArgument} to the list of
-     * {@link com.readonlydev.command.Command#arguments arguments} for this command.
+     * Adds the specified array of
+     * {@link com.readonlydev.command.arg.CommandArgument CommandArgument} to
+     * the list of {@link com.readonlydev.command.Command#arguments arguments}
+     * for this command.
      *
-     * @param arguments The array of CommandArguments to add
+     * @param arguments
+     *        The array of CommandArguments to add
      *
      * @return This CommandBuilder.
      */
@@ -125,10 +145,11 @@ public class CommandBuilder {
     }
 
     /**
-     * Sets the {@link com.readonlydev.command.Command#arguments arguments} for this
-     * command.
+     * Sets the {@link com.readonlydev.command.Command#arguments arguments} for
+     * this command.
      *
-     * @param arguments The array of CommandArguments to set
+     * @param arguments
+     *        The array of CommandArguments to set
      *
      * @return This CommandBuilder
      */
@@ -143,14 +164,16 @@ public class CommandBuilder {
     }
 
     /**
-     * Sets the {@link com.readonlydev.command.Command#arguments arguments} of the
-     * Command built from this CommandBuilder.
+     * Sets the {@link com.readonlydev.command.Command#arguments arguments} of
+     * the Command built from this CommandBuilder.
      *
-     * @param arguments The Collection of CommandArguments to set
+     * @param arguments
+     *        The Collection of CommandArguments to set
      *
      * @return This CommandBuilder
      */
-    public CommandBuilder setArguments(Collection<CommandArgument<?>> arguments) {
+    public CommandBuilder
+            setArguments(Collection<CommandArgument<?>> arguments) {
         this.arguments.clear();
         if (arguments != null) {
             this.arguments.addAll(arguments);
@@ -159,11 +182,12 @@ public class CommandBuilder {
     }
 
     /**
-     * Sets the Command built to be {@link com.readonlydev.command.Command#guildOnly
-     * guild only}.
+     * Sets the Command built to be
+     * {@link com.readonlydev.command.Command#guildOnly guild only}.
      *
-     * @param guildOnly {@code true} if the Command built is guild only,
-     *                  {@code false} if it is not.
+     * @param guildOnly
+     *        {@code true} if the Command built is guild only, {@code false} if
+     *        it is not.
      *
      * @return This CommandBuilder
      */
@@ -173,11 +197,12 @@ public class CommandBuilder {
     }
 
     /**
-     * Adds the name of a {@link net.dv8tion.jda.api.entities.Role role} to the list
-     * of {@link com.readonlydev.command.Command#requiredRoles requiredRoles} needed
-     * to use this command.
+     * Adds the name of a {@link net.dv8tion.jda.api.entities.Role role} to the
+     * list of {@link com.readonlydev.command.Command#requiredRoles
+     * requiredRoles} needed to use this command.
      *
-     * @param role The name of a required role
+     * @param role
+     *        The name of a required role
      *
      * @return This CommandBuilder.
      */
@@ -187,11 +212,12 @@ public class CommandBuilder {
     }
 
     /**
-     * Adds the names of many {@link net.dv8tion.jda.api.entities.Role roles} to the
-     * list of {@link com.readonlydev.command.Command#requiredRoles requiredRoles}
-     * needed to use this command.
+     * Adds the names of many {@link net.dv8tion.jda.api.entities.Role roles} to
+     * the list of {@link com.readonlydev.command.Command#requiredRoles
+     * requiredRoles} needed to use this command.
      *
-     * @param roles The name of a required role
+     * @param roles
+     *        The name of a required role
      *
      * @return This CommandBuilder.
      */
@@ -203,10 +229,11 @@ public class CommandBuilder {
     }
 
     /**
-     * Sets the {@link com.readonlydev.command.Command#requiredRoles requiredRoles}
-     * needed to use this command.
+     * Sets the {@link com.readonlydev.command.Command#requiredRoles
+     * requiredRoles} needed to use this command.
      *
-     * @param roles the names of required roles to set
+     * @param roles
+     *        the names of required roles to set
      *
      * @return This CommandBuilder
      */
@@ -221,10 +248,11 @@ public class CommandBuilder {
     }
 
     /**
-     * Sets the {@link com.readonlydev.command.Command#requiredRoles requiredRoles}
-     * of the Command built from this CommandBuilder.
+     * Sets the {@link com.readonlydev.command.Command#requiredRoles
+     * requiredRoles} of the Command built from this CommandBuilder.
      *
-     * @param roles The roles of the Command to be built.
+     * @param roles
+     *        The roles of the Command to be built.
      *
      * @return This CommandBuilder
      */
@@ -240,8 +268,9 @@ public class CommandBuilder {
      * Sets the Command built to be
      * {@link com.readonlydev.command.Command#ownerCommand owner only}.
      *
-     * @param ownerCommand {@code true} if the Command built is owner only,
-     *                     {@code false} if it is not.
+     * @param ownerCommand
+     *        {@code true} if the Command built is owner only, {@code false} if
+     *        it is not.
      *
      * @return This CommandBuilder
      */
@@ -254,7 +283,8 @@ public class CommandBuilder {
      * Sets the {@link com.readonlydev.command.Command#cooldown cooldown} of the
      * Command built from this CommandBuilder.
      *
-     * @param cooldown The number of seconds the built Command will be on cooldown.
+     * @param cooldown
+     *        The number of seconds the built Command will be on cooldown.
      *
      * @return This CommandBuilder
      */
@@ -264,11 +294,12 @@ public class CommandBuilder {
     }
 
     /**
-     * Sets the {@link com.readonlydev.command.Command#userPermissions required user
-     * permissions} of the Command built from this CommandBuilder.
+     * Sets the {@link com.readonlydev.command.Command#userPermissions required
+     * user permissions} of the Command built from this CommandBuilder.
      *
-     * @param userPermissions The required Permissions a User must have when using
-     *                        the Command to be built.
+     * @param userPermissions
+     *        The required Permissions a User must have when using the Command
+     *        to be built.
      *
      * @return This CommandBuilder
      */
@@ -282,15 +313,17 @@ public class CommandBuilder {
     }
 
     /**
-     * Sets the {@link com.readonlydev.command.Command#userPermissions required user
-     * permissions} of the Command built from this CommandBuilder.
+     * Sets the {@link com.readonlydev.command.Command#userPermissions required
+     * user permissions} of the Command built from this CommandBuilder.
      *
-     * @param userPermissions The required Permissions a User must have when using
-     *                        the Command to be built.
+     * @param userPermissions
+     *        The required Permissions a User must have when using the Command
+     *        to be built.
      *
      * @return This CommandBuilder
      */
-    public CommandBuilder setUserPermissions(Collection<Permission> userPermissions) {
+    public CommandBuilder
+            setUserPermissions(Collection<Permission> userPermissions) {
         if (userPermissions == null) {
             this.userPermissions = new Permission[0];
         } else {
@@ -300,11 +333,12 @@ public class CommandBuilder {
     }
 
     /**
-     * Sets the {@link com.readonlydev.command.Command#botPermissions required bot
-     * permissions} of the Command built from this CommandBuilder.
+     * Sets the {@link com.readonlydev.command.Command#botPermissions required
+     * bot permissions} of the Command built from this CommandBuilder.
      *
-     * @param botPermissions The required Permissions the bot must have when using
-     *                       the Command to be built.
+     * @param botPermissions
+     *        The required Permissions the bot must have when using the Command
+     *        to be built.
      *
      * @return This CommandBuilder
      */
@@ -318,15 +352,17 @@ public class CommandBuilder {
     }
 
     /**
-     * Sets the {@link com.readonlydev.command.Command#botPermissions required bot
-     * permissions} of the Command built from this CommandBuilder.
+     * Sets the {@link com.readonlydev.command.Command#botPermissions required
+     * bot permissions} of the Command built from this CommandBuilder.
      *
-     * @param botPermissions The required Permissions the bot must have when using
-     *                       the Command to be built.
+     * @param botPermissions
+     *        The required Permissions the bot must have when using the Command
+     *        to be built.
      *
      * @return This CommandBuilder
      */
-    public CommandBuilder setBotPermissions(Collection<Permission> botPermissions) {
+    public CommandBuilder
+            setBotPermissions(Collection<Permission> botPermissions) {
         if (botPermissions == null) {
             this.botPermissions = new Permission[0];
         } else {
@@ -336,10 +372,11 @@ public class CommandBuilder {
     }
 
     /**
-     * Adds a {@link com.readonlydev.command.Command#aliases alias} for the Command
-     * built from this CommandBuilder.
+     * Adds a {@link com.readonlydev.command.Command#aliases alias} for the
+     * Command built from this CommandBuilder.
      *
-     * @param alias The Command alias to add.
+     * @param alias
+     *        The Command alias to add.
      *
      * @return This CommandBuilder.
      */
@@ -349,10 +386,11 @@ public class CommandBuilder {
     }
 
     /**
-     * Adds {@link com.readonlydev.command.Command#aliases aliases} for the Command
-     * built from this CommandBuilder.
+     * Adds {@link com.readonlydev.command.Command#aliases aliases} for the
+     * Command built from this CommandBuilder.
      *
-     * @param aliases The Command aliases to add.
+     * @param aliases
+     *        The Command aliases to add.
      *
      * @return This CommandBuilder.
      */
@@ -367,7 +405,8 @@ public class CommandBuilder {
      * Sets the {@link com.readonlydev.command.Command#aliases aliases} of the
      * Command built from this CommandBuilder.
      *
-     * @param aliases The aliases of the Command to be built.
+     * @param aliases
+     *        The aliases of the Command to be built.
      *
      * @return This CommandBuilder
      */
@@ -385,7 +424,8 @@ public class CommandBuilder {
      * Sets the {@link com.readonlydev.command.Command#aliases aliases} of the
      * Command built from this CommandBuilder.
      *
-     * @param aliases The aliases of the Command to be built.
+     * @param aliases
+     *        The aliases of the Command to be built.
      *
      * @return This CommandBuilder
      */
@@ -398,10 +438,11 @@ public class CommandBuilder {
     }
 
     /**
-     * Adds a {@link com.readonlydev.command.Command#children child} Command to the
-     * Command built from this CommandBuilder.
+     * Adds a {@link com.readonlydev.command.Command#children child} Command to
+     * the Command built from this CommandBuilder.
      *
-     * @param child The child Command to add.
+     * @param child
+     *        The child Command to add.
      *
      * @return This CommandBuilder.
      */
@@ -411,10 +452,11 @@ public class CommandBuilder {
     }
 
     /**
-     * Adds {@link com.readonlydev.command.Command#children child} Commands to the
-     * Command built from this CommandBuilder.
+     * Adds {@link com.readonlydev.command.Command#children child} Commands to
+     * the Command built from this CommandBuilder.
      *
-     * @param children The child Commands to add.
+     * @param children
+     *        The child Commands to add.
      *
      * @return This CommandBuilder.
      */
@@ -429,7 +471,8 @@ public class CommandBuilder {
      * Sets the {@link com.readonlydev.command.Command#children children} of the
      * Command built from this CommandBuilder.
      *
-     * @param children The children of the Command to be built.
+     * @param children
+     *        The children of the Command to be built.
      *
      * @return This CommandBuilder
      */
@@ -447,7 +490,8 @@ public class CommandBuilder {
      * Sets the {@link com.readonlydev.command.Command#children children} of the
      * Command built from this CommandBuilder.
      *
-     * @param children The children of the Command to be built.
+     * @param children
+     *        The children of the Command to be built.
      *
      * @return This CommandBuilder
      */
@@ -463,21 +507,24 @@ public class CommandBuilder {
      * Sets the {@link com.readonlydev.command.Command#helpBiConsumer help
      * BiConsumer} of the Command built from this CommandBuilder.
      *
-     * @param helpBiConsumer The help BiConsumer of the Command to be built.
+     * @param helpBiConsumer
+     *        The help BiConsumer of the Command to be built.
      *
      * @return This CommandBuilder
      */
-    public CommandBuilder setHelpBiConsumer(BiConsumer<CommandEvent, Command> helpBiConsumer) {
+    public CommandBuilder setHelpBiConsumer(
+            BiConsumer<CommandEvent, Command> helpBiConsumer) {
         this.helpBiConsumer = helpBiConsumer;
         return this;
     }
 
     /**
-     * Sets the Command built to {@link com.readonlydev.command.Command#usesTopicTags
-     * use TopicTags}.
+     * Sets the Command built to
+     * {@link com.readonlydev.command.Command#usesTopicTags use TopicTags}.
      *
-     * @param usesTopicTags {@code true} if the Command built is uses topic tags,
-     *                      {@code false} if it does not.
+     * @param usesTopicTags
+     *        {@code true} if the Command built is uses topic tags,
+     *        {@code false} if it does not.
      *
      * @return This CommandBuilder
      */
@@ -487,10 +534,11 @@ public class CommandBuilder {
     }
 
     /**
-     * Sets the {@link com.readonlydev.command.Command#cooldownScope cooldown scope}
-     * of the Command built from this CommandBuilder.
+     * Sets the {@link com.readonlydev.command.Command#cooldownScope cooldown
+     * scope} of the Command built from this CommandBuilder.
      *
-     * @param cooldownScope The CooldownScope of the Command to be built.
+     * @param cooldownScope
+     *        The CooldownScope of the Command to be built.
      *
      * @return This CommandBuilder
      */
@@ -504,11 +552,13 @@ public class CommandBuilder {
     }
 
     /**
-     * Sets the Command built to be {@link com.readonlydev.command.Command#hidden
-     * hidden} from the help builder.
+     * Sets the Command built to be
+     * {@link com.readonlydev.command.Command#hidden hidden} from the help
+     * builder.
      *
-     * @param hidden {@code true} if this will be hidden from the help builder,
-     *               {@code false} otherwise.
+     * @param hidden
+     *        {@code true} if this will be hidden from the help builder,
+     *        {@code false} otherwise.
      *
      * @return This CommandBuilder
      */
@@ -519,21 +569,19 @@ public class CommandBuilder {
 
     /**
      * Builds the {@link com.readonlydev.command.Command Command} using the
-     * previously provided information.
-     * <p>
-     * This uses the only the {@link com.readonlydev.command.event.CommandEvent CommandEvent}
-     * parameter that would be provided during
+     * previously provided information. <p> This uses the only the
+     * {@link com.readonlydev.command.event.CommandEvent CommandEvent} parameter
+     * that would be provided during
      * {@link com.readonlydev.command.Command#execute(CommandEvent)
      * #execute(CommandEvent)}, and no information about the Command can be
-     * retrieved using this.
-     * <p>
-     * An alternate method
+     * retrieved using this. <p> An alternate method
      * {@link com.readonlydev.command.CommandBuilder#build(java.util.function.BiConsumer)}
      * exists if you wish to retrieve information about the Command built during
      * execution.
      *
-     * @param execution The {@link java.util.function.Consumer} that runs on
-     *                  Command#execute(CommandEvent).
+     * @param execution
+     *        The {@link java.util.function.Consumer} that runs on
+     *        Command#execute(CommandEvent).
      *
      * @return The Command built
      */
@@ -543,24 +591,26 @@ public class CommandBuilder {
 
     /**
      * Builds the {@link com.readonlydev.command.Command Command} using the
-     * previously provided information.
-     * <p>
-     * This uses the both the {@link com.readonlydev.command.event.CommandEvent CommandEvent}
-     * parameter that would be provided during
+     * previously provided information. <p> This uses the both the
+     * {@link com.readonlydev.command.event.CommandEvent CommandEvent} parameter
+     * that would be provided during
      * {@link com.readonlydev.command.Command#execute(CommandEvent)
      * #execute(CommandEvent)}, and the Command built when, allowing info on the
      * Command to be retrieved during execution.
      *
-     * @param execution The {@link java.util.function.BiConsumer} that runs on
-     *                  {@link com.readonlydev.command.Command#execute(CommandEvent)}.
+     * @param execution
+     *        The {@link java.util.function.BiConsumer} that runs on
+     *        {@link com.readonlydev.command.Command#execute(CommandEvent)}.
      *
      * @return The Command built
      */
     public Command build(BiConsumer<Command, CommandEvent> execution) {
-        return new BlankCommand(name, help, category, arguments, guildOnly, requiredRoles, ownerCommand, cooldown,
-            userPermissions, botPermissions, aliases.toArray(new String[aliases.size()]),
-            children.toArray(new Command[children.size()]), helpBiConsumer, usesTopicTags, cooldownScope,
-            hidden) {
+        return new BlankCommand(name, help, category, arguments, guildOnly,
+            requiredRoles, ownerCommand, cooldown, userPermissions,
+            botPermissions, aliases.toArray(new String[aliases.size()]),
+            children.toArray(new Command[children.size()]), helpBiConsumer,
+            usesTopicTags, cooldownScope, hidden) {
+
             @Override
             protected void execute(CommandEvent event) {
                 execution.accept(this, event);
@@ -569,11 +619,15 @@ public class CommandBuilder {
     }
 
     private abstract class BlankCommand extends Command {
-        BlankCommand(String name, String help, Category category, List<CommandArgument<?>> arguments, boolean guildOnly,
-            List<String> requiredRole, boolean ownerCommand, int cooldown, Permission[] userPermissions,
-            Permission[] botPermissions, String[] aliases, Command[] children,
-            BiConsumer<CommandEvent, Command> helpBiConsumer, boolean usesTopicTags, CooldownScope cooldownScope,
-            boolean hidden) {
+
+        BlankCommand(String name, String help, Category category,
+                List<CommandArgument<?>> arguments, boolean guildOnly,
+                List<String> requiredRole, boolean ownerCommand, int cooldown,
+                Permission[] userPermissions, Permission[] botPermissions,
+                String[] aliases, Command[] children,
+                BiConsumer<CommandEvent, Command> helpBiConsumer,
+                boolean usesTopicTags, CooldownScope cooldownScope,
+                boolean hidden) {
             this.name = name;
             this.help = help;
             this.category = category;

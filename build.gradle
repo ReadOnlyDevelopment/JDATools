@@ -10,7 +10,7 @@ plugins {
     id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
-version = "2.1.4"
+version = "2.2.1"
 group = 'com.readonlydev'
 archivesBaseName = 'JDATools'
 
@@ -34,10 +34,9 @@ repositories {
 
 dependencies {
     implementation jda()
-    implementation log4j()
     implementation lang3()
     implementation json()
-    implementation reflections()
+
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
@@ -113,7 +112,6 @@ javadoc {
 }
 
 jar {
-    archiveClassifier.set('lite')
     manifest(setMainManifestProps)
 }
 
@@ -121,10 +119,26 @@ shadowJar {
     classifier = ''
 }
 
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+task sourcesJar(type: Jar) {
+classifier = 'sources'
+from sourceSets.main.allSource
+}
+
 build {
     dependsOn { clean }
     dependsOn { javadocJar }
     dependsOn { shadowJar }
+}
+
+artifacts {
+    archives shadowJar
+    archives sourcesJar
+    archives javadocJar
 }
 
 mavenPublishing {
@@ -135,7 +149,9 @@ mavenPublishing {
 
 task fullRelease {
     group 'jdatools'
+    dependsOn 'clean'
     dependsOn 'publish'
     dependsOn 'closeAndReleaseRepository'
+    tasks.findByName('publish').mustRunAfter 'clean'
     tasks.findByName('closeAndReleaseRepository').mustRunAfter 'publish'
 }

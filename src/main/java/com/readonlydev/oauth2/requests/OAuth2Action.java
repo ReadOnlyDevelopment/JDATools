@@ -1,3 +1,4 @@
+
 package com.readonlydev.oauth2.requests;
 
 import java.io.IOException;
@@ -16,136 +17,140 @@ import okhttp3.Response;
 
 /**
  * An adaptable lookalike of JDA's
- * {@link net.dv8tion.jda.api.requests.RestAction RestAction}.
- *
- * <p>
- * OAuth2Actions can either be completed <i>asynchronously</i> using
+ * {@link net.dv8tion.jda.api.requests.RestAction RestAction}. <p> OAuth2Actions
+ * can either be completed <i>asynchronously</i> using
  * {@link OAuth2Action#queue() queue}, or synchronously using
- * {@link OAuth2Action#complete() complete}.
- *
- * <p>
- * Note that OAuth2Action does not extend JDA's RestAction.
- *
- *
+ * {@link OAuth2Action#complete() complete}. <p> Note that OAuth2Action does not
+ * extend JDA's RestAction.
  */
 public abstract class OAuth2Action<T> {
-	protected static final Consumer<?> DEFAULT_SUCCESS = t -> {
-	};
-	protected static final Consumer<Throwable> DEFAULT_FAILURE = t -> {
-		OAuth2Requester.LOGGER.error("Requester encountered an error while processing response!", t);
-	};
 
-	protected final OAuth2ClientImpl client;
-	protected final Method method;
-	protected final String url;
+    protected static final Consumer<?>         DEFAULT_SUCCESS = t -> {};
 
-	public OAuth2Action(OAuth2ClientImpl client, Method method, String url) {
-		Checks.notNull(client, "OAuth2Client");
-		Checks.notNull(method, "Request method");
-		Checks.notEmpty(url, "URL");
+    protected static final Consumer<Throwable> DEFAULT_FAILURE = t -> {
+                                                                   OAuth2Requester.LOGGER
+                                                                       .error(
+                                                                           "Requester encountered an error while processing response!",
+                                                                           t);
+                                                               };
 
-		this.client = client;
-		this.method = method;
-		this.url = url;
-	}
+    protected final OAuth2ClientImpl           client;
 
-	protected RequestBody getBody() {
-		return OAuth2Requester.EMPTY_BODY;
-	}
+    protected final Method                     method;
 
-	protected Headers getHeaders() {
-		return Headers.of();
-	}
+    protected final String                     url;
 
-	protected Request buildRequest() {
-		Request.Builder builder = new Request.Builder();
+    public OAuth2Action(OAuth2ClientImpl client, Method method, String url) {
+        Checks.notNull(client, "OAuth2Client");
+        Checks.notNull(method, "Request method");
+        Checks.notEmpty(url, "URL");
 
-		switch (method) {
-		case GET:
-			builder.get();
-			break;
-		case POST:
-			builder.post(getBody());
-			break;
-		default:
-			throw new IllegalArgumentException(method.name() + " requests are not supported!");
-		}
+        this.client = client;
+        this.method = method;
+        this.url = url;
+    }
 
-		builder.url(url);
-		builder.header("User-Agent", OAuth2Requester.USER_AGENT);
-		builder.headers(getHeaders());
+    protected RequestBody getBody() {
+        return OAuth2Requester.EMPTY_BODY;
+    }
 
-		return builder.build();
-	}
+    protected Headers getHeaders() {
+        return Headers.of();
+    }
 
-	protected Method getMethod() {
-		return method;
-	}
+    protected Request buildRequest() {
+        Request.Builder builder = new Request.Builder();
 
-	protected String getUrl() {
-		return url;
-	}
+        switch (method) {
+            case GET:
+                builder.get();
+                break;
+            case POST:
+                builder.post(getBody());
+                break;
+            default:
+                throw new IllegalArgumentException(
+                    method.name() + " requests are not supported!");
+        }
 
-	/**
-	 * Asynchronously executes this OAuth2Action.
-	 */
-	@SuppressWarnings("unchecked")
-	public void queue() {
-		queue((Consumer<T>) DEFAULT_SUCCESS);
-	}
+        builder.url(url);
+        builder.header("User-Agent", OAuth2Requester.USER_AGENT);
+        builder.headers(getHeaders());
 
-	/**
-	 * Asynchronously executes this OAuth2Action, providing the value constructed
-	 * from the response as the parameter given to the success
-	 * {@link java.util.function.Consumer Consumer}.
-	 *
-	 * @param success The success consumer, executed when this OAuth2Action gets a
-	 *                successful response.
-	 */
-	public void queue(Consumer<T> success) {
-		queue(success, DEFAULT_FAILURE);
-	}
+        return builder.build();
+    }
 
-	/**
-	 * Asynchronously executes this OAuth2Action, providing the value constructed
-	 * from the response as the parameter given to the success
-	 * {@link java.util.function.Consumer Consumer} if the response is successful,
-	 * or the exception to the failure Consumer if it's not.
-	 *
-	 * @param success The success consumer, executed when this OAuth2Action gets a
-	 *                successful response.
-	 * @param failure The failure consumer, executed when this OAuth2Action gets a
-	 *                failed response.
-	 */
-	public void queue(Consumer<T> success, Consumer<Throwable> failure) {
-		client.getRequester().submitAsync(this, success, failure);
-	}
+    protected Method getMethod() {
+        return method;
+    }
 
-	/**
-	 * Synchronously executes this OAuth2Action, returning the value constructed
-	 * from the response if it was successful, or throwing the
-	 * {@link java.lang.Exception Exception} if it was not.
-	 *
-	 * <p>
-	 * Bear in mind when using this, that this method blocks the thread it is called
-	 * in.
-	 *
-	 * @return the value constructed from the response
-	 * @throws java.io.IOException on unsuccessful execution
-	 */
-	public T complete() throws IOException {
-		return client.getRequester().submitSync(this);
-	}
+    protected String getUrl() {
+        return url;
+    }
 
-	/**
-	 * Gets the {@link com.readonlydev.oauth2.OAuth2Client client} responsible for
-	 * creating this OAuth2Action.
-	 *
-	 * @return The OAuth2Client responsible for creating this.
-	 */
-	public OAuth2ClientImpl getClient() {
-		return client;
-	}
+    /**
+     * Asynchronously executes this OAuth2Action.
+     */
+    @SuppressWarnings("unchecked")
+    public void queue() {
+        queue((Consumer<T>) DEFAULT_SUCCESS);
+    }
 
-	protected abstract T handle(@WillClose Response response) throws IOException;
+    /**
+     * Asynchronously executes this OAuth2Action, providing the value
+     * constructed from the response as the parameter given to the success
+     * {@link java.util.function.Consumer Consumer}.
+     *
+     * @param success
+     *        The success consumer, executed when this OAuth2Action gets a
+     *        successful response.
+     */
+    public void queue(Consumer<T> success) {
+        queue(success, DEFAULT_FAILURE);
+    }
+
+    /**
+     * Asynchronously executes this OAuth2Action, providing the value
+     * constructed from the response as the parameter given to the success
+     * {@link java.util.function.Consumer Consumer} if the response is
+     * successful, or the exception to the failure Consumer if it's not.
+     *
+     * @param success
+     *        The success consumer, executed when this OAuth2Action gets a
+     *        successful response.
+     * @param failure
+     *        The failure consumer, executed when this OAuth2Action gets a
+     *        failed response.
+     */
+    public void queue(Consumer<T> success, Consumer<Throwable> failure) {
+        client.getRequester().submitAsync(this, success, failure);
+    }
+
+    /**
+     * Synchronously executes this OAuth2Action, returning the value constructed
+     * from the response if it was successful, or throwing the
+     * {@link java.lang.Exception Exception} if it was not. <p> Bear in mind
+     * when using this, that this method blocks the thread it is called in.
+     *
+     * @return the value constructed from the response
+     * 
+     * @throws java.io.IOException
+     *         on unsuccessful execution
+     */
+    public T complete() throws IOException {
+        return client.getRequester().submitSync(this);
+    }
+
+    /**
+     * Gets the {@link com.readonlydev.oauth2.OAuth2Client client} responsible
+     * for creating this OAuth2Action.
+     *
+     * @return The OAuth2Client responsible for creating this.
+     */
+    public OAuth2ClientImpl getClient() {
+        return client;
+    }
+
+    protected abstract T handle(@WillClose Response response)
+            throws IOException;
 }

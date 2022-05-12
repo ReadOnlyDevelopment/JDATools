@@ -1,3 +1,4 @@
+
 package com.readonlydev.command;
 
 import java.util.ArrayList;
@@ -22,18 +23,14 @@ import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.TextChannel;
 
 /**
- * <h1><b>Commands In JDATools</b></h1>
- * <p>
- * The internal inheritance for Commands used in JDATools is that of the Command
- * object.
- * <p>
- * Classes created inheriting this class gain the unique traits of commands
- * operated using the Commands Extension. <br>
- * Using several fields, a command can define properties that make it unique and
- * complex while maintaining a low level of development. <br>
- * All Commands extending this class can define any number of these fields in a
- * object constructor and then create the command action/response in the
- * abstract
+ * <h1><b>Commands In JDATools</b></h1> <p> The internal inheritance for
+ * Commands used in JDATools is that of the Command object. <p> Classes created
+ * inheriting this class gain the unique traits of commands operated using the
+ * Commands Extension. <br> Using several fields, a command can define
+ * properties that make it unique and complex while maintaining a low level of
+ * development. <br> All Commands extending this class can define any number of
+ * these fields in a object constructor and then create the command
+ * action/response in the abstract
  * {@link com.readonlydev.command.Command#execute(com.readonlydev.command.CommandEvent)
  * #execute(CommandEvent)} body:
  *
@@ -54,149 +51,143 @@ import net.dv8tion.jda.api.entities.TextChannel;
  * }</code>
  * </pre>
  *
- * Execution is with the provision of a MessageReceivedEvent-Client
- * wrapper called a {@link com.readonlydev.command.event.CommandEvent CommandEvent} and is
- * performed in two steps:
- * <ul>
+ * Execution is with the provision of a MessageReceivedEvent-Client wrapper
+ * called a {@link com.readonlydev.command.event.CommandEvent CommandEvent} and
+ * is performed in two steps: <ul>
  * <li>{@link com.readonlydev.command.Command#run(CommandEvent) run} - The
  * command runs through a series of conditionals, automatically terminating the
  * command instance if one is not met, and possibly providing an error
  * response.</li>
  * <li>{@link com.readonlydev.command.Command#execute(CommandEvent) execute} -
  * The command, now being cleared to run, executes and performs whatever lies in
- * the abstract body method.</li>
- * </ul>
+ * the abstract body method.</li> </ul>
  */
 public abstract class Command extends UserInteraction {
-    /**
-     * The name of the command, allows the command to be called the formats: <br>
-     * Normal Command: {@code [prefix]<command name>}. <br>
-     * Slash Command: {@code /<command name>}
-     */
-    protected String name = "null";
 
     /**
-     * A small help String that summarizes the function of the command, used in the
-     * default help builder, and shown in the client for Slash Commands.
+     * The name of the command, allows the command to be called the formats:
+     * <br> Normal Command: {@code [prefix]<command name>}. <br> Slash Command:
+     * {@code /<command name>}
      */
-    protected String help = "no help available";
+    protected String                            name                   = "null";
 
     /**
-     * The {@link com.readonlydev.command.Command.Category Category} of the command.
-     * <br>
-     * This can perform any other checks not completed by the default conditional
-     * fields.
+     * A small help String that summarizes the function of the command, used in
+     * the default help builder, and shown in the client for Slash Commands.
      */
-    protected Category category = null;
+    protected String                            help                   = "no help available";
 
     /**
-     * An arguments format String for the command, used in the default help builder.
-     * Not supported for SlashCommands.
+     * The {@link com.readonlydev.command.Command.Category Category} of the
+     * command. <br> This can perform any other checks not completed by the
+     * default conditional fields.
+     */
+    protected Category                          category               = null;
+
+    /**
+     * An arguments format String for the command, used in the default help
+     * builder. Not supported for SlashCommands.
      *
      * @see SlashCommand#options
      */
-    List<CommandArgument<?>> arguments = new ArrayList<>();
+    List<CommandArgument<?>>                    arguments              = new ArrayList<>();
 
     /**
      * {@code true} if the command may only be used in an NSFW
      * {@link net.dv8tion.jda.api.entities.TextChannel TextChannel} or DMs.
-     * {@code false} if it may be used anywhere <br>
-     * Default: {@code false}
+     * {@code false} if it may be used anywhere <br> Default: {@code false}
      */
-    protected boolean nsfwOnly = false;
+    protected boolean                           nsfwOnly               = false;
 
     /**
      * A String name of a role required to use this command.
      */
-    List<String> requiredRoles = new ArrayList<>();
+    List<String>                                requiredRoles          = new ArrayList<>();
 
     /**
-     * {@code true} if the command may only be used by a User with an ID matching
-     * the Owners or any of the CoOwners.<br>
-     * If enabled for a Slash Command, only owners (owner + up to 9 co-owners) will
-     * be added to the SlashCommand. All other permissions will be ignored. <br>
-     * Default {@code false}.
+     * {@code true} if the command may only be used by a User with an ID
+     * matching the Owners or any of the CoOwners.<br> If enabled for a Slash
+     * Command, only owners (owner + up to 9 co-owners) will be added to the
+     * SlashCommand. All other permissions will be ignored. <br> Default
+     * {@code false}.
      */
-    protected boolean ownerCommand = false;
+    protected boolean                           ownerCommand           = false;
 
     /**
-     * An {@code int} number of seconds users must wait before using this command
-     * again.
+     * An {@code int} number of seconds users must wait before using this
+     * command again.
      */
-    protected int cooldown = 0;
+    protected int                               cooldown               = 0;
 
     /**
-     * Any {@link net.dv8tion.jda.api.Permission Permission}s a Member must have to
-     * use this command. <br>
-     * These are only checked in a {@link net.dv8tion.jda.api.entities.Guild Guild}
-     * environment.
+     * Any {@link net.dv8tion.jda.api.Permission Permission}s a Member must have
+     * to use this command. <br> These are only checked in a
+     * {@link net.dv8tion.jda.api.entities.Guild Guild} environment.
      */
-    protected Permission[] userPermissions = new Permission[0];
+    protected Permission[]                      userPermissions        = new Permission[0];
 
     /**
-     * Any {@link net.dv8tion.jda.api.Permission Permission}s the bot must have to
-     * use a command. <br>
-     * These are only checked in a {@link net.dv8tion.jda.api.entities.Guild Guild}
-     * environment.
+     * Any {@link net.dv8tion.jda.api.Permission Permission}s the bot must have
+     * to use a command. <br> These are only checked in a
+     * {@link net.dv8tion.jda.api.entities.Guild Guild} environment.
      */
-    protected Permission[] botPermissions = new Permission[0];
+    protected Permission[]                      botPermissions         = new Permission[0];
 
     /**
-     * The aliases of the command, when calling a command these function identically
-     * to calling the {@link com.readonlydev.command.Command#name Command.name}. This
-     * options only works for normal commands, not slash commands.
+     * The aliases of the command, when calling a command these function
+     * identically to calling the {@link com.readonlydev.command.Command#name
+     * Command.name}. This options only works for normal commands, not slash
+     * commands.
      */
-    protected String[] aliases = new String[0];
+    protected String[]                          aliases                = new String[0];
 
     /**
      * The child commands of the command. These are used in the format
      * {@code [prefix]<parent name>
      * <child name>}.
      */
-    protected Command[] children = new Command[0];
+    protected Command[]                         children               = new Command[0];
 
     /**
      * The {@link java.util.function.BiConsumer BiConsumer} for creating a help
      * response to the format {@code [prefix]<command name> help}.
      */
-    protected BiConsumer<CommandEvent, Command> helpBiConsumer = null;
+    protected BiConsumer<CommandEvent, Command> helpBiConsumer         = null;
 
     /**
      * {@code true} if this command checks a channel topic for topic-tags. <br>
-     * This means that putting {@code {-commandname}}, {@code {-command category}},
-     * {@code {-all}} in a channel topic will cause this command to terminate. <br>
-     * Default {@code true}.
+     * This means that putting {@code {-commandname}}, {@code {-command
+     * category}}, {@code {-all}} in a channel topic will cause this command to
+     * terminate. <br> Default {@code true}.
      */
-    protected boolean usesTopicTags = true;
+    protected boolean                           usesTopicTags          = true;
 
     /**
-     * {@code true} if this command should be hidden from the help. <br>
-     * Default {@code false}<br>
-     * <b>This has no effect for SlashCommands.</b>
+     * {@code true} if this command should be hidden from the help. <br> Default
+     * {@code false}<br> <b>This has no effect for SlashCommands.</b>
      */
-    protected boolean hidden = false;
+    protected boolean                           hidden                 = false;
 
     /**
      * The {@link com.readonlydev.api.CooldownScope CooldownScope} of the
-     * command. This defines how far of a scope cooldowns have. <br>
-     * Default {@link com.readonlydev.api.CooldownScope#USER
-     * CooldownScope.USER}.
+     * command. This defines how far of a scope cooldowns have. <br> Default
+     * {@link com.readonlydev.api.CooldownScope#USER CooldownScope.USER}.
      */
-    protected CooldownScope cooldownScope = CooldownScope.USER;
+    protected CooldownScope                     cooldownScope          = CooldownScope.USER;
 
     /**
      * The permission message used when the bot does not have the requires
-     * permission. Requires 3 "%s", first is user mention, second is the permission
-     * needed, third is type, e.g. Guild.
+     * permission. Requires 3 "%s", first is user mention, second is the
+     * permission needed, third is type, e.g. Guild.
      */
-    protected String botMissingPermMessage = "%s I need the %s permission in this %s!";
+    protected String                            botMissingPermMessage  = "%s I need the %s permission in this %s!";
 
     /**
      * The permission message used when the user does not have the requires
-     * permission. Requires 3 "%s", first is user mention, second is the permission
-     * needed, third is type, e.g. Guild.
+     * permission. Requires 3 "%s", first is user mention, second is the
+     * permission needed, third is type, e.g. Guild.
      */
-    protected String userMissingPermMessage = "%s You must have the %s permission in this %s to use that!";
+    protected String                            userMissingPermMessage = "%s You must have the %s permission in this %s to use that!";
 
     protected void addAguments(CommandArgument<?>... argumentArray) {
         arguments.addAll(Arrays.asList(argumentArray));
@@ -211,36 +202,41 @@ public abstract class Command extends UserInteraction {
     }
 
     /**
-     * The main body method of a {@link com.readonlydev.command.Command Command}.
-     * <br>
-     * This is the "response" for a successful
-     * {@link com.readonlydev.command.Command#run(CommandEvent) #run(CommandEvent)}.
+     * The main body method of a {@link com.readonlydev.command.Command
+     * Command}. <br> This is the "response" for a successful
+     * {@link com.readonlydev.command.Command#run(CommandEvent)
+     * #run(CommandEvent)}.
      *
-     * @param event The {@link com.readonlydev.command.event.CommandEvent CommandEvent} that
-     *              triggered this Command
+     * @param event
+     *        The {@link com.readonlydev.command.event.CommandEvent
+     *        CommandEvent} that triggered this Command
      */
     protected abstract void execute(CommandEvent event);
 
     /**
-     * Runs checks for the {@link com.readonlydev.command.Command Command} with the
-     * given {@link com.readonlydev.command.event.CommandEvent CommandEvent} that called it.
-     * <br>
-     * Will terminate, and possibly respond with a failure message, if any checks
-     * fail.
+     * Runs checks for the {@link com.readonlydev.command.Command Command} with
+     * the given {@link com.readonlydev.command.event.CommandEvent CommandEvent}
+     * that called it. <br> Will terminate, and possibly respond with a failure
+     * message, if any checks fail.
      *
-     * @param event The CommandEvent that triggered this Command
+     * @param event
+     *        The CommandEvent that triggered this Command
      */
     public final void run(CommandEvent event) {
         // child check
         if (!event.getArgumentIndex().isEmpty()) {
-            String[] parts = Arrays.copyOf(event.getArgumentIndex().getChildArgArray(), 2);
-            if ((helpBiConsumer != null) && parts[0].equalsIgnoreCase(event.getClient().getHelpWord())) {
+            String[] parts = Arrays
+                .copyOf(event.getArgumentIndex().getChildArgArray(), 2);
+            if ((helpBiConsumer != null) && parts[0]
+                .equalsIgnoreCase(event.getClient().getHelpWord())) {
                 helpBiConsumer.accept(event, this);
                 return;
             }
             for (Command cmd : getChildren()) {
                 if (cmd.isCommandFor(parts[0])) {
-                    event.setArgumentIndex(new ArgumentIndex(parts[1] == null ? "" : parts[1]));
+                    event
+                        .setArgumentIndex(new ArgumentIndex(
+                            parts[1] == null ? "" : parts[1]));
                     cmd.run(event);
                     return;
                 }
@@ -257,17 +253,23 @@ public abstract class Command extends UserInteraction {
             return;
         }
         // is allowed check
-        if (event.isFromType(ChannelType.TEXT) && !isAllowed(event.getTextChannel())) {
+        if (event.isFromType(ChannelType.TEXT)
+                && !isAllowed(event.getTextChannel())) {
             terminate(event, "That command cannot be used in this channel!");
             return;
         }
         // required role check
         if (!requiredRoles.isEmpty()) {
             requiredRoles.forEach(role -> {
-                if (!event.isFromType(ChannelType.TEXT)
-                        || event.getMember().getRoles().stream().noneMatch(r -> r.getName().equalsIgnoreCase(role))) {
+                if (!event.isFromType(ChannelType.TEXT) || event
+                    .getMember()
+                    .getRoles()
+                    .stream()
+                    .noneMatch(r -> r.getName().equalsIgnoreCase(role))) {
                     terminate(event,
-                        event.getClient().getError() + " You must have a role called `" + role + "` to use that!");
+                        event.getClient().getError()
+                                + " You must have a role called `" + role
+                                + "` to use that!");
                     return;
                 }
             });
@@ -278,15 +280,23 @@ public abstract class Command extends UserInteraction {
             // user perms
             for (Permission p : userPermissions) {
                 if (p.isChannel()) {
-                    if (!event.getMember().hasPermission(event.getTextChannel(), p)) {
-                        terminate(event, String.format(userMissingPermMessage, event.getClient().getError(),
-                            p.getName(), "channel"));
+                    if (!event
+                        .getMember()
+                        .hasPermission(event.getTextChannel(), p)) {
+                        terminate(event,
+                            String
+                                .format(userMissingPermMessage,
+                                    event.getClient().getError(), p.getName(),
+                                    "channel"));
                         return;
                     }
                 } else {
                     if (!event.getMember().hasPermission(p)) {
-                        terminate(event, String.format(userMissingPermMessage, event.getClient().getError(),
-                            p.getName(), "server"));
+                        terminate(event,
+                            String
+                                .format(userMissingPermMessage,
+                                    event.getClient().getError(), p.getName(),
+                                    "server"));
                         return;
                     }
                 }
@@ -298,36 +308,51 @@ public abstract class Command extends UserInteraction {
                         GuildVoiceState gvc = event.getMember().getVoiceState();
                         AudioChannel vc = gvc == null ? null : gvc.getChannel();
                         if (vc == null) {
-                            terminate(event,
-                                event.getClient().getError() + " You must be in a voice channel to use that!");
+                            terminate(event, event.getClient().getError()
+                                    + " You must be in a voice channel to use that!");
                             return;
-                        } else if (!event.getSelfMember().hasPermission(vc, p)) {
-                            terminate(event, String.format(botMissingPermMessage, event.getClient().getError(),
-                                p.getName(), "voice channel"));
+                        } else if (!event
+                            .getSelfMember()
+                            .hasPermission(vc, p)) {
+                            terminate(event,
+                                String
+                                    .format(botMissingPermMessage,
+                                        event.getClient().getError(),
+                                        p.getName(), "voice channel"));
                             return;
                         }
                     } else {
-                        if (!event.getSelfMember().hasPermission(event.getTextChannel(), p)) {
-                            terminate(event, String.format(botMissingPermMessage, event.getClient().getError(),
-                                p.getName(), "channel"));
+                        if (!event
+                            .getSelfMember()
+                            .hasPermission(event.getTextChannel(), p)) {
+                            terminate(event,
+                                String
+                                    .format(botMissingPermMessage,
+                                        event.getClient().getError(),
+                                        p.getName(), "channel"));
                             return;
                         }
                     }
                 } else {
                     if (!event.getSelfMember().hasPermission(p)) {
-                        terminate(event, String.format(botMissingPermMessage, event.getClient().getError(), p.getName(),
-                                "server"));
+                        terminate(event,
+                            String
+                                .format(botMissingPermMessage,
+                                    event.getClient().getError(), p.getName(),
+                                    "server"));
                         return;
                     }
                 }
             }
             // nsfw check
             if (nsfwOnly && !event.getTextChannel().isNSFW()) {
-                terminate(event, "This command may only be used in NSFW text channels!");
+                terminate(event,
+                    "This command may only be used in NSFW text channels!");
                 return;
             }
         } else if (guildOnly) {
-            terminate(event, event.getClient().getError() + " This command cannot be used in direct messages");
+            terminate(event, event.getClient().getError()
+                    + " This command cannot be used in direct messages");
             return;
         }
         // cooldown check, ignoring owner
@@ -346,7 +371,10 @@ public abstract class Command extends UserInteraction {
             execute(event);
         } catch (Throwable t) {
             if (event.getClient().getListener() != null) {
-                event.getClient().getListener().onCommandException(event, this, t);
+                event
+                    .getClient()
+                    .getListener()
+                    .onCommandException(event, this, t);
                 return;
             }
             // otherwise we rethrow
@@ -360,7 +388,8 @@ public abstract class Command extends UserInteraction {
     /**
      * Checks if the given input represents this Command
      *
-     * @param input The input to check
+     * @param input
+     *        The input to check
      *
      * @return {@code true} if the input is the name or an alias of the Command
      */
@@ -378,25 +407,24 @@ public abstract class Command extends UserInteraction {
 
     /**
      * Checks whether a command is allowed in a
-     * {@link net.dv8tion.jda.api.entities.TextChannel TextChannel} by searching the
-     * channel topic for topic tags relating to the command.
-     * <p>
+     * {@link net.dv8tion.jda.api.entities.TextChannel TextChannel} by searching
+     * the channel topic for topic tags relating to the command. <p>
      * {-{@link com.readonlydev.command.Command#name name}},
      * {-{@link com.readonlydev.command.Command.Category category name}}, or
      * {-{@code all}} are valid examples of ways that this method would return
-     * {@code false} if placed in a channel topic.
-     * <p>
-     * <b>NOTE:</b>Topic tags are <b>case sensitive</b> and proper usage must be in
-     * lower case! <br>
-     * Also note that setting {@link com.readonlydev.command.Command#usesTopicTags
-     * usesTopicTags} to {@code false} will cause this method to always return
-     * {@code true}, as the feature would not be applicable in the first place.
+     * {@code false} if placed in a channel topic. <p> <b>NOTE:</b>Topic tags
+     * are <b>case sensitive</b> and proper usage must be in lower case! <br>
+     * Also note that setting
+     * {@link com.readonlydev.command.Command#usesTopicTags usesTopicTags} to
+     * {@code false} will cause this method to always return {@code true}, as
+     * the feature would not be applicable in the first place.
      *
-     * @param channel The TextChannel to test.
+     * @param channel
+     *        The TextChannel to test.
      *
-     * @return {@code true} if the channel topic doesn't specify any topic-tags that
-     *         would cause this command to be cancelled, or if {@code usesTopicTags}
-     *         has been set to {@code false}.
+     * @return {@code true} if the channel topic doesn't specify any topic-tags
+     *         that would cause this command to be cancelled, or if
+     *         {@code usesTopicTags} has been set to {@code false}.
      */
     public boolean isAllowed(TextChannel channel) {
         if (!usesTopicTags) {
@@ -417,7 +445,8 @@ public abstract class Command extends UserInteraction {
         if (topic.contains("{-" + lowerName + "}")) {
             return false;
         }
-        String lowerCat = category == null ? null : category.getName().toLowerCase(Locale.ROOT);
+        String lowerCat = category == null ? null
+                : category.getName().toLowerCase(Locale.ROOT);
         if (lowerCat != null) {
             if (topic.contains("{" + lowerCat + "}")) {
                 return true;
@@ -430,8 +459,8 @@ public abstract class Command extends UserInteraction {
     }
 
     /**
-     * Gets the {@link com.readonlydev.command.Command#name Command.name} for the
-     * Command.
+     * Gets the {@link com.readonlydev.command.Command#name Command.name} for
+     * the Command.
      *
      * @return The name for the Command
      */
@@ -440,8 +469,8 @@ public abstract class Command extends UserInteraction {
     }
 
     /**
-     * Gets the {@link com.readonlydev.command.Command#help Command.help} for the
-     * Command.
+     * Gets the {@link com.readonlydev.command.Command#help Command.help} for
+     * the Command.
      *
      * @return The help for the Command
      */
@@ -450,8 +479,8 @@ public abstract class Command extends UserInteraction {
     }
 
     /**
-     * Gets the {@link com.readonlydev.command.Command#category Command.category} for
-     * the Command.
+     * Gets the {@link com.readonlydev.command.Command#category
+     * Command.category} for the Command.
      *
      * @return The category for the Command
      */
@@ -460,8 +489,8 @@ public abstract class Command extends UserInteraction {
     }
 
     /**
-     * Gets the {@link com.readonlydev.command.Command#arguments Command.arguments}
-     * for the Command.
+     * Gets the {@link com.readonlydev.command.Command#arguments
+     * Command.arguments} for the Command.
      *
      * @return The arguments for the Command
      */
@@ -491,8 +520,8 @@ public abstract class Command extends UserInteraction {
     }
 
     /**
-     * Gets the {@link com.readonlydev.command.Command#cooldown Command.cooldown} for
-     * the Command.
+     * Gets the {@link com.readonlydev.command.Command#cooldown
+     * Command.cooldown} for the Command.
      *
      * @return The cooldown for the Command
      */
@@ -524,8 +553,8 @@ public abstract class Command extends UserInteraction {
     }
 
     /**
-     * Gets the {@link com.readonlydev.command.Command#aliases Command.aliases} for
-     * the Command.
+     * Gets the {@link com.readonlydev.command.Command#aliases Command.aliases}
+     * for the Command.
      *
      * @return The aliases for the Command
      */
@@ -534,8 +563,8 @@ public abstract class Command extends UserInteraction {
     }
 
     /**
-     * Gets the {@link com.readonlydev.command.Command#children Command.children} for
-     * the Command.
+     * Gets the {@link com.readonlydev.command.Command#children
+     * Command.children} for the Command.
      *
      * @return The children for the Command
      */
@@ -557,7 +586,8 @@ public abstract class Command extends UserInteraction {
     /**
      * Checks whether or not this command should be hidden from the help.
      *
-     * @return {@code true} if the command should be hidden, otherwise {@code false}
+     * @return {@code true} if the command should be hidden, otherwise
+     *         {@code false}
      */
     public boolean isHidden() {
         return hidden;
@@ -576,35 +606,48 @@ public abstract class Command extends UserInteraction {
      * Gets the proper cooldown key for this Command under the provided
      * {@link com.readonlydev.command.event.CommandEvent CommandEvent}.
      *
-     * @param event The CommandEvent to generate the cooldown for.
+     * @param event
+     *        The CommandEvent to generate the cooldown for.
      *
      * @return A String key to use when applying a cooldown.
      */
     public String getCooldownKey(CommandEvent event) {
         switch (cooldownScope) {
             case USER:
-                return cooldownScope.genKey(name, event.getAuthor().getIdLong());
+                return cooldownScope
+                    .genKey(name, event.getAuthor().getIdLong());
             case USER_GUILD:
                 return event.getGuild() != null
-                ? cooldownScope.genKey(name, event.getAuthor().getIdLong(), event.getGuild().getIdLong())
-                        : CooldownScope.USER_CHANNEL.genKey(name, event.getAuthor().getIdLong(),
-                            event.getChannel().getIdLong());
+                        ? cooldownScope
+                            .genKey(name, event.getAuthor().getIdLong(),
+                                event.getGuild().getIdLong())
+                        : CooldownScope.USER_CHANNEL
+                            .genKey(name, event.getAuthor().getIdLong(),
+                                event.getChannel().getIdLong());
             case USER_CHANNEL:
-                return cooldownScope.genKey(name, event.getAuthor().getIdLong(), event.getChannel().getIdLong());
+                return cooldownScope
+                    .genKey(name, event.getAuthor().getIdLong(),
+                        event.getChannel().getIdLong());
             case GUILD:
-                return event.getGuild() != null ? cooldownScope.genKey(name, event.getGuild().getIdLong())
-                        : CooldownScope.CHANNEL.genKey(name, event.getChannel().getIdLong());
+                return event.getGuild() != null
+                        ? cooldownScope
+                            .genKey(name, event.getGuild().getIdLong())
+                        : CooldownScope.CHANNEL
+                            .genKey(name, event.getChannel().getIdLong());
             case CHANNEL:
-                return cooldownScope.genKey(name, event.getChannel().getIdLong());
+                return cooldownScope
+                    .genKey(name, event.getChannel().getIdLong());
             case SHARD:
-                return event.getJDA().getShardInfo() != null
-                ? cooldownScope.genKey(name, event.getJDA().getShardInfo().getShardId())
+                return event.getJDA().getShardInfo() != null ? cooldownScope
+                    .genKey(name, event.getJDA().getShardInfo().getShardId())
                         : CooldownScope.GLOBAL.genKey(name, 0);
             case USER_SHARD:
                 return event.getJDA().getShardInfo() != null
-                ? cooldownScope.genKey(name, event.getAuthor().getIdLong(),
-                    event.getJDA().getShardInfo().getShardId())
-                        : CooldownScope.USER.genKey(name, event.getAuthor().getIdLong());
+                        ? cooldownScope
+                            .genKey(name, event.getAuthor().getIdLong(),
+                                event.getJDA().getShardInfo().getShardId())
+                        : CooldownScope.USER
+                            .genKey(name, event.getAuthor().getIdLong());
             case GLOBAL:
                 return cooldownScope.genKey(name, 0);
             default:
@@ -616,9 +659,10 @@ public abstract class Command extends UserInteraction {
      * Gets an error message for this Command under the provided
      * {@link com.readonlydev.command.event.CommandEvent CommanEvent}.
      *
-     * @param event     The CommandEvent to generate the error message for.
-     * @param remaining The remaining number of seconds a command is on cooldown
-     *                  for.
+     * @param event
+     *        The CommandEvent to generate the error message for.
+     * @param remaining
+     *        The remaining number of seconds a command is on cooldown for.
      *
      * @return A String error message for this command if {@code remaining > 0},
      *         else {@code null}.
@@ -627,34 +671,43 @@ public abstract class Command extends UserInteraction {
         if (remaining <= 0) {
             return null;
         }
-        String front = event.getClient().getWarning() + " That command is on cooldown for " + remaining
+        String front = event.getClient().getWarning()
+                + " That command is on cooldown for " + remaining
                 + " more seconds";
         if (cooldownScope.equals(CooldownScope.USER)) {
             return front + "!";
-        } else if (cooldownScope.equals(CooldownScope.USER_GUILD) && (event.getGuild() == null)) {
-            return front + " " + CooldownScope.USER_CHANNEL.getErrorSpecification() + "!";
-        } else if (cooldownScope.equals(CooldownScope.GUILD) && (event.getGuild() == null)) {
-            return front + " " + CooldownScope.CHANNEL.getErrorSpecification() + "!";
+        } else if (cooldownScope.equals(CooldownScope.USER_GUILD)
+                && (event.getGuild() == null)) {
+            return front + " "
+                    + CooldownScope.USER_CHANNEL.getErrorSpecification() + "!";
+        } else if (cooldownScope.equals(CooldownScope.GUILD)
+                && (event.getGuild() == null)) {
+            return front + " " + CooldownScope.CHANNEL.getErrorSpecification()
+                    + "!";
         } else {
             return front + " " + cooldownScope.getErrorSpecification() + "!";
         }
     }
 
     /**
-     * To be used in {@link com.readonlydev.command.Command Command}s as a means of
-     * organizing commands into "Categories" as well as terminate command usage when
-     * the calling {@link com.readonlydev.command.event.CommandEvent CommandEvent} doesn't
-     * meet certain requirements.
+     * To be used in {@link com.readonlydev.command.Command Command}s as a means
+     * of organizing commands into "Categories" as well as terminate command
+     * usage when the calling {@link com.readonlydev.command.event.CommandEvent
+     * CommandEvent} doesn't meet certain requirements.
      */
     public static class Category {
-        private final String name;
-        private final String failResponse;
+
+        private final String                  name;
+
+        private final String                  failResponse;
+
         private final Predicate<CommandEvent> predicate;
 
         /**
          * A Command Category containing a name.
          *
-         * @param name The name of the Category
+         * @param name
+         *        The name of the Category
          */
         public Category(String name) {
             this.name = name;
@@ -664,14 +717,15 @@ public abstract class Command extends UserInteraction {
 
         /**
          * A Command Category containing a name and a
-         * {@link java.util.function.Predicate}.
-         * <p>
-         * The command will be terminated if
+         * {@link java.util.function.Predicate}. <p> The command will be
+         * terminated if
          * {@link com.readonlydev.command.Command.Category#test(com.readonlydev.command.CommandEvent)}
          * returns {@code false}.
          *
-         * @param name      The name of the Category
-         * @param predicate The Category predicate to test
+         * @param name
+         *        The name of the Category
+         * @param predicate
+         *        The Category predicate to test
          */
         public Category(String name, Predicate<CommandEvent> predicate) {
             this.name = name;
@@ -680,18 +734,21 @@ public abstract class Command extends UserInteraction {
         }
 
         /**
-         * A Command Category containing a name, a {@link java.util.function.Predicate},
-         * and a failure response.
-         * <p>
-         * The command will be terminated if
+         * A Command Category containing a name, a
+         * {@link java.util.function.Predicate}, and a failure response. <p> The
+         * command will be terminated if
          * {@link com.readonlydev.command.Command.Category#test(com.readonlydev.command.CommandEvent)}
          * returns {@code false}, and the failure response will be sent.
          *
-         * @param name         The name of the Category
-         * @param failResponse The response if the test fails
-         * @param predicate    The Category predicate to test
+         * @param name
+         *        The name of the Category
+         * @param failResponse
+         *        The response if the test fails
+         * @param predicate
+         *        The Category predicate to test
          */
-        public Category(String name, String failResponse, Predicate<CommandEvent> predicate) {
+        public Category(String name, String failResponse,
+                Predicate<CommandEvent> predicate) {
             this.name = name;
             this.failResponse = failResponse;
             this.predicate = predicate;
@@ -716,14 +773,16 @@ public abstract class Command extends UserInteraction {
         }
 
         /**
-         * Runs a test of the provided {@link java.util.function.Predicate}. Does not
-         * support SlashCommands.
+         * Runs a test of the provided {@link java.util.function.Predicate}.
+         * Does not support SlashCommands.
          *
-         * @param event The {@link com.readonlydev.command.event.CommandEvent CommandEvent} that
-         *              was called when this method is invoked
+         * @param event
+         *        The {@link com.readonlydev.command.event.CommandEvent
+         *        CommandEvent} that was called when this method is invoked
          *
-         * @return {@code true} if the Predicate was not set, was set as null, or was
-         *         tested and returned true, otherwise returns {@code false}
+         * @return {@code true} if the Predicate was not set, was set as null,
+         *         or was tested and returned true, otherwise returns
+         *         {@code false}
          */
         public boolean test(CommandEvent event) {
             return (predicate == null) || predicate.test(event);
@@ -735,7 +794,8 @@ public abstract class Command extends UserInteraction {
                 return false;
             }
             Category other = (Category) obj;
-            return Objects.equals(name, other.name) && Objects.equals(predicate, other.predicate)
+            return Objects.equals(name, other.name)
+                    && Objects.equals(predicate, other.predicate)
                     && Objects.equals(failResponse, other.failResponse);
         }
 
