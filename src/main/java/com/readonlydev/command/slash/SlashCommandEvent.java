@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import com.readonlydev.command.client.Client;
+import com.readonlydev.command.event.Event;
 
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.GuildChannel;
@@ -18,7 +19,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
-public class SlashCommandEvent extends SlashCommandInteractionEvent {
+public class SlashCommandEvent extends SlashCommandInteractionEvent implements Event {
     private final Client client;
 
     public SlashCommandEvent(SlashCommandInteractionEvent event, Client client)
@@ -151,7 +152,7 @@ public class SlashCommandEvent extends SlashCommandInteractionEvent {
             return defaultValue;
         }
 
-        return getOption(key, defaultValue, OptionMapping::getAsGuildChannel);
+        return getOption(key, defaultValue, optionMapping -> optionMapping.getAsChannel().asStandardGuildChannel());
     }
 
     /**
@@ -284,8 +285,9 @@ public class SlashCommandEvent extends SlashCommandInteractionEvent {
     @Nullable
     @Contract("_, !null -> !null")
     public MessageChannel optMessageChannel(@NotNull String key, @Nullable MessageChannel defaultValue) {
-        return getOption(key, defaultValue, OptionMapping::getAsMessageChannel);
+        return getOption(key, defaultValue, optionMapping -> optionMapping.getAsChannel().asGuildMessageChannel());
     }
+
 
     /**
      * Gets the provided Option Key as an Attachment value, or returns {@code null} if the option cannot be found.

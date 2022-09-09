@@ -16,4 +16,5 @@ public final class JDAToolsInfo {
     public static final String  GITHUB  = "https://github.com/ROMVoid95/JDATools";
 
     public static final String  AUTHOR  = "JDATools";
+
 }

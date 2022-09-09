@@ -2,15 +2,19 @@
 package com.readonlydev.api;
 
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
 
 import com.readonlydev.command.Command;
+import com.readonlydev.command.Command.Category;
 import com.readonlydev.command.CommandListener;
+import com.readonlydev.command.ctx.ContextMenu;
 import com.readonlydev.command.slash.SlashCommand;
 import com.readonlydev.settings.GuildSettingsManager;
 
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -216,6 +220,30 @@ public interface ClientInterface {
     void addSlashCommand(SlashCommand command, int index);
 
     /**
+     * Adds a single {@link ContextMenu} to this CommandClient's registered Context Menus.
+     *
+     * @param  menu
+     *         The menu to add
+     *
+     * @throws java.lang.IllegalArgumentException
+     *         If the Context Menu provided has a name that has already been registered
+     */
+    void addContextMenu(ContextMenu menu);
+
+    /**
+     * Adds a single {@link ContextMenu} to this CommandClient's registered Context Menus.
+     *
+     * @param  menu
+     *         The menu to add
+     * @param  index
+     *         The index to add the Context Menu at (must follow the specifications {@code 0<=index<=size()})
+     *
+     * @throws java.lang.IllegalArgumentException
+     *         If the Context Menu provided has a name that has already been registered
+     */
+    void addContextMenu(ContextMenu menu, int index);
+
+    /**
      * Removes a single {@link com.readonlydev.command.Command Command} from
      * this Client's registered Commands at the index linked to the provided
      * name/alias. <p> For Client's containing 20 commands or less, command
@@ -279,18 +307,18 @@ public interface ClientInterface {
     List<SlashCommand> getSlashCommands();
 
     /**
-     * Returns whether manual upsertion is enabled
+     * Returns the list of registered {@link ContextMenu}s during this session.
      *
-     * @return The manual upsertion status
+     * @return A never-null List of Context Menus registered during this session
      */
-    boolean isManualUpsert();
+    List<ContextMenu> getContextMenus();
 
     /**
-     * Returns the forced Guild ID for automatic slash command upserts
+     * Returns the list of registered command {@link Category}'s during this session.
      *
-     * @return A possibly-null forcedGuildId set in the builder
+     * @return A never-null List of command Category's registered during this session
      */
-    String forcedGuildId();
+    HashMap<Category, List<Command>> getCommandCategoryToCommandListMap();
 
     /**
      * Gets the time this {@link com.readonlydev.api.ClientInterface Client}
@@ -401,6 +429,8 @@ public interface ClientInterface {
      * @return The {@code long} ID(s) of any CoOwners of this bot
      */
     long[] getCoOwnerIdsLong();
+
+    String getBotTestingServerId();
 
     /**
      * Gets the success emoji.
@@ -527,4 +557,27 @@ public interface ClientInterface {
      * guild settings manager
      */
     void shutdown();
+
+    /**
+     * Upserts all interactions to the provided {@link #forcedGuildId() forced server}.
+     * <br>This runs after the {@link net.dv8tion.jda.api.events.ReadyEvent ReadyEvent} has been fired
+     * if {@link #isManualUpsert()} is {@code false}.
+     * <br>If {@link #forcedGuildId()} is {@code null}, commands will upsert globally.
+     * <b>This may take up to an hour.</b>
+     *
+     * @param jda The JDA instance to use
+     */
+    default void upsertInteractions(JDA jda) {};
+
+    /**
+     * Upserts all interactions to the provided server.
+     * <br>This runs after the {@link net.dv8tion.jda.api.events.ReadyEvent ReadyEvent} has been fired
+     * if {@link #isManualUpsert()} is {@code false}.
+     * <br>If {@code null} is passed for the server, commands will upsert globally.
+     * <b>This may take up to an hour.</b>
+     *
+     * @param jda The JDA instance to use
+     * @param serverId The server to upsert interactions for
+     */
+    default void upsertInteractions(JDA jda, List<String> serverIdList) {};
 }

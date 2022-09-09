@@ -19,7 +19,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 /**
  * Utility class containing useful methods for getting values of Slash command
  * arguments. <h2>Example</h2>
- * 
+ *
  * <pre>
  * <code>
  * public class MyCommand extends SlashCommand {
@@ -55,7 +55,7 @@ public class OptionHelper {
      *        The slash command event to get options from
      * @param key
      *        The option we want
-     * 
+     *
      * @return The provided option, or null if the option is not present
      */
     @Nullable
@@ -74,7 +74,7 @@ public class OptionHelper {
      *        The option we want
      * @param defaultValue
      *        Nullable default value used in the absence of the option value
-     * 
+     *
      * @return The provided option, or the default value if the option is not
      *         present
      */
@@ -95,7 +95,7 @@ public class OptionHelper {
      *        The slash command event to get options from
      * @param key
      *        The option we want
-     * 
+     *
      * @return The provided option, or false if the option is not present
      */
     public static boolean optBoolean(
@@ -113,7 +113,7 @@ public class OptionHelper {
      *        The option we want
      * @param defaultValue
      *        The fallback option in case of the absence of the option value
-     * 
+     *
      * @return The provided option, or the default value if the option is not
      *         present
      */
@@ -133,7 +133,7 @@ public class OptionHelper {
      *        The slash command event to get options from
      * @param key
      *        The option we want
-     * 
+     *
      * @return The provided option, or 0 if the option is not present
      */
     public static long optLong(@NotNull SlashCommandInteractionEvent event,
@@ -151,7 +151,7 @@ public class OptionHelper {
      *        The option we want
      * @param defaultValue
      *        The fallback option in case of the absence of the option value
-     * 
+     *
      * @return The provided option, or the default value if the option is not
      *         present
      */
@@ -170,7 +170,7 @@ public class OptionHelper {
      *        The slash command event to get options from
      * @param key
      *        The option we want
-     * 
+     *
      * @return The provided option, or 0.0 if the option is not present
      */
     public static double optDouble(@NotNull SlashCommandInteractionEvent event,
@@ -188,7 +188,7 @@ public class OptionHelper {
      *        The option we want
      * @param defaultValue
      *        The fallback option in case of the absence of the option value
-     * 
+     *
      * @return The provided option, or the default value if the option is not
      *         present
      */
@@ -209,7 +209,7 @@ public class OptionHelper {
      *        The slash command event to get options from
      * @param key
      *        The option we want
-     * 
+     *
      * @return The provided option, or null if the option is not present
      */
     @Nullable
@@ -230,7 +230,7 @@ public class OptionHelper {
      *        The option we want
      * @param defaultValue
      *        Nullable default value used in the absence of the option value
-     * 
+     *
      * @return The provided option, or the default value if the option is not
      *         present
      */
@@ -245,7 +245,7 @@ public class OptionHelper {
 
         OptionMapping option = event.getOption(key);
 
-        return option == null ? defaultValue : option.getAsGuildChannel();
+        return option == null ? defaultValue : option.getAsChannel();
     }
 
     /**
@@ -257,7 +257,7 @@ public class OptionHelper {
      *        The slash command event to get options from
      * @param key
      *        The option we want
-     * 
+     *
      * @return The provided option, or null if the option is not present
      */
     @Nullable
@@ -278,7 +278,7 @@ public class OptionHelper {
      *        The option we want
      * @param defaultValue
      *        Nullable default value used in the absence of the option value
-     * 
+     *
      * @return The provided option, or the default value if the option is not
      *         present
      */
@@ -303,7 +303,7 @@ public class OptionHelper {
      *        The slash command event to get options from
      * @param key
      *        The option we want
-     * 
+     *
      * @return The provided option, or null if the option is not present
      */
     @Nullable
@@ -322,7 +322,7 @@ public class OptionHelper {
      *        The option we want
      * @param defaultValue
      *        Nullable default value used in the absence of the option value
-     * 
+     *
      * @return The provided option, or the default value if the option is not
      *         present
      */
@@ -345,7 +345,7 @@ public class OptionHelper {
      *        The slash command event to get options from
      * @param key
      *        The option we want
-     * 
+     *
      * @return The provided option, or null if the option is not present
      */
     @Nullable
@@ -366,7 +366,7 @@ public class OptionHelper {
      *        The option we want
      * @param defaultValue
      *        Nullable default value used in the absence of the option value
-     * 
+     *
      * @return The provided option, or the default value if the option is not
      *         present
      */
@@ -391,7 +391,7 @@ public class OptionHelper {
      *        The slash command event to get options from
      * @param key
      *        The option we want
-     * 
+     *
      * @return The provided option, or null if the option is not present
      */
     @Nullable
@@ -410,7 +410,7 @@ public class OptionHelper {
      *        The option we want
      * @param defaultValue
      *        Nullable default value used in the absence of the option value
-     * 
+     *
      * @return The provided option, or the default value if the option is not
      *         present
      */
@@ -431,7 +431,7 @@ public class OptionHelper {
      *        The slash command event to get options from
      * @param key
      *        The option we want
-     * 
+     *
      * @return The provided option, or null if the option is not present
      */
     @Nullable
@@ -450,7 +450,7 @@ public class OptionHelper {
      *        The option we want
      * @param defaultValue
      *        Nullable default value used in the absence of the option value
-     * 
+     *
      * @return The provided option, or the default value if the option is not
      *         present
      */
@@ -461,7 +461,7 @@ public class OptionHelper {
             @Nullable MessageChannel defaultValue) {
         OptionMapping option = event.getOption(key);
 
-        return option == null ? defaultValue : option.getAsMessageChannel();
+        return option == null ? defaultValue : option.getAsChannel().asGuildMessageChannel();
     }
 
     /**
@@ -472,7 +472,7 @@ public class OptionHelper {
      *        the slash command event to get options from
      * @param key
      *        the option we want
-     * 
+     *
      * @return true if the option exists, false otherwise
      */
     public static boolean hasOption(@NotNull SlashCommandInteractionEvent event,

@@ -1,22 +1,40 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import org.apache.tools.ant.filters.ReplaceTokens
-import com.vanniktech.maven.publish.SonatypeHost
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.vanniktech:gradle-maven-publish-plugin:0.21.0'
+    }
+}
 
 plugins {
     id 'eclipse'
     id 'java-library'
-    id "com.vanniktech.maven.publish" version "0.19.0"
     id "com.github.ben-manes.versions" version "0.42.0"
     id "com.github.johnrengelman.shadow" version "7.1.2"
+    id 'signing'
 }
 
-version = "2.2.1"
+apply plugin: "com.vanniktech.maven.publish"
+
+version = "3.0.1"
 group = 'com.readonlydev'
 archivesBaseName = 'JDATools'
+
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.apache.tools.ant.filters.ReplaceTokens
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 def javaVersion = JavaVersion.VERSION_17
+
+configurations {
+    resolveableImpl {
+        transitive = true
+        canBeResolved = true
+    }
+    api.extendsFrom resolveableImpl
+}
 
 sourceSets {
     test {
@@ -33,9 +51,13 @@ repositories {
 }
 
 dependencies {
-    implementation jda()
-    implementation lang3()
-    implementation json()
+    api jda()
+    api guava()
+    api lang3()
+    api json()
+    api jacksonCore()
+    api jacksonDatabind()
+    api jacksonAnnotations()
 
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
@@ -64,16 +86,9 @@ task sourcesForRelease(type: Copy) {
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
     source = sourcesForRelease.destinationDir
-    classpath = sourceSets.main.compileClasspath
+    classpath += sourceSets.main.compileClasspath
 
     dependsOn sourcesForRelease
-}
-
-configurations {
-    implementation {
-        description = 'implementation'
-        transitive = true
-    }
 }
 
 def setMainManifestProps = { Manifest manifest->
@@ -100,33 +115,27 @@ javadoc {
     options.setWindowTitle(archivesBaseName + ' | ' + projectVersion)
     options.setDocTitle(archivesBaseName + ' | ' + projectVersion)
     options.setEncoding('UTF-8')
-    options.setMemberLevel(JavadocMemberLevel.PROTECTED)
     options.tags 'apiNote:a:API Note:', 'implSpec:a:Implementation Requirements:', 'implNote:a:Implementation Note:'
     options.links = [
-        "https://docs.oracle.com/en/java/javase/${majorJavaVersion}/docs/api".toString()
+        "https://docs.oracle.com/en/java/javase/${majorJavaVersion}/docs/api".toString(),
+        "https://javadoc.io/doc/net.dv8tion/JDA/${jdaVersion}".toString()
     ]
 
     destinationDir = file("$buildDir/docs/")
-    source = sourceSets.main.allJava
-    classpath += configurations.compileClasspath
 }
 
 jar {
     manifest(setMainManifestProps)
+    classifier = 'lite'
 }
 
 shadowJar {
     classifier = ''
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
 task sourcesJar(type: Jar) {
-classifier = 'sources'
-from sourceSets.main.allSource
+    classifier = 'sources'
+    from sourceSets.main.allSource
 }
 
 build {
@@ -136,15 +145,37 @@ build {
 }
 
 artifacts {
+    archives jar
     archives shadowJar
     archives sourcesJar
-    archives javadocJar
 }
 
 mavenPublishing {
-    publishToMavenCentral(SonatypeHost.S01)
     signAllPublications()
     pomFromGradleProperties()
+}
+//
+//publishing {
+//    publications {
+//        JDATools(MavenPublication) {
+//            artifact jar
+//            artifact shadowJar
+//            artifact sourcesJar
+//            artifact javadocJar
+//        }
+//    }
+//    repositories {
+//        maven {
+//            url "file://${project.projectDir}/repo"
+//        }
+//    }
+//}
+
+task localMavenPublish {
+    group 'jdatools'
+    dependsOn 'clean'
+    dependsOn 'publishToMavenLocal'
+    tasks.findByName('publishToMavenLocal').mustRunAfter 'clean'
 }
 
 task fullRelease {

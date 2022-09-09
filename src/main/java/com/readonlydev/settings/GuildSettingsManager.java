@@ -1,9 +1,10 @@
 
 package com.readonlydev.settings;
 
-import net.dv8tion.jda.api.entities.Guild;
-
 import javax.annotation.Nullable;
+
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Guild;
 
 /**
  * An implementable frame for classes that handle Guild-Specific settings. <p>
@@ -36,6 +37,13 @@ public interface GuildSettingsManager<T> {
      */
     @Nullable
     T getSettings(Guild guild);
+
+    /**
+     * Called when JDA has fired a {@link net.dv8tion.jda.api.events.ReadyEvent
+     * ReadyEvent}. <p> Developers should implement this method to create or
+     * initialize resources when starting their bot.
+     */
+    default void init(JDA jda) {};
 
     /**
      * Called when JDA has fired a {@link net.dv8tion.jda.api.events.ReadyEvent

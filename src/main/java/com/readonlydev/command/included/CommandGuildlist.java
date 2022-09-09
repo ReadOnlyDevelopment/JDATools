@@ -20,78 +20,77 @@ import net.dv8tion.jda.api.exceptions.PermissionException;
 
 public class CommandGuildlist extends Command {
 
-	private final EmbedMessageMenu.Builder menuBuilder;
-	private final JDA jdaInstance;
+    private final EmbedMessageMenu.Builder menuBuilder;
+    protected JDA jdaInstance;
 
-	public CommandGuildlist(EventWaiter waiter, JDA jdaInstance) {
-		this.jdaInstance = jdaInstance;
-		this.category = new Command.Category("Bot-Owner");
-		this.help = "shows the list of guilds the bot is on";
-		this.ownerCommand = true;
-		this.guildOnly = false;
-		this.menuBuilder = new EmbedMessageMenu.Builder()
-				.setText("Servers That I Am In")
-				.setEventWaiter(waiter)
-				.setJda(jdaInstance)
-				.setFinalAction(m -> {
-					try {
-						m.clearReactions().queue();
-					} catch(PermissionException ex) {
-						m.delete().queue();
-					}
-				})
-				.setTimeout(3, TimeUnit.MINUTES);
-	}
+    public CommandGuildlist(EventWaiter waiter) {
+        this.category = new Command.Category("Bot Owner");
+        this.help = "shows the list of guilds the bot is on";
+        this.ownerCommand = true;
+        this.guildOnly = false;
+        this.menuBuilder = new EmbedMessageMenu.Builder()
+            .setText("Servers That I Am In")
+            .setEventWaiter(waiter)
+            .setJda(jdaInstance)
+            .setFinalAction(m -> {
+                try {
+                    m.clearReactions().queue();
+                } catch(PermissionException ex) {
+                    m.delete().queue();
+                }
+            })
+            .setTimeout(3, TimeUnit.MINUTES);
+    }
 
-	@Override
-	public void execute(CommandEvent event) {
+    @Override
+    public void execute(CommandEvent event) {
 
-		menuBuilder.clearItems();
+        menuBuilder.clearItems();
 
-		Stream<Guild> guilds = Stream.of(this.jdaInstance.getGuilds().toArray(new Guild[0]));
-		menuBuilder.setItems(guilds.collect(Collectors.toMap(g -> JoinedServerEmbed.func().apply(g), g -> g)));
+        Stream<Guild> guilds = Stream.of(this.jdaInstance.getGuilds().toArray(new Guild[0]));
+        menuBuilder.setItems(guilds.collect(Collectors.toMap(g -> JoinedServerEmbed.func().apply(g), g -> g)));
 
-		EmbedMessageMenu menu = menuBuilder.build();
-		event.getMessage().delete().queue();
-		menu.display(event.getChannel());
-	}
+        EmbedMessageMenu menu = menuBuilder.build();
+        event.getMessage().delete().queue();
+        menu.display(event.getChannel());
+    }
 
-	@FunctionalInterface
-	interface FunctionalEmbed extends Function<Guild, MessageEmbed> {
+    @FunctionalInterface
+    interface FunctionalEmbed extends Function<Guild, MessageEmbed> {
 
-		@Override
-		MessageEmbed apply(Guild t);
+        @Override
+        MessageEmbed apply(Guild t);
 
-	}
+    }
 
-	final static class JoinedServerEmbed implements FunctionalEmbed {
+    final static class JoinedServerEmbed implements FunctionalEmbed {
 
-		private EmbedBuilder embed = new EmbedBuilder();
+        private EmbedBuilder embed = new EmbedBuilder();
 
-		static JoinedServerEmbed func() {
-			return new JoinedServerEmbed();
-		}
+        static JoinedServerEmbed func() {
+            return new JoinedServerEmbed();
+        }
 
-		@Override
-		public MessageEmbed apply(Guild g) {
-			embed.setTitle(g.getName(), g.getIconUrl());
-			embed.setDescription(format("Owner", g.getOwner().getUser().getAsTag()));
-			embed.appendDescription(format("Members", g.getMemberCount()));
-			embed.appendDescription(format("Created", time(g.getTimeCreated())));
-			embed.setThumbnail(g.getIconUrl()).build();
-			return embed.build();
-		}
+        @Override
+        public MessageEmbed apply(Guild g) {
+            embed.setTitle(g.getName(), g.getIconUrl());
+            embed.setDescription(format("Owner", g.getOwner().getUser().getAsTag()));
+            embed.appendDescription(format("Members", g.getMemberCount()));
+            embed.appendDescription(format("Created", time(g.getTimeCreated())));
+            embed.setThumbnail(g.getIconUrl()).build();
+            return embed.build();
+        }
 
-		private String time(OffsetDateTime offset) {
-			return offset.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM));
-		}
+        private String time(OffsetDateTime offset) {
+            return offset.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM));
+        }
 
-		private String format(String title, String rest) {
-			return "**" + title + "**: \n" + rest + "\n\n";
-		}
+        private String format(String title, String rest) {
+            return "**" + title + "**: \n" + rest + "\n\n";
+        }
 
-		private String format(String title, int rest) {
-			return "**" + title + "**: \n" + rest + "\n\n";
-		}
-	}
+        private String format(String title, int rest) {
+            return "**" + title + "**: \n" + rest + "\n\n";
+        }
+    }
 }
