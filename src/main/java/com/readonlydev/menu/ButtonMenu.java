@@ -1,4 +1,18 @@
-
+/*
+ * Copyright 2016-2018 John Grosh (jagrosh) & Kaidan Gustave (TheMonitorLizard)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.readonlydev.menu;
 
 import java.awt.Color;
@@ -11,23 +25,27 @@ import java.util.function.Consumer;
 import com.readonlydev.common.waiter.EventWaiter;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.requests.RestAction;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import net.dv8tion.jda.internal.utils.Checks;
 
 /**
- * A {@link com.readonlydev.menu.Menu Menu} implementation that creates a
- * organized display of emotes/emojis as buttons paired with options, and below
+ * A {@link com.readonlydev.menu.Menu Menu} implementation that creates
+ * a organized display of emotes/emojis as buttons paired with options, and below
  * the menu reactions corresponding to each button.
+ *
+ * @author John Grosh
  */
-public class ButtonMenu extends Menu {
-
+public class ButtonMenu extends Menu
+{
     private final Color color;
     private final String text;
     private final String description;
@@ -36,7 +54,7 @@ public class ButtonMenu extends Menu {
     private final Consumer<Message> finalAction;
 
     ButtonMenu(EventWaiter waiter, Set<User> users, Set<Role> roles, long timeout, TimeUnit unit,
-        Color color, String text, String description, List<String> choices, Consumer<Emoji> action, Consumer<Message> finalAction)
+               Color color, String text, String description, List<String> choices, Consumer<Emoji> action, Consumer<Message> finalAction)
     {
         super(waiter, users, roles, timeout, unit);
         this.color = color;
@@ -49,7 +67,7 @@ public class ButtonMenu extends Menu {
 
     /**
      * Shows the ButtonMenu as a new {@link net.dv8tion.jda.api.entities.Message Message}
-     * in the provided {@link net.dv8tion.jda.api.entities.MessageChannel MessageChannel}.
+     * in the provided {@link net.dv8tion.jda.api.entities.channel.middleman.MessageChannel MessageChannel}.
      *
      * @param  channel
      *         The MessageChannel to send the new Message to
@@ -57,7 +75,7 @@ public class ButtonMenu extends Menu {
     @Override
     public void display(MessageChannel channel)
     {
-        initialize(channel.sendMessage(getMessage()));
+        initialize(channel.sendMessage(MessageCreateData.fromEditData(getMessage())));
     }
 
     /**
@@ -91,18 +109,17 @@ public class ButtonMenu extends Menu {
                 // If it's neither, that's on the developer and we'll let it
                 // throw an error when we queue a rest action.
                 RestAction<Void> r = emote==null ? m.addReaction(Emoji.fromFormatted(choices.get(i))) : m.addReaction(emote);
-                if((i+1)<choices.size()) {
+                if(i+1<choices.size())
                     r.queue(); // If there is still more reactions to add we delay using the EventWaiter
-                } else
+                else
                 {
                     // This is the last reaction added.
                     r.queue(v -> {
                         waiter.waitForEvent(MessageReactionAddEvent.class, event -> {
                             // If the message is not the same as the ButtonMenu
                             // currently being displayed.
-                            if(!event.getMessageId().equals(m.getId())) {
+                            if(!event.getMessageId().equals(m.getId()))
                                 return false;
-                            }
 
                             // If the reaction is an Emote we get the Snowflake,
                             // otherwise we get the unicode value.
@@ -110,9 +127,8 @@ public class ButtonMenu extends Menu {
 
                             // If the value we got is not registered as a button to
                             // the ButtonMenu being displayed we return false.
-                            if(!choices.contains(re)) {
+                            if(!choices.contains(re))
                                 return false;
-                            }
 
                             // Last check is that the person who added the reaction
                             // is a valid user.
@@ -132,15 +148,13 @@ public class ButtonMenu extends Menu {
     }
 
     // Generates a ButtonMenu message
-    private Message getMessage()
+    private MessageEditData getMessage()
     {
-        MessageBuilder mbuilder = new MessageBuilder();
-        if(text!=null) {
-            mbuilder.append(text);
-        }
-        if(description!=null) {
+        MessageEditBuilder mbuilder = new MessageEditBuilder();
+        if(text!=null)
+            mbuilder.setContent(text);
+        if(description!=null)
             mbuilder.setEmbeds(new EmbedBuilder().setColor(color).setDescription(description).build());
-        }
         return mbuilder.build();
     }
 
@@ -180,7 +194,7 @@ public class ButtonMenu extends Menu {
             Checks.check(waiter != null, "Must set an EventWaiter");
             Checks.check(!choices.isEmpty(), "Must have at least one choice");
             Checks.check(action != null, "Must provide an action consumer");
-            Checks.check((text != null) || (description != null), "Either text or description must be set");
+            Checks.check(text != null || description != null, "Either text or description must be set");
 
             return new ButtonMenu(waiter, users, roles, timeout, unit, color, text, description, choices, action, finalAction);
         }
@@ -312,9 +326,8 @@ public class ButtonMenu extends Menu {
          */
         public Builder addChoices(String... emojis)
         {
-            for(String emoji : emojis) {
+            for(String emoji : emojis)
                 addChoice(emoji);
-            }
             return this;
         }
 
@@ -332,9 +345,8 @@ public class ButtonMenu extends Menu {
          */
         public Builder addChoices(Emoji... emotes)
         {
-            for(Emoji emote : emotes) {
+            for(Emoji emote : emotes)
                 addChoice(emote);
-            }
             return this;
         }
 

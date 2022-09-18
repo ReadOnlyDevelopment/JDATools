@@ -18,10 +18,9 @@ import com.readonlydev.common.waiter.EventWaiter;
 import com.readonlydev.menu.Menu;
 
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -29,6 +28,9 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.requests.RestAction;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import net.dv8tion.jda.internal.utils.Checks;
 
 public class EmbedMessageMenu extends Menu
@@ -59,7 +61,7 @@ public class EmbedMessageMenu extends Menu
     }
 
     /**
-     * Begins pagination on page 1 as a new {@link net.dv8tion.jda.api.entities.Message Message} in the provided {@link net.dv8tion.jda.api.entities.MessageChannel MessageChannel}.
+     * Begins pagination on page 1 as a new {@link net.dv8tion.jda.api.entities.Message Message} in the provided {@link net.dv8tion.jda.api.entities.channel.middleman.MessageChannel MessageChannel}.
      *
      * @param channel The MessageChannel to send the new Message to
      */
@@ -70,7 +72,7 @@ public class EmbedMessageMenu extends Menu
     }
 
     /**
-     * Begins pagination as a new {@link net.dv8tion.jda.api.entities.Message Message} in the provided {@link net.dv8tion.jda.api.entities.MessageChannel MessageChannel}, starting on whatever page number is provided.
+     * Begins pagination as a new {@link net.dv8tion.jda.api.entities.Message Message} in the provided {@link net.dv8tion.jda.api.entities.channel.middleman.MessageChannel MessageChannel}, starting on whatever page number is provided.
      *
      * @param channel The MessageChannel to send the new Message to
      * @param pageNum The page number to begin on
@@ -84,8 +86,8 @@ public class EmbedMessageMenu extends Menu
         {
             pageNum = this.guildMap.size();
         }
-        Message msg = renderPage(pageNum);
-        initialize(channel.sendMessage(msg), pageNum);
+        MessageEditData msg = renderPage(pageNum);
+        initialize(channel.sendMessage(MessageCreateData.fromEditData(msg)), pageNum);
     }
 
     private void initialize(RestAction<Message> action, int pageNum)
@@ -183,9 +185,9 @@ public class EmbedMessageMenu extends Menu
         message.editMessage(renderPage(newPageNum)).queue(m -> pagination(m, n));
     }
 
-    private Message renderPage(int pageNum)
+    private MessageEditData renderPage(int pageNum)
     {
-        MessageBuilder mbuilder = new MessageBuilder();
+        MessageEditBuilder mbuilder = new MessageEditBuilder();
         int size = this.guildMap.keySet().size();
         List<MessageEmbed> embedList = new ArrayList<>(size);
         for (MessageEmbed em : this.guildMap.keySet())
@@ -200,7 +202,7 @@ public class EmbedMessageMenu extends Menu
         mbuilder.setEmbeds(new MessageEmbed[] { membed });
         if (this.text != null)
         {
-            mbuilder.append(this.text.apply(Integer.valueOf(pageNum), Integer.valueOf(embedList.size())));
+            mbuilder.setContent(this.text.apply(Integer.valueOf(pageNum), Integer.valueOf(embedList.size())));
         }
         return mbuilder.build();
     }

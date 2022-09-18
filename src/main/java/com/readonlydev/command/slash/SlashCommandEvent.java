@@ -8,18 +8,18 @@ import org.jetbrains.annotations.NotNull;
 import com.readonlydev.command.client.Client;
 import com.readonlydev.command.event.Event;
 
-import net.dv8tion.jda.api.entities.ChannelType;
-import net.dv8tion.jda.api.entities.GuildChannel;
 import net.dv8tion.jda.api.entities.IMentionable;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
-public class SlashCommandEvent extends SlashCommandInteractionEvent implements Event {
+public class SlashCommandEvent extends SlashCommandInteractionEvent implements Event<SlashCommandInteractionEvent> {
     private final Client client;
 
     public SlashCommandEvent(SlashCommandInteractionEvent event, Client client)
@@ -336,5 +336,11 @@ public class SlashCommandEvent extends SlashCommandInteractionEvent implements E
     public boolean isFromType(ChannelType channelType)
     {
         return getChannelType() == channelType;
+    }
+
+    @Override
+    public SlashCommandInteractionEvent getEvent()
+    {
+        return this;
     }
 }

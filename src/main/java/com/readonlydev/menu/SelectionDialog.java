@@ -1,4 +1,18 @@
-
+/*
+ * Copyright 2016-2018 John Grosh (jagrosh) & Kaidan Gustave (TheMonitorLizard)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.readonlydev.menu;
 
 import java.awt.Color;
@@ -14,24 +28,28 @@ import java.util.function.Function;
 import com.readonlydev.common.waiter.EventWaiter;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.requests.RestAction;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import net.dv8tion.jda.internal.utils.Checks;
 
 /**
- * A {@link com.readonlydev.menu.Menu Menu} implementation that creates a listed
- * display of text choices horizontally that users can scroll through using
- * reactions and make selections.
+ * A {@link com.readonlydev.menu.Menu Menu} implementation that creates
+ * a listed display of text choices horizontally that users can scroll through
+ * using reactions and make selections.
+ *
+ * @author John Grosh
  */
-public class SelectionDialog extends Menu {
-
+public class SelectionDialog extends Menu
+{
     private final List<String> choices;
     private final String leftEnd, rightEnd;
     private final String defaultLeft, defaultRight;
@@ -48,9 +66,9 @@ public class SelectionDialog extends Menu {
     public static final String CANCEL = "\u274E";
 
     SelectionDialog(EventWaiter waiter, Set<User> users, Set<Role> roles, long timeout, TimeUnit unit,
-        List<String> choices, String leftEnd, String rightEnd, String defaultLeft, String defaultRight,
-        Function<Integer,Color> color, boolean loop, BiConsumer<Message, Integer> success,
-        Consumer<Message> cancel, Function<Integer,String> text, boolean singleSelectionMode)
+                    List<String> choices, String leftEnd, String rightEnd, String defaultLeft, String defaultRight,
+                    Function<Integer,Color> color, boolean loop, BiConsumer<Message, Integer> success,
+                    Consumer<Message> cancel, Function<Integer,String> text, boolean singleSelectionMode)
     {
         super(waiter, users, roles, timeout, unit);
         this.choices = choices;
@@ -72,16 +90,16 @@ public class SelectionDialog extends Menu {
      */
     @Deprecated
     SelectionDialog(EventWaiter waiter, Set<User> users, Set<Role> roles, long timeout, TimeUnit unit,
-            List<String> choices, String leftEnd, String rightEnd, String defaultLeft, String defaultRight,
-            Function<Integer,Color> color, boolean loop, BiConsumer<Message, Integer> success,
-            Consumer<Message> cancel, Function<Integer,String> text)
+                    List<String> choices, String leftEnd, String rightEnd, String defaultLeft, String defaultRight,
+                    Function<Integer,Color> color, boolean loop, BiConsumer<Message, Integer> success,
+                    Consumer<Message> cancel, Function<Integer,String> text)
     {
         this(waiter, users, roles, timeout, unit, choices, leftEnd, rightEnd, defaultLeft, defaultRight, color, loop, success, cancel, text, false);
     }
 
     /**
      * Shows the SelectionDialog as a new {@link net.dv8tion.jda.api.entities.Message Message}
-     * in the provided {@link net.dv8tion.jda.api.entities.MessageChannel MessageChannel}, starting with
+     * in the provided {@link net.dv8tion.jda.api.entities.channel.middleman.MessageChannel MessageChannel}, starting with
      * the first selection.
      *
      * @param  channel
@@ -108,7 +126,7 @@ public class SelectionDialog extends Menu {
 
     /**
      * Shows the SelectionDialog as a new {@link net.dv8tion.jda.api.entities.Message Message}
-     * in the provided {@link net.dv8tion.jda.api.entities.MessageChannel MessageChannel}, starting with
+     * in the provided {@link net.dv8tion.jda.api.entities.channel.middleman.MessageChannel MessageChannel}, starting with
      * the number selection provided.
      *
      * @param  channel
@@ -118,13 +136,12 @@ public class SelectionDialog extends Menu {
      */
     public void showDialog(MessageChannel channel, int selection)
     {
-        if(selection<1) {
+        if(selection<1)
             selection = 1;
-        } else if(selection>choices.size()) {
+        else if(selection>choices.size())
             selection = choices.size();
-        }
-        Message msg = render(selection);
-        initialize(channel.sendMessage(msg), selection);
+        MessageEditData msg = render(selection);
+        initialize(channel.sendMessage(MessageCreateData.fromEditData(msg)), selection);
     }
 
     /**
@@ -139,12 +156,11 @@ public class SelectionDialog extends Menu {
      */
     public void showDialog(Message message, int selection)
     {
-        if(selection<1) {
+        if(selection<1)
             selection = 1;
-        } else if(selection>choices.size()) {
+        else if(selection>choices.size())
             selection = choices.size();
-        }
-        Message msg = render(selection);
+        MessageEditData msg = render(selection);
         initialize(message.editMessage(msg), selection);
     }
 
@@ -169,39 +185,34 @@ public class SelectionDialog extends Menu {
     private void selectionDialog(Message message, int selection)
     {
         waiter.waitForEvent(MessageReactionAddEvent.class, event -> {
-            if(!event.getMessageId().equals(message.getId())) {
+            if(!event.getMessageId().equals(message.getId()))
                 return false;
-            }
             if(!(UP.equals(event.getReaction().getEmoji().getName())
                     || DOWN.equals(event.getReaction().getEmoji().getName())
                     || CANCEL.equals(event.getReaction().getEmoji().getName())
-                    || SELECT.equals(event.getReaction().getEmoji().getName()))) {
+                    || SELECT.equals(event.getReaction().getEmoji().getName())))
                 return false;
-            }
             return isValidUser(event.getUser(), event.isFromGuild() ? event.getGuild() : null);
         }, event -> {
             int newSelection = selection;
             switch(event.getReaction().getEmoji().getName())
             {
                 case UP:
-                    if(newSelection>1) {
+                    if(newSelection>1)
                         newSelection--;
-                    } else if(loop) {
+                    else if(loop)
                         newSelection = choices.size();
-                    }
                     break;
                 case DOWN:
-                    if(newSelection<choices.size()) {
+                    if(newSelection<choices.size())
                         newSelection++;
-                    } else if(loop) {
+                    else if(loop)
                         newSelection = 1;
-                    }
                     break;
                 case SELECT:
                     success.accept(message, selection);
-                    if(singleSelectionMode) {
+                    if(singleSelectionMode)
                         return;
-                    }
                     break;
                 case CANCEL:
                     cancel.accept(message);
@@ -216,25 +227,22 @@ public class SelectionDialog extends Menu {
         }, timeout, unit, () -> cancel.accept(message));
     }
 
-    private Message render(int selection)
+    private MessageEditData render(int selection)
     {
         StringBuilder sbuilder = new StringBuilder();
-        for(int i=0; i<choices.size(); i++) {
-            if((i+1)==selection) {
+        for(int i=0; i<choices.size(); i++)
+            if(i+1==selection)
                 sbuilder.append("\n").append(leftEnd).append(choices.get(i)).append(rightEnd);
-            } else {
+            else
                 sbuilder.append("\n").append(defaultLeft).append(choices.get(i)).append(defaultRight);
-            }
-        }
-        MessageBuilder mbuilder = new MessageBuilder();
+        MessageEditBuilder mbuilder = new MessageEditBuilder();
         String content = text.apply(selection);
-        if(content!=null) {
-            mbuilder.append(content);
-        }
+        if(content!=null)
+            mbuilder.setContent(content);
         return mbuilder.setEmbeds(new EmbedBuilder()
-            .setColor(color.apply(selection))
-            .setDescription(sbuilder.toString())
-            .build()).build();
+                .setColor(color.apply(selection))
+                .setDescription(sbuilder.toString())
+                .build()).build();
     }
 
     /**
@@ -279,7 +287,7 @@ public class SelectionDialog extends Menu {
             Checks.check(selection != null, "Must provide a selection consumer");
 
             return new SelectionDialog(waiter,users,roles,timeout,unit,choices,leftEnd,rightEnd,
-                defaultLeft,defaultRight,color,loop, selection, cancel,text, singleSelectionMode);
+                    defaultLeft,defaultRight,color,loop, selection, cancel,text, singleSelectionMode);
         }
 
         /**

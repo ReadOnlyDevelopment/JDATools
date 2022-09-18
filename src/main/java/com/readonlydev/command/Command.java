@@ -17,10 +17,10 @@ import com.readonlydev.command.operation.UserInteraction;
 import com.readonlydev.command.slash.SlashCommand;
 
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.AudioChannel;
-import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 /**
  * <h1><b>Commands In JDATools</b></h1> <p> The internal inheritance for Commands used in JDATools is that of the Command object. <p> Classes created inheriting this class gain the unique traits of commands operated using the Commands Extension. <br> Using several fields, a command can define
@@ -74,7 +74,7 @@ public abstract class Command extends UserInteraction
     protected List<CommandArgument<?>> arguments = new ArrayList<>();
 
     /**
-     * {@code true} if the command may only be used in an NSFW {@link net.dv8tion.jda.api.entities.TextChannel TextChannel} or DMs. {@code false} if it may be used anywhere <br> Default: {@code false}
+     * {@code true} if the command may only be used in an NSFW {@link net.dv8tion.jda.api.entities.channel.concrete.TextChannel TextChannel} or DMs. {@code false} if it may be used anywhere <br> Default: {@code false}
      */
     protected boolean nsfwOnly = false;
 
@@ -349,7 +349,7 @@ public abstract class Command extends UserInteraction
     }
 
     /**
-     * Checks whether a command is allowed in a {@link net.dv8tion.jda.api.entities.TextChannel TextChannel} by searching the channel topic for topic tags relating to the command. <p> {-{@link com.readonlydev.command.Command#name name}}, {-{@link com.readonlydev.command.Command.Category category
+     * Checks whether a command is allowed in a {@link net.dv8tion.jda.api.entities.channel.concrete.TextChannel TextChannel} by searching the channel topic for topic tags relating to the command. <p> {-{@link com.readonlydev.command.Command#name name}}, {-{@link com.readonlydev.command.Command.Category category
      * name}}, or {-{@code all}} are valid examples of ways that this method would return {@code false} if placed in a channel topic. <p> <b>NOTE:</b>Topic tags are <b>case sensitive</b> and proper usage must be in lower case! <br> Also note that setting
      * {@link com.readonlydev.command.Command#usesTopicTags usesTopicTags} to {@code false} will cause this method to always return {@code true}, as the feature would not be applicable in the first place.
      *

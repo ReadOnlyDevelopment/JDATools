@@ -324,7 +324,7 @@ public class MessageContentBuilder implements Appendable
     /**
      * Appends a mention to the Message.
      * <br>Typical usage would be providing an {@link net.dv8tion.jda.api.entities.IMentionable IMentionable} like
-     * {@link net.dv8tion.jda.api.entities.User User} or {@link net.dv8tion.jda.api.entities.TextChannel TextChannel}.
+     * {@link net.dv8tion.jda.api.entities.User User} or {@link net.dv8tion.jda.api.entities.channel.concrete.TextChannel TextChannel}.
      *
      * <p>This will not add a rule to mention a {@link User} or {@link Role}. You have to use {@link #mention(IMentionable...)}
      * in addition to this method.
@@ -398,8 +398,8 @@ public class MessageContentBuilder implements Appendable
      * <ul>
      *     <li>{@link net.dv8tion.jda.api.entities.IMentionable IMentionable}
      *     <br>These will output their {@link net.dv8tion.jda.api.entities.IMentionable#getAsMention() getAsMention} by default,
-     *         some implementations have alternatives such as {@link net.dv8tion.jda.api.entities.User User} and {@link net.dv8tion.jda.api.entities.TextChannel TextChannel}.</li>
-     *     <li>{@link net.dv8tion.jda.api.entities.MessageChannel MessageChannel}
+     *         some implementations have alternatives such as {@link net.dv8tion.jda.api.entities.User User} and {@link net.dv8tion.jda.api.entities.channel.concrete.TextChannel TextChannel}.</li>
+     *     <li>{@link net.dv8tion.jda.api.entities.channel.middleman.MessageChannel MessageChannel}
      *     <br>All message channels format to {@code "#" + getName()} by default, TextChannel has special handling
      *         and uses the getAsMention output by default and the MessageChannel output as alternative ({@code #} flag).</li>
      *     <li>{@link net.dv8tion.jda.api.entities.Message Message}

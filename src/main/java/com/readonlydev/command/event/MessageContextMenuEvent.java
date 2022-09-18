@@ -30,7 +30,8 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.context.MessageContextInteraction;
 import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction;
-import net.dv8tion.jda.api.utils.AttachmentOption;
+import net.dv8tion.jda.api.utils.FileUpload;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 /**
  * <h2><b>Message Context Menus In JDA-Chewtils</b></h2>
@@ -123,7 +124,7 @@ public class MessageContextMenuEvent extends MessageContextInteractionEvent
      *
      * @param message The Message to reply with
      */
-    public void respond(Message message)
+    public void respond(MessageCreateData message)
     {
         reply(message).queue();
     }
@@ -142,9 +143,20 @@ public class MessageContextMenuEvent extends MessageContextInteractionEvent
      * @param filename The filename that Discord should display (null for default).
      * @param options The {@link AttachmentOption}s to apply to the File.
      */
-    public void respond(File file, String filename, AttachmentOption... options)
+    public void respond(File file, String filename, String description, boolean spoiler)
     {
-        replyFile(file, filename, options).queue();
+        FileUpload fileUpload = FileUpload.fromData(file, filename);
+        if((description != null) && !description.isEmpty())
+        {
+            fileUpload.setDescription(description);
+        }
+
+        if(spoiler)
+        {
+            fileUpload.asSpoiler();
+        }
+
+        replyFiles(fileUpload).queue();
     }
 
     /**

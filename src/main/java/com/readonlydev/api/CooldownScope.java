@@ -14,7 +14,7 @@ public enum CooldownScope {
 
     /**
      * Applies the cooldown to the
-     * {@link net.dv8tion.jda.api.entities.MessageChannel MessageChannel} the
+     * {@link net.dv8tion.jda.api.entities.channel.middleman.MessageChannel MessageChannel} the
      * command is called in. <p>The key for this is generated in the format <ul>
      * <li>{@code <command-name>|C:<channelID>}</li> </ul>
      */
@@ -23,7 +23,7 @@ public enum CooldownScope {
     /**
      * Applies the cooldown to the calling
      * {@link net.dv8tion.jda.api.entities.User User} local to the
-     * {@link net.dv8tion.jda.api.entities.MessageChannel MessageChannel} the
+     * {@link net.dv8tion.jda.api.entities.channel.middleman.MessageChannel MessageChannel} the
      * command is called in. <p>The key for this is generated in the format <ul>
      * <li>{@code <command-name>|U:<userID>|C:<channelID>}</li> </ul>
      */
@@ -84,7 +84,7 @@ public enum CooldownScope {
     /**
      * Applies this cooldown globally. <p>As this implies: the command will be
      * unusable on the instance of JDA in all types of
-     * {@link net.dv8tion.jda.api.entities.MessageChannel MessageChannel}s until
+     * {@link net.dv8tion.jda.api.entities.channel.middleman.MessageChannel MessageChannel}s until
      * the cooldown has ended. <p>The key for this is
      * {@code <command-name>|globally}
      */

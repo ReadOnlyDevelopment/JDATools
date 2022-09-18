@@ -17,7 +17,7 @@ plugins {
 
 apply plugin: "com.vanniktech.maven.publish"
 
-version = "3.0.1"
+version = "3.0.2-SNAPSHOT"
 group = 'com.readonlydev'
 archivesBaseName = 'JDATools'
 
@@ -176,13 +176,4 @@ task localMavenPublish {
     dependsOn 'clean'
     dependsOn 'publishToMavenLocal'
     tasks.findByName('publishToMavenLocal').mustRunAfter 'clean'
-}
-
-task fullRelease {
-    group 'jdatools'
-    dependsOn 'clean'
-    dependsOn 'publish'
-    dependsOn 'closeAndReleaseRepository'
-    tasks.findByName('publish').mustRunAfter 'clean'
-    tasks.findByName('closeAndReleaseRepository').mustRunAfter 'publish'
 }

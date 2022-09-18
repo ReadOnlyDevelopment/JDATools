@@ -1,4 +1,18 @@
-
+/*
+ * Copyright 2016-2018 John Grosh (jagrosh) & Kaidan Gustave (TheMonitorLizard)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.readonlydev.menu;
 
 import java.awt.Color;
@@ -13,13 +27,12 @@ import java.util.function.Consumer;
 import com.readonlydev.common.waiter.EventWaiter;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.GenericMessageEvent;
@@ -27,19 +40,24 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.requests.RestAction;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import net.dv8tion.jda.internal.utils.Checks;
 
 /**
- * A {@link com.readonlydev.menu.Menu Menu} of ordered buttons signified by
- * numbers or letters, each with a reaction linked to it for users to click. <p>
- * Up to ten text choices can be set in the {@link OrderedMenu.Builder}, and
- * additional methods for handling the resulting choice made by a user using the
- * menu may also be attached via the
- * {@link OrderedMenu.Builder#setSelection(BiConsumer)} and
- * {@link OrderedMenu.Builder#setCancel(Consumer)} methods.
+ * A {@link com.readonlydev.menu.Menu Menu} of ordered buttons signified
+ * by numbers or letters, each with a reaction linked to it for users to click.
+ *
+ * <p>Up to ten text choices can be set in the {@link OrderedMenu.Builder},
+ * and additional methods for handling the resulting choice made by a user using the
+ * menu may also be attached via the {@link OrderedMenu.Builder#setSelection(BiConsumer)}
+ * and {@link OrderedMenu.Builder#setCancel(Consumer)} methods.
+ *
+ * @author John Grosh
  */
-public class OrderedMenu extends Menu {
-
+public class OrderedMenu extends Menu
+{
     private final Color color;
     private final String text;
     private final String description;
@@ -51,16 +69,16 @@ public class OrderedMenu extends Menu {
     private final boolean useCancel;
 
     public final static String[] NUMBERS = new String[]{"1\u20E3","2\u20E3","3\u20E3",
-            "4\u20E3","5\u20E3","6\u20E3","7\u20E3","8\u20E3","9\u20E3", "\uD83D\uDD1F"};
+        "4\u20E3","5\u20E3","6\u20E3","7\u20E3","8\u20E3","9\u20E3", "\uD83D\uDD1F"};
 
     public final static String[] LETTERS = new String[]{"\uD83C\uDDE6","\uD83C\uDDE7","\uD83C\uDDE8",
-            "\uD83C\uDDE9","\uD83C\uDDEA","\uD83C\uDDEB","\uD83C\uDDEC","\uD83C\uDDED","\uD83C\uDDEE","\uD83C\uDDEF"};
+        "\uD83C\uDDE9","\uD83C\uDDEA","\uD83C\uDDEB","\uD83C\uDDEC","\uD83C\uDDED","\uD83C\uDDEE","\uD83C\uDDEF"};
 
     public final static String CANCEL = "\u274C";
 
     OrderedMenu(EventWaiter waiter, Set<User> users, Set<Role> roles, long timeout, TimeUnit unit,
-        Color color, String text, String description, List<String> choices, BiConsumer<Message,Integer> action,
-        Consumer<Message> cancel, boolean useLetters, boolean allowTypedInput, boolean useCancel)
+                Color color, String text, String description, List<String> choices, BiConsumer<Message,Integer> action,
+                Consumer<Message> cancel, boolean useLetters, boolean allowTypedInput, boolean useCancel)
     {
         super(waiter, users, roles, timeout, unit);
         this.color = color;
@@ -76,7 +94,7 @@ public class OrderedMenu extends Menu {
 
     /**
      * Shows the OrderedMenu as a new {@link net.dv8tion.jda.api.entities.Message Message}
-     * in the provided {@link net.dv8tion.jda.api.entities.MessageChannel MessageChannel}.
+     * in the provided {@link net.dv8tion.jda.api.entities.channel.middleman.MessageChannel MessageChannel}.
      *
      * @param  channel
      *         The MessageChannel to send the new Message to
@@ -84,7 +102,7 @@ public class OrderedMenu extends Menu {
      * @throws java.lang.IllegalArgumentException
      *         If <b>all</b> of the following are violated simultaneously:
      *         <ul>
-     *             <li>Being sent to a {@link net.dv8tion.jda.api.entities.TextChannel TextChannel}.</li>
+     *             <li>Being sent to a {@link net.dv8tion.jda.api.entities.channel.concrete.TextChannel TextChannel}.</li>
      *             <li>This OrderedMenu does not allow typed input.</li>
      *             <li>The bot doesn't have {@link net.dv8tion.jda.api.Permission#MESSAGE_ADD_REACTION
      *             Permission.MESSAGE_ADD_REACTION} in the channel this menu is being sent to.</li>
@@ -97,12 +115,11 @@ public class OrderedMenu extends Menu {
         // Is from text channel
         // Does not allow typed input
         // Does not have permission to add reactions
-        if((channel.getType()==ChannelType.TEXT)
+        if(channel.getType()==ChannelType.TEXT
                 && !allowTypedInput
-                && !((TextChannel)channel).getGuild().getSelfMember().hasPermission((TextChannel) channel, Permission.MESSAGE_ADD_REACTION)) {
+                && !((TextChannel)channel).getGuild().getSelfMember().hasPermission((TextChannel) channel, Permission.MESSAGE_ADD_REACTION))
             throw new PermissionException("Must be able to add reactions if not allowing typed input!");
-        }
-        initialize(channel.sendMessage(getMessage()));
+        initialize(channel.sendMessage(MessageCreateData.fromEditData(getMessage())));
     }
 
     /**
@@ -115,7 +132,7 @@ public class OrderedMenu extends Menu {
      * @throws java.lang.IllegalArgumentException
      *         If <b>all</b> of the following are violated simultaneously:
      *         <ul>
-     *             <li>Being sent to a {@link net.dv8tion.jda.api.entities.TextChannel TextChannel}.</li>
+     *             <li>Being sent to a {@link net.dv8tion.jda.api.entities.channel.concrete.TextChannel TextChannel}.</li>
      *             <li>This OrderedMenu does not allow typed input.</li>
      *             <li>The bot doesn't have {@link net.dv8tion.jda.api.Permission#MESSAGE_ADD_REACTION
      *             Permission.MESSAGE_ADD_REACTION} in the channel this menu is being sent to.</li>
@@ -128,11 +145,10 @@ public class OrderedMenu extends Menu {
         // Is from text channel
         // Does not allow typed input
         // Does not have permission to add reactions
-        if((message.getChannelType() == ChannelType.TEXT)
+        if(message.getChannelType() == ChannelType.TEXT
                 && !allowTypedInput
-                && !message.getGuild().getSelfMember().hasPermission(message.getChannel().asGuildMessageChannel(), Permission.MESSAGE_ADD_REACTION)) {
+                && !message.getGuild().getSelfMember().hasPermission(message.getChannel().asGuildMessageChannel(), Permission.MESSAGE_ADD_REACTION))
             throw new PermissionException("Must be able to add reactions if not allowing typed input!");
-        }
         initialize(message.editMessage(getMessage()));
     }
 
@@ -151,10 +167,10 @@ public class OrderedMenu extends Menu {
                 for(int i = 0; i < choices.size(); i++)
                 {
                     // If this is not the last run of this loop
-                    if(i < (choices.size()-1)) {
+                    if(i < choices.size()-1)
                         m.addReaction(Emoji.fromFormatted(getEmoji(i))).queue();
-                        // If this is the last run of this loop
-                    } else
+                    // If this is the last run of this loop
+                    else
                     {
                         RestAction<Void> re = m.addReaction(Emoji.fromFormatted(getEmoji(i)));
                         // If we're using the cancel function we want
@@ -170,22 +186,20 @@ public class OrderedMenu extends Menu {
                         re.queue(v -> {
                             // Depending on whether we are allowing text input,
                             // we call a different method.
-                            if(allowTypedInput) {
+                            if(allowTypedInput)
                                 waitGeneric(m);
-                            } else {
+                            else
                                 waitReactionOnly(m);
-                            }
                         });
                     }
                 }
             } catch(PermissionException ex) {
                 // If there is a permission exception mid process, we'll still
                 // attempt to make due with what we have.
-                if(allowTypedInput) {
+                if(allowTypedInput)
                     waitGeneric(m);
-                } else {
+                else
                     waitReactionOnly(m);
-                }
             }
         });
     }
@@ -196,13 +210,11 @@ public class OrderedMenu extends Menu {
         // Wait for a GenericMessageEvent
         waiter.waitForEvent(GenericMessageEvent.class, e -> {
             // If we're dealing with a message reaction being added we return whether it's valid
-            if(e instanceof MessageReactionAddEvent) {
+            if(e instanceof MessageReactionAddEvent)
                 return isValidReaction(m, (MessageReactionAddEvent)e);
-            }
             // If we're dealing with a received message being added we return whether it's valid
-            if(e instanceof MessageReceivedEvent) {
+            if(e instanceof MessageReceivedEvent)
                 return isValidMessage(m, (MessageReceivedEvent)e);
-            }
             // Otherwise return false
             return false;
         }, e -> {
@@ -212,14 +224,13 @@ public class OrderedMenu extends Menu {
             {
                 MessageReactionAddEvent event = (MessageReactionAddEvent)e;
                 // Process which reaction it is
-                if(event.getReaction().getEmoji().getName().equals(CANCEL)) {
+                if(event.getReaction().getEmoji().getName().equals(CANCEL))
                     cancel.accept(m);
-                } else {
+                else
                     // The int provided in the success consumer is not indexed from 0 to number of choices - 1,
                     // but from 1 to number of choices. So the first choice will correspond to 1, the second
                     // choice to 2, etc.
                     action.accept(m, getNumber(event.getReaction().getEmoji().getName()));
-                }
             }
             // If it's a valid MessageReceivedEvent
             else if (e instanceof MessageReceivedEvent)
@@ -227,11 +238,10 @@ public class OrderedMenu extends Menu {
                 MessageReceivedEvent event = (MessageReceivedEvent)e;
                 // Get the number in the message and process
                 int num = getMessageNumber(event.getMessage().getContentRaw());
-                if((num<0) || (num>choices.size())) {
+                if(num<0 || num>choices.size())
                     cancel.accept(m);
-                } else {
+                else
                     action.accept(m, num);
-                }
             }
         }, timeout, unit, () -> cancel.accept(m));
     }
@@ -244,58 +254,51 @@ public class OrderedMenu extends Menu {
             return isValidReaction(m, e);
         }, e -> {
             m.delete().queue();
-            if(e.getReaction().getEmoji().getName().equals(CANCEL)) {
+            if(e.getReaction().getEmoji().getName().equals(CANCEL))
                 cancel.accept(m);
-            } else {
+            else
                 // The int provided in the success consumer is not indexed from 0 to number of choices - 1,
                 // but from 1 to number of choices. So the first choice will correspond to 1, the second
                 // choice to 2, etc.
                 action.accept(m, getNumber(e.getReaction().getEmoji().getName()));
-            }
         }, timeout, unit, () -> cancel.accept(m));
     }
 
     // This is where the displayed message for the OrderedMenu is built.
-    private Message getMessage()
+    private MessageEditData getMessage()
     {
-        MessageBuilder mbuilder = new MessageBuilder();
-        if(text!=null) {
-            mbuilder.append(text);
-        }
+        MessageEditBuilder mbuilder = new MessageEditBuilder();
+        if(text!=null)
+            mbuilder.setContent(text);
         StringBuilder sb = new StringBuilder();
-        for(int i=0; i<choices.size(); i++) {
+        for(int i=0; i<choices.size(); i++)
             sb.append("\n").append(getEmoji(i)).append(" ").append(choices.get(i));
-        }
         mbuilder.setEmbeds(new EmbedBuilder().setColor(color)
-            .setDescription(description==null ? sb.toString() : description+sb.toString()).build());
+                .setDescription(description==null ? sb.toString() : description+sb.toString()).build());
         return mbuilder.build();
     }
 
     private boolean isValidReaction(Message m, MessageReactionAddEvent e)
     {
         // The message is not the same message as the menu
-        if(!e.getMessageId().equals(m.getId())) {
+        if(!e.getMessageId().equals(m.getId()))
             return false;
-        }
         // The user is not valid
-        if(!isValidUser(e.getUser(), e.isFromGuild() ? e.getGuild() : null)) {
+        if(!isValidUser(e.getUser(), e.isFromGuild() ? e.getGuild() : null))
             return false;
-        }
         // The reaction is the cancel reaction
-        if(e.getReaction().getEmoji().getName().equals(CANCEL)) {
+        if(e.getReaction().getEmoji().getName().equals(CANCEL))
             return true;
-        }
 
         int num = getNumber(e.getReaction().getEmoji().getName());
-        return !((num<0) || (num>choices.size()));
+        return !(num<0 || num>choices.size());
     }
 
     private boolean isValidMessage(Message m, MessageReceivedEvent e)
     {
         // If the channel is not the same channel
-        if(!e.getChannel().equals(m.getChannel())) {
+        if(!e.getChannel().equals(m.getChannel()))
             return false;
-        }
         // Otherwise if it's a valid user or not
         return isValidUser(e.getAuthor(), e.isFromGuild() ? e.getGuild() : null);
     }
@@ -312,29 +315,26 @@ public class OrderedMenu extends Menu {
     private int getNumber(String emoji)
     {
         String[] array = useLetters ? LETTERS : NUMBERS;
-        for(int i=0; i<array.length; i++) {
-            if(array[i].equals(emoji)) {
+        for(int i=0; i<array.length; i++)
+            if(array[i].equals(emoji))
                 return i+1;
-            }
-        }
         return -1;
     }
 
     private int getMessageNumber(String message)
     {
-        if(useLetters) {
+        if(useLetters)
             // This doesn't look good, but bear with me for a second:
             // So the maximum number of letters you can have as reactions
             // is 10 (the maximum number of choices in general even).
             // If you look carefully, you'll see that a corresponds to the
             // index 1, b to the index 2, and so on.
             return message.length()==1 ? " abcdefghij".indexOf(message.toLowerCase(Locale.ROOT)) : -1;
-        } else
+        else
         {
             // The same as above applies here, albeit in a different way.
-            if(message.length()==1) {
+            if(message.length()==1)
                 return " 123456789".indexOf(message);
-            }
             return message.equals("10") ? 10 : -1;
         }
     }
@@ -380,7 +380,7 @@ public class OrderedMenu extends Menu {
             Checks.check(!choices.isEmpty(), "Must have at least one choice");
             Checks.check(choices.size() <= 10, "Must have no more than ten choices");
             Checks.check(selection != null, "Must provide an selection consumer");
-            Checks.check((text != null) || (description != null), "Either text or description must be set");
+            Checks.check(text != null || description != null, "Either text or description must be set");
             return new OrderedMenu(waiter,users,roles,timeout,unit,color,text,description,choices,
                 selection,cancel,useLetters,allowTypedInput,addCancel);
         }
@@ -541,9 +541,8 @@ public class OrderedMenu extends Menu {
          */
         public Builder addChoices(String... choices)
         {
-            for(String choice : choices) {
+            for(String choice : choices)
                 addChoice(choice);
-            }
             return this;
         }
 
