@@ -19,11 +19,14 @@ import com.readonlydev.doc.annotation.DocConverter;
 @ConvertedBy(CommandInfo.Converter.class)
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE, ElementType.METHOD })
-public @interface CommandInfo {
+@Target(
+{ ElementType.TYPE, ElementType.METHOD })
+public @interface CommandInfo
+{
 	/**
 	 * The name and aliases of a command.
-	 * The first one should be the official name, and following elements should be
+	 * The first one should be the official name, and following elements should
+	 * be
 	 * aliases (if any are allowed).
 	 *
 	 * @return The name and aliases
@@ -38,8 +41,10 @@ public @interface CommandInfo {
 	String usage() default "";
 
 	/**
-	 * A description of this command, what it does, and (if needed) elaboration on
-	 * the {@link com.readonlydev.doc.annotation.docstandard.CommandInfo#usage()}.
+	 * A description of this command, what it does, and (if needed) elaboration
+	 * on
+	 * the
+	 * {@link com.readonlydev.doc.annotation.docstandard.CommandInfo#usage()}.
 	 *
 	 * @return The description of this command
 	 */
@@ -54,23 +59,30 @@ public @interface CommandInfo {
 	String[] requirements() default {};
 
 	/**
-	 * The {@link com.readonlydev.doc.annotation.DocConverter DocConverter} for the
-	 * {@link com.readonlydev.doc.annotation.docstandard.CommandInfo @CommandInfo} annotation.
+	 * The {@link com.readonlydev.doc.annotation.DocConverter DocConverter} for
+	 * the
+	 * {@link com.readonlydev.doc.annotation.docstandard.CommandInfo @CommandInfo}
+	 * annotation.
 	 */
-	class Converter implements DocConverter<CommandInfo> {
+	class Converter implements DocConverter<CommandInfo>
+	{
 		@Override
-		public String read(CommandInfo annotation) {
-			String[] names = annotation.name();
-			String usage = annotation.usage();
-			String description = annotation.description();
-			String[] requirements = annotation.requirements();
+		public String read(CommandInfo annotation)
+		{
+			String[]	names			= annotation.name();
+			String		usage			= annotation.usage();
+			String		description		= annotation.description();
+			String[]	requirements	= annotation.requirements();
 
 			StringBuilder b = new StringBuilder();
-			if (names.length > 0) {
+			if (names.length > 0)
+			{
 				b.append("**Name:** `").append(names[0]).append("`").append("\n\n");
-				if (names.length > 1) {
+				if (names.length > 1)
+				{
 					b.append("**Aliases:**");
-					for (int i = 1; i < names.length; i++) {
+					for (int i = 1; i < names.length; i++)
+					{
 						b.append(" `").append(names[i]).append("`").append(i != names.length - 1 ? "," : "\n\n");
 					}
 				}
@@ -80,11 +92,14 @@ public @interface CommandInfo {
 
 			if (!description.isEmpty())
 				b.append("**Description:** ").append(description).append("\n\n");
-			if (requirements.length == 1) {
+			if (requirements.length == 1)
+			{
 				b.append("**Requirement:** ").append(requirements[0]).append("\n\n");
-			} else if (requirements.length > 1) {
+			} else if (requirements.length > 1)
+			{
 				b.append("**Requirements:**\n");
-				for (int i = 1; i <= requirements.length; i++) {
+				for (int i = 1; i <= requirements.length; i++)
+				{
 					b.append(i).append(") ").append(requirements[i - 1]);
 					if (i != requirements.length)
 						b.append("\n");

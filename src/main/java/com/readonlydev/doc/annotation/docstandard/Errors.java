@@ -11,10 +11,13 @@ import java.lang.annotation.*;
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE, ElementType.METHOD })
-public @interface Errors {
+@Target(
+{ ElementType.TYPE, ElementType.METHOD })
+public @interface Errors
+{
 	/**
-	 * One or more {@link com.readonlydev.doc.annotation.docstandard.Error @Error}
+	 * One or more
+	 * {@link com.readonlydev.doc.annotation.docstandard.Error @Error}
 	 * annotations.
 	 *
 	 * @return One or more @Error annotations

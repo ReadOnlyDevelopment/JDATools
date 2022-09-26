@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.vanniktech:gradle-maven-publish-plugin:0.21.0'
+        classpath 'com.vanniktech:gradle-maven-publish-plugin:0.22.0'
     }
 }
 
@@ -17,7 +17,10 @@ plugins {
 
 apply plugin: "com.vanniktech.maven.publish"
 
-version = "3.0.2-SNAPSHOT"
+def baseVersion = "3.0.2"
+def isSnapshot = true
+
+version = (isSnapshot) ? baseVersion + '-SNAPSHOT' + getBuildNumber() : baseVersion
 group = 'com.readonlydev'
 archivesBaseName = 'jdatools'
 
@@ -36,14 +39,6 @@ configurations {
     api.extendsFrom resolveableImpl
 }
 
-sourceSets {
-    test {
-        java.srcDirs += 'src/test/java'
-        compileClasspath += main.compileClasspath
-        runtimeClasspath += main.runtimeClasspath
-    }
-}
-
 apply from: 'dependencies.gradle'
 
 repositories {
@@ -51,13 +46,13 @@ repositories {
 }
 
 dependencies {
-    api jda()
-    api guava()
-    api lang3()
-    api json()
-    api jacksonCore()
-    api jacksonDatabind()
-    api jacksonAnnotations()
+    resolveableImpl jda()
+    resolveableImpl guava()
+    resolveableImpl lang3()
+    resolveableImpl json()
+    resolveableImpl jacksonCore()
+    resolveableImpl jacksonDatabind()
+    resolveableImpl jacksonAnnotations()
 
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
@@ -116,64 +111,46 @@ javadoc {
     options.setDocTitle(archivesBaseName + ' | ' + projectVersion)
     options.setEncoding('UTF-8')
     options.tags 'apiNote:a:API Note:', 'implSpec:a:Implementation Requirements:', 'implNote:a:Implementation Note:'
-    options.links = [
-        "https://docs.oracle.com/en/java/javase/${majorJavaVersion}/docs/api".toString(),
-        "https://javadoc.io/doc/net.dv8tion/JDA/${jdaVersion}".toString()
-    ]
-
-    destinationDir = file("$buildDir/docs/")
-}
-
-jar {
-    manifest(setMainManifestProps)
-    classifier = 'lite'
 }
 
 shadowJar {
-    classifier = ''
-}
-
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-build {
-    dependsOn { clean }
-    dependsOn { javadocJar }
-    dependsOn { shadowJar }
-}
-
-artifacts {
-    archives jar
-    archives shadowJar
-    archives sourcesJar
+	archiveClassifier.set('')
 }
 
 mavenPublishing {
     signAllPublications()
-    pomFromGradleProperties()
 }
-//
-//publishing {
-//    publications {
-//        JDATools(MavenPublication) {
-//            artifact jar
-//            artifact shadowJar
-//            artifact sourcesJar
-//            artifact javadocJar
-//        }
-//    }
-//    repositories {
-//        maven {
-//            url "file://${project.projectDir}/repo"
-//        }
-//    }
-//}
 
-task localMavenPublish {
-    group 'jdatools'
-    dependsOn 'clean'
-    dependsOn 'publishToMavenLocal'
-    tasks.findByName('publishToMavenLocal').mustRunAfter 'clean'
+artifacts {
+    archives shadowJar
 }
+
+String getBuildNumber() {
+    def versionFile = file('version.properties')
+    if (versionFile.canRead()) {
+        Properties versionProps = new Properties()
+        versionProps.load(new FileInputStream(versionFile))
+        return versionProps['build_num'].toString()
+    }
+    return "1"
+}
+
+task incrementBuild {
+    doFirst {
+        def versionFile = file('version.properties')
+        if (versionFile.canRead()) {
+            Properties versionProps = new Properties()
+            versionProps.load(new FileInputStream(versionFile))
+            def num = versionProps['build_num'].toInteger() + 1
+            println("incrementing BuildNumber to: " + num)
+            versionProps['build_num'] = num.toString()
+            versionProps.store(versionFile.newWriter(), null)
+        } else {
+            println("version.properties file not found! Ignoring.")
+        }
+    }
+}
+
+//gradle.startParameter.excludedTaskNames += [ "javaSourcesJar", "simpleJavadocJar" ]
+
+tasks.publishToMavenLocal.finalizedBy incrementBuild

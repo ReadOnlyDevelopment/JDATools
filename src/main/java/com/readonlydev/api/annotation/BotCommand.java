@@ -12,5 +12,5 @@ import com.readonlydev.command.CommandType;
 @Target(TYPE)
 public @interface BotCommand
 {
-    CommandType value() default CommandType.CONVENTIONAL;
+	CommandType value() default CommandType.CONVENTIONAL;
 }

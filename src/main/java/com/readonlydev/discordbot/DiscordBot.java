@@ -4,7 +4,7 @@ import javax.security.auth.login.LoginException;
 
 public interface DiscordBot
 {
-    void start() throws LoginException;
+	void start() throws LoginException;
 
-    void shutdown();
+	void shutdown();
 }

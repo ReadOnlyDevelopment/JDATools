@@ -13,7 +13,8 @@ import com.readonlydev.doc.annotation.DocConverter;
 /**
  * Specifies an {@link java.lang.annotation.Annotation Annotation} can be
  * converted using the specified
- * {@link com.readonlydev.doc.annotation.DocConverter DocConverter} value. <p>
+ * {@link com.readonlydev.doc.annotation.DocConverter DocConverter} value.
+ * <p>
  * Only annotations with this annotation applied to it are valid for processing
  * via an instance of {@link com.readonlydev.doc.DocGenerator DocGenerator}.
  *
@@ -22,15 +23,16 @@ import com.readonlydev.doc.annotation.DocConverter;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.ANNOTATION_TYPE)
-public @interface ConvertedBy {
+public @interface ConvertedBy
+{
 
-    /**
-     * The {@link com.readonlydev.doc.annotation.DocConverter DocConverter}
-     * Class that the annotation this is applied to provides to
-     * {@link com.readonlydev.doc.annotation.DocConverter#read(Annotation)
-     * DocConverter#read(Annotation)}.
-     *
-     * @return The DocConverter Class to use.
-     */
-    Class<? extends DocConverter<? extends Annotation>> value();
+	/**
+	 * The {@link com.readonlydev.doc.annotation.DocConverter DocConverter}
+	 * Class that the annotation this is applied to provides to
+	 * {@link com.readonlydev.doc.annotation.DocConverter#read(Annotation)
+	 * DocConverter#read(Annotation)}.
+	 *
+	 * @return The DocConverter Class to use.
+	 */
+	Class<? extends DocConverter<? extends Annotation>> value();
 }

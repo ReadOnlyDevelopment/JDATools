@@ -15,10 +15,10 @@ import com.readonlydev.command.event.CommandEvent;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
-import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.interactions.DiscordLocale;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
@@ -44,496 +44,537 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandGroupData;
  *
  * }</code></pre>
  *
- * Execution is with the provision of the SlashCommandEvent is performed in two steps:
+ * Execution is with the provision of the SlashCommandEvent is performed in two
+ * steps:
  * <ul>
- *     <li>{@link SlashCommand#run(SlashCommandEvent) run} - The command runs
- *     through a series of conditionals, automatically terminating the command instance if one is not met,
- *     and possibly providing an error response.</li>
+ * <li>{@link SlashCommand#run(SlashCommandEvent) run} - The command runs
+ * through a series of conditionals, automatically terminating the command
+ * instance if one is not met,
+ * and possibly providing an error response.</li>
  *
- *     <li>{@link SlashCommand#execute(SlashCommandEvent) execute} - The command,
- *     now being cleared to run, executes and performs whatever lies in the abstract body method.</li>
+ * <li>{@link SlashCommand#execute(SlashCommandEvent) execute} - The command,
+ * now being cleared to run, executes and performs whatever lies in the abstract
+ * body method.</li>
  * </ul>
  */
 public abstract class SlashCommand extends Command
 {
 
-    protected List<Long> requiredRoles = new LinkedList<>();
+	protected List<Long> requiredRoles = new LinkedList<>();
 
-    /**
-     * Whether this command is disabled by default.
-     * If disabled, you must give yourself permission to use it.<br>
-     * In order for {@link #enabledUsers} and {@link #enabledRoles} to work, this must be set to false.
-     * @see net.dv8tion.jda.api.requests.restaction.CommandCreateAction#setDefaultEnabled(boolean)
-     * @see SlashCommand#enabledRoles
-     * @see SlashCommand#enabledUsers
-     * @deprecated Discord no longer lets you disable commands.
-     */
-    @Deprecated
-    protected boolean defaultEnabled = true;
+	protected String englishLocalizationName = null;
 
-    protected String englishLocalizationName =  null;
+	protected String guildId = null;
 
-    protected String guildId = null;
+	@Getter
+	@Setter
+	public CommandData commandData;
 
-    @Getter @Setter
-    public CommandData commandData;
+	public void setGuildId(String guildId)
+	{
+		this.guildId = guildId;
+	}
 
-    public void setGuildId(String guildId)
-    {
-        this.guildId = guildId;
-    }
+	/**
+	 * The child commands of the command. These are used in the format
+	 * {@code /<parent name>
+	 * <child name>}.
+	 * This is synonymous with sub commands. Additionally, sub-commands cannot
+	 * have children.<br>
+	 */
+	protected SlashCommand[] children = new SlashCommand[0];
 
-    /**
-     * The child commands of the command. These are used in the format {@code /<parent name>
-     * <child name>}.
-     * This is synonymous with sub commands. Additionally, sub-commands cannot have children.<br>
-     */
-    protected SlashCommand[] children = new SlashCommand[0];
+	/**
+	 * The subcommand/child group this is associated with.
+	 * Will be in format
+	 * {@code /<parent name> <subcommandGroup name> <subcommand name>}.
+	 *
+	 * <b>This only works in a child/subcommand.</b>
+	 *
+	 * To instantiate:
+	 * <code>{@literal new SubcommandGroupData(name, description)}</code><br>
+	 * It's important the instantiations are the same across children if you
+	 * intend to keep them in the same group.
+	 *
+	 * Can be null, and it will not be assigned to a group.
+	 */
+	protected SubcommandGroupData subcommandGroup = null;
 
-    /**
-     * The subcommand/child group this is associated with.
-     * Will be in format {@code /<parent name> <subcommandGroup name> <subcommand name>}.
-     *
-     * <b>This only works in a child/subcommand.</b>
-     *
-     * To instantiate: <code>{@literal new SubcommandGroupData(name, description)}</code><br>
-     * It's important the instantiations are the same across children if you intend to keep them in the same group.
-     *
-     * Can be null, and it will not be assigned to a group.
-     */
-    protected SubcommandGroupData subcommandGroup = null;
+	/**
+	 * An array list of OptionData.
+	 *
+	 * <b>This is incompatible with children. You cannot have a child AND
+	 * options.</b>
+	 *
+	 * This is to specify different options for arguments and the stuff.
+	 *
+	 * For example, to add an argument for "input", you can do this:<br>
+	 *
+	 * <pre><code>
+	 *     OptionData data = new OptionData(OptionType.STRING, "input", "The input for the command").setRequired(true);
+	 *    {@literal List<OptionData> dataList = new ArrayList<>();}
+	 *     dataList.add(data);
+	 *     this.options = dataList;</code></pre>
+	 */
+	protected List<OptionData> options = new ArrayList<>();
 
-    /**
-     * An array list of OptionData.
-     *
-     * <b>This is incompatible with children. You cannot have a child AND options.</b>
-     *
-     * This is to specify different options for arguments and the stuff.
-     *
-     * For example, to add an argument for "input", you can do this:<br>
-     * <pre><code>
-     *     OptionData data = new OptionData(OptionType.STRING, "input", "The input for the command").setRequired(true);
-     *    {@literal List<OptionData> dataList = new ArrayList<>();}
-     *     dataList.add(data);
-     *     this.options = dataList;</code></pre>
-     */
-    protected List<OptionData> options = new ArrayList<>();
+	/**
+	 * The main body method of a {@link SlashCommand SlashCommand}.
+	 * <br>
+	 * This is the "response" for a successful
+	 * {@link SlashCommand#run(SlashCommandEvent) #run(CommandEvent)}.
+	 *
+	 * @param event
+	 *            The {@link SlashCommandEvent SlashCommandEvent} that
+	 *            triggered this Command
+	 */
+	protected abstract void execute(SlashCommandEvent event);
 
-    /**
-     * The main body method of a {@link SlashCommand SlashCommand}.
-     * <br>This is the "response" for a successful
-     * {@link SlashCommand#run(SlashCommandEvent) #run(CommandEvent)}.
-     *
-     * @param  event
-     *         The {@link SlashCommandEvent SlashCommandEvent} that
-     *         triggered this Command
-     */
-    protected abstract void execute(SlashCommandEvent event);
+	/**
+	 * This body is executed when an auto-complete event is received.
+	 * This only ever gets executed if an auto-complete {@link #options option}
+	 * is set.
+	 *
+	 * @param event
+	 *            The event to handle.
+	 *
+	 * @see OptionData#setAutoComplete(boolean)
+	 */
+	public void onAutoComplete(CommandAutoCompleteInteractionEvent event)
+	{
+	}
 
-    /**
-     * This body is executed when an auto-complete event is received.
-     * This only ever gets executed if an auto-complete {@link #options option} is set.
-     *
-     * @param event The event to handle.
-     * @see OptionData#setAutoComplete(boolean)
-     */
-    public void onAutoComplete(CommandAutoCompleteInteractionEvent event) {}
+	/**
+	 * The main body method of a {@link com.readonlydev.command.Command
+	 * Command}.
+	 * <br>
+	 * This is the "response" for a successful
+	 * {@link com.readonlydev.command.Command#run(CommandEvent)
+	 * #run(CommandEvent)}.
+	 * <b>
+	 * Because this is a SlashCommand, this is called, but does nothing.
+	 * You can still override this if you want to have a separate response for
+	 * normal [prefix][name].
+	 * Keep in mind you must add it as a Command via
+	 * {@link ClientBuilder#addCommand(Command)} for it to work properly.
+	 * </b>
+	 *
+	 * @param event
+	 *            The {@link com.readonlydev.command.event.CommandEvent
+	 *            CommandEvent} that
+	 *            triggered this Command
+	 */
+	@Override
+	protected void execute(CommandEvent event)
+	{
+	}
 
-    /**
-     * The main body method of a {@link com.readonlydev.command.Command Command}.
-     * <br>This is the "response" for a successful
-     * {@link com.readonlydev.command.Command#run(CommandEvent) #run(CommandEvent)}.
-     * <b>
-     *     Because this is a SlashCommand, this is called, but does nothing.
-     *     You can still override this if you want to have a separate response for normal [prefix][name].
-     *     Keep in mind you must add it as a Command via {@link ClientBuilder#addCommand(Command)} for it to work properly.
-     * </b>
-     *
-     * @param  event
-     *         The {@link com.readonlydev.command.event.CommandEvent CommandEvent} that
-     *         triggered this Command
-     */
-    @Override
-    protected void execute(CommandEvent event) {}
+	/**
+	 * Runs checks for the {@link SlashCommand SlashCommand} with the
+	 * given {@link SlashCommandEvent SlashCommandEvent} that called it.
+	 * <br>
+	 * Will terminate, and possibly respond with a failure message, if any
+	 * checks fail.
+	 *
+	 * @param event
+	 *            The SlashCommandEvent that triggered this Command
+	 */
+	public final void run(SlashCommandEvent event)
+	{
+		// set the client
+		Client client = event.getClient();
 
-    /**
-     * Runs checks for the {@link SlashCommand SlashCommand} with the
-     * given {@link SlashCommandEvent SlashCommandEvent} that called it.
-     * <br>Will terminate, and possibly respond with a failure message, if any checks fail.
-     *
-     * @param  event
-     *         The SlashCommandEvent that triggered this Command
-     */
-    public final void run(SlashCommandEvent event)
-    {
-        // set the client
-        Client client = event.getClient();
+		// owner check
+		if (ownerCommand && !(isOwner(event, client)))
+		{
+			terminate(event, "Only an owner may run this command. Sorry.", client);
+			return;
+		}
 
-        // owner check
-        if(ownerCommand && !(isOwner(event, client)))
-        {
-            terminate(event, "Only an owner may run this command. Sorry.", client);
-            return;
-        }
+		// is allowed check
+		if ((event.getChannelType() == ChannelType.TEXT) && !isAllowed(event.getChannel().asTextChannel()))
+		{
+			terminate(event, "That command cannot be used in this channel!", client);
+			return;
+		}
 
-        // is allowed check
-        if((event.getChannelType() == ChannelType.TEXT) && !isAllowed(event.getChannel().asTextChannel()))
-        {
-            terminate(event, "That command cannot be used in this channel!", client);
-            return;
-        }
+		// required roles check
+		for (long roleId : requiredRoles)
+		{
+			if (!(event.getChannelType() == ChannelType.TEXT) || event.getMember().getRoles().stream().noneMatch(r -> r.getIdLong() == roleId))
+			{
+				terminate(event, client.getError() + " You do not have the required Role to perform this command!", client);
+				return;
+			}
+		}
 
-        // required roles check
-        for(long roleId : requiredRoles)
-        {
-            if(!(event.getChannelType() == ChannelType.TEXT) || event.getMember().getRoles().stream().noneMatch(r -> r.getIdLong() == roleId))
-            {
-                terminate(event, client.getError()+" You do not have the required Role to perform this command!", client);
-                return;
-            }
-        }
+		// availability check
+		if (event.getChannelType() != ChannelType.PRIVATE)
+		{
+			// user perms
+			for (Permission p : userPermissions)
+			{
+				// Member will never be null because this is only ran in a
+				// server (text channel)
+				if (event.getMember() == null)
+				{
+					continue;
+				}
 
-        // availability check
-        if(event.getChannelType() != ChannelType.PRIVATE)
-        {
-            //user perms
-            for(Permission p: userPermissions)
-            {
-                // Member will never be null because this is only ran in a server (text channel)
-                if(event.getMember() == null) {
-                    continue;
-                }
+				if (p.isChannel())
+				{
+					if (!event.getMember().hasPermission(event.getGuildChannel(), p))
+					{
+						terminate(event, String.format(userMissingPermMessage, client.getError(), p.getName(), "channel"), client);
+						return;
+					}
+				} else
+				{
+					if (!event.getMember().hasPermission(p))
+					{
+						terminate(event, String.format(userMissingPermMessage, client.getError(), p.getName(), "server"), client);
+						return;
+					}
+				}
+			}
 
-                if(p.isChannel())
-                {
-                    if(!event.getMember().hasPermission(event.getGuildChannel(), p))
-                    {
-                        terminate(event, String.format(userMissingPermMessage, client.getError(), p.getName(), "channel"), client);
-                        return;
-                    }
-                }
-                else
-                {
-                    if(!event.getMember().hasPermission(p))
-                    {
-                        terminate(event, String.format(userMissingPermMessage, client.getError(), p.getName(), "server"), client);
-                        return;
-                    }
-                }
-            }
+			// bot perms
+			for (Permission p : botPermissions)
+			{
+				// We can ignore this permission because bots can reply with
+				// embeds even without either of these perms.
+				// The only thing stopping them is the user's ability to use
+				// Application Commands.
+				// It's extremely dumb, but what more can you do.
+				if ((p == Permission.VIEW_CHANNEL) || (p == Permission.MESSAGE_EMBED_LINKS))
+				{
+					continue;
+				}
 
-            // bot perms
-            for(Permission p: botPermissions)
-            {
-                // We can ignore this permission because bots can reply with embeds even without either of these perms.
-                // The only thing stopping them is the user's ability to use Application Commands.
-                // It's extremely dumb, but what more can you do.
-                if ((p == Permission.VIEW_CHANNEL) || (p == Permission.MESSAGE_EMBED_LINKS)) {
-                    continue;
-                }
+				Member selfMember = event.getGuild() == null ? null : event.getGuild().getSelfMember();
+				if (p.isChannel())
+				{
+					if (p.isVoice())
+					{
+						GuildVoiceState	gvc	= event.getMember().getVoiceState();
+						AudioChannel	vc	= gvc == null ? null : gvc.getChannel();
+						if (vc == null)
+						{
+							terminate(event, client.getError() + " You must be in a voice channel to use that!", client);
+							return;
+						} else if (!selfMember.hasPermission(vc, p))
+						{
+							terminate(event, String.format(botMissingPermMessage, client.getError(), p.getName(), "voice channel"), client);
+							return;
+						}
+					} else
+					{
+						if (!selfMember.hasPermission(event.getGuildChannel(), p))
+						{
+							terminate(event, String.format(botMissingPermMessage, client.getError(), p.getName(), "channel"), client);
+							return;
+						}
+					}
+				} else
+				{
+					if (!selfMember.hasPermission(p))
+					{
+						terminate(event, String.format(botMissingPermMessage, client.getError(), p.getName(), "server"), client);
+						return;
+					}
+				}
+			}
 
-                Member selfMember = event.getGuild() == null ? null : event.getGuild().getSelfMember();
-                if(p.isChannel())
-                {
-                    if(p.isVoice())
-                    {
-                        GuildVoiceState gvc = event.getMember().getVoiceState();
-                        AudioChannel vc = gvc == null ? null : gvc.getChannel();
-                        if(vc==null)
-                        {
-                            terminate(event, client.getError()+" You must be in a voice channel to use that!", client);
-                            return;
-                        }
-                        else if(!selfMember.hasPermission(vc, p))
-                        {
-                            terminate(event, String.format(botMissingPermMessage, client.getError(), p.getName(), "voice channel"), client);
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        if(!selfMember.hasPermission(event.getGuildChannel(), p))
-                        {
-                            terminate(event, String.format(botMissingPermMessage, client.getError(), p.getName(), "channel"), client);
-                            return;
-                        }
-                    }
-                }
-                else
-                {
-                    if(!selfMember.hasPermission(p))
-                    {
-                        terminate(event, String.format(botMissingPermMessage, client.getError(), p.getName(), "server"), client);
-                        return;
-                    }
-                }
-            }
+			// nsfw check
+			if (nsfwOnly && (event.getChannelType() == ChannelType.TEXT) && !event.getGuildChannel().asTextChannel().isNSFW())
+			{
+				terminate(event, "This command may only be used in NSFW text channels!", client);
+				return;
+			}
+		} else if (guildOnly)
+		{
+			terminate(event, client.getError() + " This command cannot be used in direct messages", client);
+			return;
+		}
 
-            // nsfw check
-            if (nsfwOnly && (event.getChannelType() == ChannelType.TEXT) && !event.getGuildChannel().asTextChannel().isNSFW())
-            {
-                terminate(event, "This command may only be used in NSFW text channels!", client);
-                return;
-            }
-        }
-        else if(guildOnly)
-        {
-            terminate(event, client.getError()+" This command cannot be used in direct messages", client);
-            return;
-        }
+		// cooldown check, ignoring owner
+		if ((cooldown > 0) && !(isOwner(event, client)))
+		{
+			String	key			= getCooldownKey(event);
+			int		remaining	= client.getRemainingCooldown(key);
+			if (remaining > 0)
+			{
+				terminate(event, getCooldownError(event, remaining, client), client);
+				return;
+			} else
+			{
+				client.applyCooldown(key, cooldown);
+			}
+		}
 
-        // cooldown check, ignoring owner
-        if((cooldown>0) && !(isOwner(event, client)))
-        {
-            String key = getCooldownKey(event);
-            int remaining = client.getRemainingCooldown(key);
-            if(remaining>0)
-            {
-                terminate(event, getCooldownError(event, remaining, client), client);
-                return;
-            } else {
-                client.applyCooldown(key, cooldown);
-            }
-        }
+		// run
+		try
+		{
+			execute(event);
+		} catch (Throwable t)
+		{
+			if (client.getListener() != null)
+			{
+				client.getListener().onSlashCommandException(event, this, t);
+				return;
+			}
+			// otherwise we rethrow
+			throw t;
+		}
 
-        // run
-        try {
-            execute(event);
-        } catch(Throwable t) {
-            if(client.getListener() != null)
-            {
-                client.getListener().onSlashCommandException(event, this, t);
-                return;
-            }
-            // otherwise we rethrow
-            throw t;
-        }
+		if (client.getListener() != null)
+		{
+			client.getListener().onCompletedSlashCommand(event, this);
+		}
+	}
 
-        if(client.getListener() != null) {
-            client.getListener().onCompletedSlashCommand(event, this);
-        }
-    }
+	/**
+	 * Tests whether or not the {@link net.dv8tion.jda.api.entities.User User}
+	 * who triggered this
+	 * event is an owner of the bot.
+	 *
+	 * @param event
+	 *            the event that triggered the command
+	 * @param client
+	 *            the command client for checking stuff
+	 *
+	 * @return {@code true} if the User is the Owner, else {@code false}
+	 */
+	public boolean isOwner(SlashCommandEvent event, Client client)
+	{
+		if (event.getUser().getId().equals(client.getOwnerId()))
+		{
+			return true;
+		}
+		if (client.getCoOwnerIds() == null)
+		{
+			return false;
+		}
+		for (String id : client.getCoOwnerIds())
+		{
+			if (id.equals(event.getUser().getId()))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 
-    /**
-     * Tests whether or not the {@link net.dv8tion.jda.api.entities.User User} who triggered this
-     * event is an owner of the bot.
-     *
-     * @param event the event that triggered the command
-     * @param client the command client for checking stuff
-     * @return {@code true} if the User is the Owner, else {@code false}
-     */
-    public boolean isOwner(SlashCommandEvent event, Client client)
-    {
-        if(event.getUser().getId().equals(client.getOwnerId())) {
-            return true;
-        }
-        if(client.getCoOwnerIds()==null) {
-            return false;
-        }
-        for(String id : client.getCoOwnerIds()) {
-            if(id.equals(event.getUser().getId())) {
-                return true;
-            }
-        }
-        return false;
-    }
+	protected void addRequiredRoles(long... roleIds)
+	{
+		for (long id : roleIds)
+		{
+			this.requiredRoles.add(id);
+		}
+	}
 
-    protected void addRequiredRoles(long... roleIds)
-    {
-        for(long id : roleIds)
-        {
-            this.requiredRoles.add(id);
-        }
-    }
+	/**
+	 * Gets the subcommand data associated with this subcommand.
+	 *
+	 * @return subcommand data
+	 */
+	public SubcommandGroupData getSubcommandGroup()
+	{
+		return subcommandGroup;
+	}
 
-    /**
-     * Gets the subcommand data associated with this subcommand.
-     *
-     * @return subcommand data
-     */
-    public SubcommandGroupData getSubcommandGroup()
-    {
-        return subcommandGroup;
-    }
+	/**
+	 * Gets the options associated with this command.
+	 *
+	 * @return the OptionData array for options
+	 */
+	public List<OptionData> getOptions()
+	{
+		return options;
+	}
 
-    /**
-     * Gets the options associated with this command.
-     *
-     * @return the OptionData array for options
-     */
-    public List<OptionData> getOptions()
-    {
-        return options;
-    }
+	/**
+	 * Builds CommandData for the SlashCommand upsert.
+	 * This code is executed when we need to upsert the command.
+	 *
+	 * Useful for manual upserting.
+	 *
+	 * @return the built command data
+	 */
+	public CommandData buildCommandData()
+	{
+		// Make the command data
+		SlashCommandData data = Commands.slash(getName(), getHelp());
+		if (!getOptions().isEmpty())
+		{
+			data.addOptions(getOptions());
+		}
+		// Check for children
+		if (children.length != 0)
+		{
+			// Temporary map for easy group storage
+			Map<String, SubcommandGroupData> groupData = new HashMap<>();
+			for (SlashCommand child : children)
+			{
+				// Create subcommand data
+				SubcommandData subcommandData = new SubcommandData(child.getName(), child.getHelp());
+				// Add options
+				if (!child.getOptions().isEmpty())
+				{
+					subcommandData.addOptions(child.getOptions());
+				}
 
-    /**
-     * Builds CommandData for the SlashCommand upsert.
-     * This code is executed when we need to upsert the command.
-     *
-     * Useful for manual upserting.
-     *
-     * @return the built command data
-     */
-    public CommandData buildCommandData()
-    {
-        // Make the command data
-        SlashCommandData data = Commands.slash(getName(), getHelp());
-        if (!getOptions().isEmpty())
-        {
-            data.addOptions(getOptions());
-        }
-        // Check for children
-        if (children.length != 0)
-        {
-            // Temporary map for easy group storage
-            Map<String, SubcommandGroupData> groupData = new HashMap<>();
-            for (SlashCommand child : children)
-            {
-                // Create subcommand data
-                SubcommandData subcommandData = new SubcommandData(child.getName(), child.getHelp());
-                // Add options
-                if (!child.getOptions().isEmpty())
-                {
-                    subcommandData.addOptions(child.getOptions());
-                }
+				// If there's a subcommand group
+				if (child.getSubcommandGroup() != null)
+				{
+					SubcommandGroupData	group	= child.getSubcommandGroup();
+					SubcommandGroupData	newData	= groupData.getOrDefault(group.getName(), group).addSubcommands(subcommandData);
 
-                // If there's a subcommand group
-                if (child.getSubcommandGroup() != null)
-                {
-                    SubcommandGroupData group = child.getSubcommandGroup();
-                    SubcommandGroupData newData = groupData.getOrDefault(group.getName(), group)
-                        .addSubcommands(subcommandData);
+					groupData.put(group.getName(), newData);
+				}
+				// Just add to the command
+				else
+				{
+					data.addSubcommands(subcommandData);
+				}
+			}
+			if (!groupData.isEmpty())
+			{
+				data.addSubcommandGroups(groupData.values());
+			}
+		}
 
-                    groupData.put(group.getName(), newData);
-                }
-                // Just add to the command
-                else
-                {
-                    data.addSubcommands(subcommandData);
-                }
-            }
-            if (!groupData.isEmpty()) {
-                data.addSubcommandGroups(groupData.values());
-            }
-        }
+		if (this.getUserPermissions() == null)
+		{
+			data.setDefaultPermissions(DefaultMemberPermissions.DISABLED);
+		} else
+		{
+			data.setDefaultPermissions(DefaultMemberPermissions.enabledFor(this.getUserPermissions()));
+		}
 
-        if (this.getUserPermissions() == null) {
-            data.setDefaultPermissions(DefaultMemberPermissions.DISABLED);
-        } else {
-            data.setDefaultPermissions(DefaultMemberPermissions.enabledFor(this.getUserPermissions()));
-        }
+		if (this.getLocalizedName() != null)
+		{
+			data.setNameLocalization(DiscordLocale.ENGLISH_US, this.getLocalizedName());
+		}
 
-        if(this.getLocalizedName() != null)
-        {
-            data.setNameLocalization(DiscordLocale.ENGLISH_US, this.getLocalizedName());
-        }
+		data.setGuildOnly(this.guildOnly);
 
-        data.setGuildOnly(this.guildOnly);
+		this.setCommandData(data);
+		return data;
+	}
 
-        this.setCommandData(data);
-        return data;
-    }
+	public String getLocalizedName()
+	{
+		return englishLocalizationName;
+	}
 
-    public String getLocalizedName()
-    {
-        return englishLocalizationName;
-    }
+	public String getGuildId()
+	{
+		return guildId;
+	}
 
-    public String getGuildId()
-    {
-        return guildId;
-    }
+	public boolean isGuildRestricted()
+	{
+		return guildId != null;
+	}
 
-    public boolean isGuildRestricted()
-    {
-        return guildId != null;
-    }
+	public boolean isGlobalCommand()
+	{
+		return guildId == null;
+	}
 
-    public boolean isGlobalCommand()
-    {
-        return guildId == null;
-    }
+	/**
+	 * Gets the {@link SlashCommand#children Command.children} for the Command.
+	 *
+	 * @return The children for the Command
+	 */
+	@Override
+	public SlashCommand[] getChildren()
+	{
+		return children;
+	}
 
-    /**
-     * Gets the {@link SlashCommand#children Command.children} for the Command.
-     *
-     * @return The children for the Command
-     */
-    @Override
-    public SlashCommand[] getChildren()
-    {
-        return children;
-    }
+	private void terminate(SlashCommandEvent event, String message, Client client)
+	{
+		if (message != null)
+		{
+			event.reply(message).setEphemeral(true).queue();
+		}
+		if (client.getListener() != null)
+		{
+			client.getListener().onTerminatedSlashCommand(event, this);
+		}
+	}
 
-    private void terminate(SlashCommandEvent event, String message, Client client)
-    {
-        if(message!=null) {
-            event.reply(message).setEphemeral(true).queue();
-        }
-        if(client.getListener()!=null) {
-            client.getListener().onTerminatedSlashCommand(event, this);
-        }
-    }
+	/**
+	 * Gets the proper cooldown key for this Command under the provided
+	 * {@link SlashCommandEvent SlashCommandEvent}.
+	 *
+	 * @param event
+	 *            The CommandEvent to generate the cooldown for.
+	 *
+	 * @return A String key to use when applying a cooldown.
+	 */
+	public String getCooldownKey(SlashCommandEvent event)
+	{
+		switch (cooldownScope)
+		{
+		case USER:
+			return cooldownScope.genKey(name, event.getUser().getIdLong());
+		case USER_GUILD:
+			return event.getGuild() != null ? cooldownScope.genKey(name, event.getUser().getIdLong(), event.getGuild().getIdLong()) : CooldownScope.USER_CHANNEL.genKey(name, event.getUser().getIdLong(), event.getChannel().getIdLong());
+		case USER_CHANNEL:
+			return cooldownScope.genKey(name, event.getUser().getIdLong(), event.getChannel().getIdLong());
+		case GUILD:
+			return event.getGuild() != null ? cooldownScope.genKey(name, event.getGuild().getIdLong()) : CooldownScope.CHANNEL.genKey(name, event.getChannel().getIdLong());
+		case CHANNEL:
+			return cooldownScope.genKey(name, event.getChannel().getIdLong());
+		case SHARD:
+			event.getJDA().getShardInfo();
+			return cooldownScope.genKey(name, event.getJDA().getShardInfo().getShardId());
+		case USER_SHARD:
+			event.getJDA().getShardInfo();
+			return cooldownScope.genKey(name, event.getUser().getIdLong(), event.getJDA().getShardInfo().getShardId());
+		case GLOBAL:
+			return cooldownScope.genKey(name, 0);
+		default:
+			return "";
+		}
+	}
 
-    /**
-     * Gets the proper cooldown key for this Command under the provided
-     * {@link SlashCommandEvent SlashCommandEvent}.
-     *
-     * @param  event
-     *         The CommandEvent to generate the cooldown for.
-     *
-     * @return A String key to use when applying a cooldown.
-     */
-    public String getCooldownKey(SlashCommandEvent event)
-    {
-        switch (cooldownScope)
-        {
-            case USER:         return cooldownScope.genKey(name,event.getUser().getIdLong());
-            case USER_GUILD:   return event.getGuild()!=null ? cooldownScope.genKey(name,event.getUser().getIdLong(),event.getGuild().getIdLong()) :
-                CooldownScope.USER_CHANNEL.genKey(name,event.getUser().getIdLong(), event.getChannel().getIdLong());
-            case USER_CHANNEL: return cooldownScope.genKey(name,event.getUser().getIdLong(),event.getChannel().getIdLong());
-            case GUILD:        return event.getGuild()!=null ? cooldownScope.genKey(name,event.getGuild().getIdLong()) :
-                CooldownScope.CHANNEL.genKey(name,event.getChannel().getIdLong());
-            case CHANNEL:      return cooldownScope.genKey(name,event.getChannel().getIdLong());
-            case SHARD:
-                event.getJDA().getShardInfo();
-                return cooldownScope.genKey(name, event.getJDA().getShardInfo().getShardId());
-            case USER_SHARD:
-                event.getJDA().getShardInfo();
-                return cooldownScope.genKey(name,event.getUser().getIdLong(),event.getJDA().getShardInfo().getShardId());
-            case GLOBAL:       return cooldownScope.genKey(name, 0);
-            default:           return "";
-        }
-    }
-
-    /**
-     * Gets an error message for this Command under the provided
-     * {@link SlashCommandEvent SlashCommandEvent}.
-     *
-     * @param  event
-     *         The CommandEvent to generate the error message for.
-     * @param  remaining
-     *         The remaining number of seconds a command is on cooldown for.
-     * @param client
-     *         The Client for checking stuff
-     *
-     * @return A String error message for this command if {@code remaining > 0},
-     *         else {@code null}.
-     */
-    public String getCooldownError(SlashCommandEvent event, int remaining, Client client)
-    {
-        if(remaining<=0) {
-            return null;
-        }
-        String front = client.getWarning()+" That command is on cooldown for "+remaining+" more seconds";
-        if(cooldownScope.equals(CooldownScope.USER)) {
-            return front+"!";
-        } else if(cooldownScope.equals(CooldownScope.USER_GUILD) && (event.getGuild()==null)) {
-            return front+" "+ CooldownScope.USER_CHANNEL.getErrorSpecification()+"!";
-        } else if(cooldownScope.equals(CooldownScope.GUILD) && (event.getGuild()==null)) {
-            return front+" "+ CooldownScope.CHANNEL.getErrorSpecification()+"!";
-        } else {
-            return front+" "+cooldownScope.getErrorSpecification()+"!";
-        }
-    }
+	/**
+	 * Gets an error message for this Command under the provided
+	 * {@link SlashCommandEvent SlashCommandEvent}.
+	 *
+	 * @param event
+	 *            The CommandEvent to generate the error message for.
+	 * @param remaining
+	 *            The remaining number of seconds a command is on cooldown for.
+	 * @param client
+	 *            The Client for checking stuff
+	 *
+	 * @return A String error message for this command if {@code remaining > 0},
+	 *         else {@code null}.
+	 */
+	public String getCooldownError(SlashCommandEvent event, int remaining, Client client)
+	{
+		if (remaining <= 0)
+		{
+			return null;
+		}
+		String front = client.getWarning() + " That command is on cooldown for " + remaining + " more seconds";
+		if (cooldownScope.equals(CooldownScope.USER))
+		{
+			return front + "!";
+		} else if (cooldownScope.equals(CooldownScope.USER_GUILD) && (event.getGuild() == null))
+		{
+			return front + " " + CooldownScope.USER_CHANNEL.getErrorSpecification() + "!";
+		} else if (cooldownScope.equals(CooldownScope.GUILD) && (event.getGuild() == null))
+		{
+			return front + " " + CooldownScope.CHANNEL.getErrorSpecification() + "!";
+		} else
+		{
+			return front + " " + cooldownScope.getErrorSpecification() + "!";
+		}
+	}
 }

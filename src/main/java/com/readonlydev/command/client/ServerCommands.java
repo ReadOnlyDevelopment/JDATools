@@ -11,51 +11,51 @@ import com.readonlydev.common.utils.SafeIdUtil;
 
 public final class ServerCommands
 {
-    private final long serverId;
-    private List<SlashCommand> slashCommands;
-    private List<ContextMenu> contextMenus;
+	private final long			serverId;
+	private List<SlashCommand>	slashCommands;
+	private List<ContextMenu>	contextMenus;
 
-    public ServerCommands(long serverId)
-    {
-        this.serverId = serverId;
-        this.slashCommands = new LinkedList<>();
-        this.contextMenus = new LinkedList<>();
-    }
+	public ServerCommands(long serverId)
+	{
+		this.serverId = serverId;
+		this.slashCommands = new LinkedList<>();
+		this.contextMenus = new LinkedList<>();
+	}
 
-    public ServerCommands(String serverId)
-    {
-        this(SafeIdUtil.safeConvert(serverId));
-    }
+	public ServerCommands(String serverId)
+	{
+		this(SafeIdUtil.safeConvert(serverId));
+	}
 
-    public ServerCommands addAllCommands(Collection<SlashCommand> commandCollection)
-    {
-        slashCommands.addAll(commandCollection);
-        return this;
-    }
+	public ServerCommands addAllCommands(Collection<SlashCommand> commandCollection)
+	{
+		slashCommands.addAll(commandCollection);
+		return this;
+	}
 
-    public ServerCommands addAllCommands(SlashCommand... commands)
-    {
-        slashCommands.addAll(Arrays.asList(commands));
-        return this;
-    }
+	public ServerCommands addAllCommands(SlashCommand... commands)
+	{
+		slashCommands.addAll(Arrays.asList(commands));
+		return this;
+	}
 
-    public void addContextMenus(ContextMenu... menus)
-    {
-        contextMenus.addAll(Arrays.asList(menus));
-    }
+	public void addContextMenus(ContextMenu... menus)
+	{
+		contextMenus.addAll(Arrays.asList(menus));
+	}
 
-    long getServerId()
-    {
-        return serverId;
-    }
+	long getServerId()
+	{
+		return serverId;
+	}
 
-    List<SlashCommand> getSlashCommands()
-    {
-        return slashCommands;
-    }
+	List<SlashCommand> getSlashCommands()
+	{
+		return slashCommands;
+	}
 
-    List<ContextMenu> getContextMenus()
-    {
-        return contextMenus;
-    }
+	List<ContextMenu> getContextMenus()
+	{
+		return contextMenus;
+	}
 }

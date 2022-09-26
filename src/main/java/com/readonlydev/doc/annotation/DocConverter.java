@@ -48,17 +48,18 @@ import com.readonlydev.doc.ConvertedBy;
  * @see ConvertedBy
  */
 @FunctionalInterface
-public interface DocConverter<T extends Annotation> {
+public interface DocConverter<T extends Annotation>
+{
 	/**
 	 * Returns a String processed from the contents of the provided
 	 * {@link java.lang.annotation.Annotation Annotation}. <br>
 	 * <b>Should never throw and/or encounter uncaught exceptions.</b>
 	 *
-	 * @param annotation The annotation to process.
+	 * @param annotation
+	 *            The annotation to process.
 	 *
 	 * @return A String processed from the Annotation provided.
 	 */
 	String read(T annotation);
-
 
 }

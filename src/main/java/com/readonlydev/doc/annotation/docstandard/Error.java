@@ -12,11 +12,13 @@ import com.readonlydev.doc.annotation.DocConverter;
  * it's runtime.
  * <p>
  * These are formatted ways to describe errors and provide the
- * {@link com.readonlydev.doc.annotation.docstandard.Error#response()} method for
+ * {@link com.readonlydev.doc.annotation.docstandard.Error#response()} method
+ * for
  * specifying the bot's response if the error occurs.
  * <p>
  * Multiples of these can be applied using the
- * {@link com.readonlydev.doc.annotation.docstandard.Errors @Errors} annotation, or simply
+ * {@link com.readonlydev.doc.annotation.docstandard.Errors @Errors} annotation,
+ * or simply
  * multiples of these can be attached to a class or method.
  * <p>
  * Below is a visual of what this should generally look like:
@@ -35,8 +37,10 @@ import com.readonlydev.doc.annotation.DocConverter;
 @Documented
 @Repeatable(Errors.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE, ElementType.METHOD })
-public @interface Error {
+@Target(
+{ ElementType.TYPE, ElementType.METHOD })
+public @interface Error
+{
 	/**
 	 * A brief description of what caused the error.
 	 *
@@ -54,23 +58,29 @@ public @interface Error {
 	String response() default "";
 
 	/**
-	 * A prefix appended to the front of the produced String during conversion. <br>
+	 * A prefix appended to the front of the produced String during conversion.
+	 * <br>
 	 * Only really useful or needed when a Command has multiple
-	 * {@link com.readonlydev.doc.annotation.docstandard.Error @Error} annotations, for the
+	 * {@link com.readonlydev.doc.annotation.docstandard.Error @Error}
+	 * annotations, for the
 	 * purpose of listing.
 	 *
 	 * @return A prefix for the conversion, useful when multiple @Errors are
-	 * specified.
+	 *         specified.
 	 */
 	String prefix() default "";
 
 	/**
-	 * The {@link com.readonlydev.doc.annotation.DocConverter DocConverter} for the
-	 * {@link com.readonlydev.doc.annotation.docstandard.Error @Error} annotation.
+	 * The {@link com.readonlydev.doc.annotation.DocConverter DocConverter} for
+	 * the
+	 * {@link com.readonlydev.doc.annotation.docstandard.Error @Error}
+	 * annotation.
 	 */
-	class Converter implements DocConverter<Error> {
+	class Converter implements DocConverter<Error>
+	{
 		@Override
-		public String read(Error annotation) {
+		public String read(Error annotation)
+		{
 			StringBuilder b = new StringBuilder(annotation.prefix());
 			if (!annotation.response().isEmpty())
 				b.append("\"").append(annotation.response()).append("\" - ");

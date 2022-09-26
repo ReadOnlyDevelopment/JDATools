@@ -9,24 +9,24 @@ import lombok.NoArgsConstructor;
 public abstract class SpecialList<T, V> extends LinkedList<V>
 {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    public SpecialList(List<V> fromList)
-    {
-        this.addAll(fromList);
-    }
+	public SpecialList(List<V> fromList)
+	{
+		this.addAll(fromList);
+	}
 
-    @Override
-    public boolean add(V e)
-    {
-        if(!this.contains(e))
-        {
-            return super.add(e);
-        }
+	@Override
+	public boolean add(V e)
+	{
+		if (!this.contains(e))
+		{
+			return super.add(e);
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    public abstract T getSubListFrom(T specialList);
+	public abstract T getSubListFrom(T specialList);
 
 }

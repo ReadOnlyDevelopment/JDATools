@@ -5,7 +5,9 @@ import java.lang.annotation.*;
 
 /**
  * A helper {@link java.lang.annotation.Annotation Annotation}, useful for
- * formatting multiple occurrences of the same CommandDoc annotation. <p> This
+ * formatting multiple occurrences of the same CommandDoc annotation.
+ * <p>
+ * This
  * is best coupled with usage of an
  * {@link java.lang.annotation.Repeatable @Repeatable} annotation and a
  * similarly named holder annotation for multiple occurrences. <br>
@@ -19,29 +21,32 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.ANNOTATION_TYPE)
-public @interface DocMultiple {
+public @interface DocMultiple
+{
 
-    /**
-     * Text that occurs before all occurrences of the annotation this is applied
-     * to. <br> Default this is an empty String.
-     *
-     * @return The preface text
-     */
-    String preface() default "";
+	/**
+	 * Text that occurs before all occurrences of the annotation this is applied
+	 * to. <br>
+	 * Default this is an empty String.
+	 *
+	 * @return The preface text
+	 */
+	String preface() default "";
 
-    /**
-     * A prefix annotation appended to the front of each occurrence. <br>
-     * Default this is an empty string.
-     *
-     * @return The prefix String.
-     */
-    String prefixEach() default "";
+	/**
+	 * A prefix annotation appended to the front of each occurrence. <br>
+	 * Default this is an empty string.
+	 *
+	 * @return The prefix String.
+	 */
+	String prefixEach() default "";
 
-    /**
-     * A separator String applied in-between occurrences. <br> Default this is
-     * an empty string.
-     *
-     * @return The separator String.
-     */
-    String separateBy() default "";
+	/**
+	 * A separator String applied in-between occurrences. <br>
+	 * Default this is
+	 * an empty string.
+	 *
+	 * @return The separator String.
+	 */
+	String separateBy() default "";
 }
