@@ -1,43 +1,24 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.vanniktech:gradle-maven-publish-plugin:0.22.0'
-    }
-}
-
 plugins {
     id 'eclipse'
     id 'java-library'
     id "com.github.ben-manes.versions" version "0.42.0"
-    id "com.github.johnrengelman.shadow" version "7.1.2"
     id 'signing'
+    id 'maven-publish'
+    id "io.freefair.lombok" version "6.6.1"
 }
 
-apply plugin: "com.vanniktech.maven.publish"
+def baseVersion = "4.0.0"
+def isSnapshot = false
 
-def baseVersion = "3.0.2"
-def isSnapshot = true
-
-version = (isSnapshot) ? baseVersion + '-SNAPSHOT' + getBuildNumber() : baseVersion
+version = (isSnapshot) ? baseVersion + '-SNAPSHOT.' + getBuildNumber() : baseVersion
 group = 'com.readonlydev'
 archivesBaseName = 'jdatools'
 
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.apache.tools.ant.filters.ReplaceTokens
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 def javaVersion = JavaVersion.VERSION_17
-
-configurations {
-    resolveableImpl {
-        transitive = true
-        canBeResolved = true
-    }
-    api.extendsFrom resolveableImpl
-}
 
 apply from: 'dependencies.gradle'
 
@@ -46,19 +27,15 @@ repositories {
 }
 
 dependencies {
-    resolveableImpl jda()
-    resolveableImpl guava()
-    resolveableImpl lang3()
-    resolveableImpl json()
-    resolveableImpl jacksonCore()
-    resolveableImpl jacksonDatabind()
-    resolveableImpl jacksonAnnotations()
-
-    compileOnly 'org.projectlombok:lombok:1.18.24'
-    annotationProcessor 'org.projectlombok:lombok:1.18.24'
-
-    testCompileOnly 'org.projectlombok:lombok:1.18.24'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
+    api jda() {
+		exclude module: 'opus-java'
+	}
+    api guava()
+    api lang3()
+    implementation json()
+    api jacksonCore()
+    api jacksonDatabind()
+    api jacksonAnnotations()
 }
 
 def projectVersion = version.toString()
@@ -71,8 +48,8 @@ task sourcesForRelease(type: Copy) {
     from('src/main/java') {
         filter(ReplaceTokens, tokens: [
             MAJOR:	splitVerison.get(0),
-            MINOR:    	splitVerison.get(1),
-            PATCH:      splitVerison.get(2)
+            MINOR:  splitVerison.get(1),
+            PATCH:  splitVerison.get(2)
         ])
     }
     into 'build/filteredSrc'
@@ -99,7 +76,9 @@ task fullBuild {
     group 'jdatools'
     dependsOn 'clean'
     dependsOn 'build'
+    dependsOn 'publishToMavenLocal'
     tasks.findByName('build').mustRunAfter 'clean'
+    tasks.findByName('publishToMavenLocal').mustRunAfter 'build'
 }
 
 def majorJavaVersion = javaVersion.getMajorVersion()
@@ -113,16 +92,8 @@ javadoc {
     options.tags 'apiNote:a:API Note:', 'implSpec:a:Implementation Requirements:', 'implNote:a:Implementation Note:'
 }
 
-shadowJar {
-	archiveClassifier.set('')
-}
-
-mavenPublishing {
-    signAllPublications()
-}
-
 artifacts {
-    archives shadowJar
+	archives jar
 }
 
 String getBuildNumber() {
@@ -151,6 +122,12 @@ task incrementBuild {
     }
 }
 
-//gradle.startParameter.excludedTaskNames += [ "javaSourcesJar", "simpleJavadocJar" ]
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+        	from components.java
+        }
+    }
+}
 
 tasks.publishToMavenLocal.finalizedBy incrementBuild

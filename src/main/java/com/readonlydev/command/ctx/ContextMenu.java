@@ -5,12 +5,18 @@
  */
 package com.readonlydev.command.ctx;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.readonlydev.api.CooldownScope;
 import com.readonlydev.command.client.Client;
 import com.readonlydev.command.operation.UserInteraction;
 
+import lombok.Getter;
+import lombok.Setter;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.DiscordLocale;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -22,23 +28,24 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
  */
 public abstract class ContextMenu extends UserInteraction
 {
+	@Getter
+	@Setter
+	public CommandData commandData;
+
 	/**
 	 * The name of the command. This appears in the context menu.
 	 * Can be 1-32 characters long. Spaces are allowed.
-	 * 
+	 *
 	 * @see CommandData#setName(String)
 	 */
+	@Getter
 	protected String name = "null";
 
 	/**
-	 * Gets the {@link ContextMenu ContextMenu.name} for the Context Menu.
-	 *
-	 * @return The name for the Context Menu.
+	 * Localization of menu names. Allows discord to change the language of the name of menu in the client.
 	 */
-	public String getName()
-	{
-		return name;
-	}
+	@Getter
+	protected Map<DiscordLocale, String> nameLocalization = new HashMap<>();
 
 	/**
 	 * Gets the type of context menu.
@@ -131,14 +138,9 @@ public abstract class ContextMenu extends UserInteraction
 	}
 
 	/**
-	 * Builds CommandData for the ContextMenu upsert.
-	 * This code is executed when we need to upsert the menu.
-	 *
-	 * Useful for manual upserting.
-	 *
-	 * @return the built command data
+	 * Builds and sets the CommandData for the ContextMenu upsert.
 	 */
-	public CommandData buildCommandData()
+	public void buildCommandData()
 	{
 		// Make the command data
 		CommandData data = Commands.context(getType(), name);
@@ -153,6 +155,13 @@ public abstract class ContextMenu extends UserInteraction
 
 		data.setGuildOnly(this.guildOnly);
 
-		return data;
+		//Check name localizations
+		if (!getNameLocalization().isEmpty())
+		{
+			//Add localizations
+			data.setNameLocalizations(getNameLocalization());
+		}
+
+		this.setCommandData(data);
 	}
 }

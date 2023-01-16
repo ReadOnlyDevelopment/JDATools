@@ -16,7 +16,6 @@ import com.readonlydev.settings.GuildSettingsManager;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
@@ -417,8 +416,6 @@ public interface ClientInterface
 	 * @return The {@code long} ID(s) of any CoOwners of this bot
 	 */
 	long[] getCoOwnerIdsLong();
-
-	String getBotTestingServerId();
 
 	/**
 	 * Gets the success emoji.

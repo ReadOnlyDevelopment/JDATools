@@ -39,7 +39,6 @@ public class ClientBuilder
 	private String[]											coOwnerIds;
 	private String												prefix;
 	private String[]											prefixes;
-	private String												botTestingServerId;
 	private Function<MessageReceivedEvent, String>				prefixFunction;
 	private Function<MessageReceivedEvent, Boolean>				commandPreProcessFunction;
 	private BiFunction<MessageReceivedEvent, Command, Boolean>	commandPreProcessBiFunction;
@@ -73,7 +72,7 @@ public class ClientBuilder
 	public Client build()
 	{
 		// @noformat
-		Client client = new Client(ownerId, coOwnerIds, prefix, prefixes, botTestingServerId, prefixFunction, commandPreProcessFunction, commandPreProcessBiFunction, activity, status, serverInvite, success, warning, error, new ArrayList<>(commands), new ArrayList<>(slashCommands), new ArrayList<>(contextMenus), serverCommands, globalCommands, embedAllReplies, useHelp, shutdownAutomatically, helpConsumer, helpWord, executor, linkedCacheSize, manager);
+		Client client = new Client(ownerId, coOwnerIds, prefix, prefixes, prefixFunction, commandPreProcessFunction, commandPreProcessBiFunction, activity, status, serverInvite, success, warning, error, new ArrayList<>(commands), new ArrayList<>(slashCommands), new ArrayList<>(contextMenus), serverCommands, globalCommands, embedAllReplies, useHelp, shutdownAutomatically, helpConsumer, helpWord, executor, linkedCacheSize, manager);
 		if (listener != null)
 		{
 			client.setListener(listener);
@@ -140,12 +139,6 @@ public class ClientBuilder
 	public ClientBuilder setPrefixes(String[] prefixes)
 	{
 		this.prefixes = prefixes;
-		return this;
-	}
-
-	public ClientBuilder setBotTestingServerId(String botTestingServerId)
-	{
-		this.botTestingServerId = botTestingServerId;
 		return this;
 	}
 

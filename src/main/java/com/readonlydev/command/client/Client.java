@@ -55,14 +55,14 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.GenericEvent;
-import net.dv8tion.jda.api.events.ReadyEvent;
-import net.dv8tion.jda.api.events.ShutdownEvent;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.session.ReadyEvent;
+import net.dv8tion.jda.api.events.session.ShutdownEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.internal.utils.Checks;
@@ -89,7 +89,6 @@ public class Client implements ClientInterface, EventListener
 	private final String[]												coOwnerIds;
 	private final String												prefix;
 	private final String[]												prefixes;
-	private final String												botTestingServerId;
 	private final Function<MessageReceivedEvent, String>				prefixFunction;
 	private final Function<MessageReceivedEvent, Boolean>				commandPreProcessFunction;
 	private final BiFunction<MessageReceivedEvent, Command, Boolean>	commandPreProcessBiFunction;
@@ -123,7 +122,7 @@ public class Client implements ClientInterface, EventListener
 	private CommandListener	listener	= null;
 	private int				totalGuilds;
 
-	public Client(String ownerId, String[] coOwnerIds, String prefix, String[] prefixes, String botTestingServerId, Function<MessageReceivedEvent, String> prefixFunction, Function<MessageReceivedEvent, Boolean> commandPreProcessFunction, BiFunction<MessageReceivedEvent, Command, Boolean> commandPreProcessBiFunction, Activity activity, OnlineStatus status, String serverInvite, String success, String warning, String error, ArrayList<Command> commands,
+	public Client(String ownerId, String[] coOwnerIds, String prefix, String[] prefixes, Function<MessageReceivedEvent, String> prefixFunction, Function<MessageReceivedEvent, Boolean> commandPreProcessFunction, BiFunction<MessageReceivedEvent, Command, Boolean> commandPreProcessBiFunction, Activity activity, OnlineStatus status, String serverInvite, String success, String warning, String error, ArrayList<Command> commands,
 		ArrayList<SlashCommand> slashCommands, ArrayList<ContextMenu> contextMenus, LinkedList<ServerCommands> serverCommands, LinkedList<SlashCommand> globalSlashCommands, boolean embedAllReplies, boolean useHelp, boolean shutdownAutomatically, Consumer<CommandEvent> helpConsumer, String helpWord, ScheduledExecutorService executor, int linkedCacheSize, GuildSettingsManager<?> manager)
 	{
 		Checks.check(ownerId != null, "Owner ID was set null or not set! Please provide an User ID to register as the owner!");
@@ -161,7 +160,6 @@ public class Client implements ClientInterface, EventListener
 			this.prefixes = ArrayUtils.remove(prefixes, 0);
 			Arrays.sort(this.prefixes, Comparator.reverseOrder());
 		}
-		this.botTestingServerId = botTestingServerId;
 		this.prefixFunction = prefixFunction;
 		this.commandPreProcessFunction = commandPreProcessFunction;
 		this.commandPreProcessBiFunction = commandPreProcessBiFunction;
@@ -298,12 +296,6 @@ public class Client implements ClientInterface, EventListener
 	public OffsetDateTime getStartTime()
 	{
 		return start;
-	}
-
-	@Override
-	public String getBotTestingServerId()
-	{
-		return botTestingServerId;
 	}
 
 	@Override
@@ -704,12 +696,11 @@ public class Client implements ClientInterface, EventListener
 			menu.buildCommandData();
 		}
 
-		this.serverCommands.add(new ServerCommands(getBotTestingServerId()).addAllCommands(getSlashCommands()));
 		for (ServerCommands server : serverCommands)
 		{
 			List<CommandData>	data				= new ArrayList<>();
 			SlashCommandList	serverSlashCmds		= SlashCommandList.from(server.getSlashCommands());
-			ContextMenuList		serverContextMenus	= ContextMenuList.from(getContextMenus());
+			ContextMenuList		serverContextMenus	= ContextMenuList.from(server.getContextMenus());
 
 			for (SlashCommand command : serverSlashCmds)
 			{
@@ -718,14 +709,14 @@ public class Client implements ClientInterface, EventListener
 
 			for (ContextMenu menu : serverContextMenus)
 			{
-				data.add(menu.buildCommandData());
+				data.add(menu.getCommandData());
 			}
 
 			// Attempt to retrieve the provided guild
 			Guild guild = jda.getGuildById(server.getServerId());
 			if (guild == null)
 			{
-				LOG.error("Specified forced guild is null! Slash Commands will NOT be added! Is the bot added?");
+				LOG.error("Specified guild '{}' is null! Slash Commands will NOT be added!", server.getServerId());
 				return;
 			} else
 			{
@@ -869,10 +860,13 @@ public class Client implements ClientInterface, EventListener
 		{
 			for (String pre : prefixes)
 			{
-				if (lowerCaseContent.startsWith(pre.toLowerCase(Locale.ROOT)))
+				if(pre != null)
 				{
-					final int prefixLength = pre.length();
-					return makeMessageParts(rawContent, prefixLength);
+					if (lowerCaseContent.startsWith(pre.toLowerCase(Locale.ROOT)))
+					{
+						final int prefixLength = pre.length();
+						return makeMessageParts(rawContent, prefixLength);
+					}
 				}
 			}
 		}
@@ -961,7 +955,7 @@ public class Client implements ClientInterface, EventListener
 	private void onSlashCommand(SlashCommandInteractionEvent event)
 	{
 		// this will be null if it's not a command
-		final SlashCommand command = findSlashCommand(event.getCommandPath());
+		final SlashCommand command = findSlashCommand(event.getFullCommandName());
 
 		// Wrap the event in a SlashCommandEvent
 		final SlashCommandEvent commandEvent = new SlashCommandEvent(event, this);
@@ -981,7 +975,7 @@ public class Client implements ClientInterface, EventListener
 	private void onCommandAutoComplete(CommandAutoCompleteInteractionEvent event)
 	{
 		// this will be null if it's not a command
-		final SlashCommand command = findSlashCommand(event.getCommandPath());
+		final SlashCommand command = findSlashCommand(event.getFullCommandName());
 
 		if (command != null)
 		{
@@ -991,7 +985,7 @@ public class Client implements ClientInterface, EventListener
 
 	private SlashCommand findSlashCommand(String path)
 	{
-		String[] parts = path.split("/");
+		String[] parts = path.split(" ");
 
 		final SlashCommand command; // this will be null if it's not a command
 		synchronized (slashCommandIndex)

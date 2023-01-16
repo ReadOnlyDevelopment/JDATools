@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.readonlydev.api.CooldownScope;
 import com.readonlydev.command.Command;
@@ -17,6 +18,7 @@ import lombok.Setter;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
@@ -44,67 +46,84 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandGroupData;
  *
  * }</code></pre>
  *
- * Execution is with the provision of the SlashCommandEvent is performed in two
- * steps:
+ * Execution is with the provision of the SlashCommandEvent is performed in two steps:
  * <ul>
- * <li>{@link SlashCommand#run(SlashCommandEvent) run} - The command runs
- * through a series of conditionals, automatically terminating the command
- * instance if one is not met,
- * and possibly providing an error response.</li>
+ * <li>{@link SlashCommand#run(SlashCommandEvent) run} - The command runs through a series of conditionals,
+ * automatically terminating the command instance if one is not met, and possibly providing an error response.</li>
  *
- * <li>{@link SlashCommand#execute(SlashCommandEvent) execute} - The command,
- * now being cleared to run, executes and performs whatever lies in the abstract
- * body method.</li>
+ * <li>{@link SlashCommand#execute(SlashCommandEvent) execute} - The command, now being cleared to run, executes and
+ * performs whatever lies in the abstract body method.</li>
  * </ul>
  */
 public abstract class SlashCommand extends Command
 {
-
 	protected List<Long> requiredRoles = new LinkedList<>();
 
-	protected String englishLocalizationName = null;
+	/**
+	 * Localization of slash command name. Allows discord to change the language of the name of slash commands in the
+	 * client.<br>
+	 * Example:<br>
+	 *
+	 * <pre>
+	 * <code>
+	 *     public Command() {
+	 *          this.name = "help"
+	 *          this.nameLocalization = Map.of(DiscordLocale.GERMAN, "hilfe", DiscordLocale.RUSSIAN, "помощь");
+	 *     }
+	 *</code>
+	 * </pre>
+	 */
+	@Getter
+	protected Map<DiscordLocale, String> nameLocalization = new HashMap<>();
 
+	/**
+	 * Localization of slash command description. Allows discord to change the language of the description of slash
+	 * commands in the client.<br>
+	 * Example:<br>
+	 *
+	 * <pre>
+	 * <code>
+	 *     public Command() {
+	 *          this.description = "all commands"
+	 *          this.descriptionLocalization = Map.of(DiscordLocale.GERMAN, "alle Befehle", DiscordLocale.RUSSIAN, "все команды");
+	 *     }
+	 *</code>
+	 * </pre>
+	 */
+	@Getter
+	protected Map<DiscordLocale, String> descriptionLocalization = new HashMap<>();
+
+	@Setter
 	protected String guildId = null;
 
 	@Getter
 	@Setter
 	public CommandData commandData;
 
-	public void setGuildId(String guildId)
-	{
-		this.guildId = guildId;
-	}
-
 	/**
-	 * The child commands of the command. These are used in the format
-	 * {@code /<parent name>
-	 * <child name>}.
-	 * This is synonymous with sub commands. Additionally, sub-commands cannot
-	 * have children.<br>
+	 * The child commands of the command. These are used in the format {@code /<parent name>
+	 * <child name>}. This is synonymous with sub commands. Additionally, sub-commands cannot have children.<br>
 	 */
 	protected SlashCommand[] children = new SlashCommand[0];
 
 	/**
-	 * The subcommand/child group this is associated with.
-	 * Will be in format
+	 * The subcommand/child group this is associated with. Will be in format
 	 * {@code /<parent name> <subcommandGroup name> <subcommand name>}.
 	 *
 	 * <b>This only works in a child/subcommand.</b>
 	 *
-	 * To instantiate:
-	 * <code>{@literal new SubcommandGroupData(name, description)}</code><br>
-	 * It's important the instantiations are the same across children if you
-	 * intend to keep them in the same group.
+	 * To instantiate: <code>{@literal new SubcommandGroupData(name, description)}</code><br>
+	 * It's important the instantiations are the same across children if you intend to keep them in the same group.
 	 *
 	 * Can be null, and it will not be assigned to a group.
 	 */
+	@Getter
 	protected SubcommandGroupData subcommandGroup = null;
 
 	/**
 	 * An array list of OptionData.
 	 *
-	 * <b>This is incompatible with children. You cannot have a child AND
-	 * options.</b>
+	 * <b>This is incompatible with children. You cannot have a child AND options.</b>
 	 *
 	 * This is to specify different options for arguments and the stuff.
 	 *
@@ -116,24 +135,21 @@ public abstract class SlashCommand extends Command
 	 *     dataList.add(data);
 	 *     this.options = dataList;</code></pre>
 	 */
+	@Getter
 	protected List<OptionData> options = new ArrayList<>();
 
 	/**
-	 * The main body method of a {@link SlashCommand SlashCommand}.
-	 * <br>
-	 * This is the "response" for a successful
-	 * {@link SlashCommand#run(SlashCommandEvent) #run(CommandEvent)}.
+	 * The main body method of a {@link SlashCommand SlashCommand}. <br>
+	 * This is the "response" for a successful {@link SlashCommand#run(SlashCommandEvent) #run(CommandEvent)}.
 	 *
 	 * @param event
-	 *            The {@link SlashCommandEvent SlashCommandEvent} that
-	 *            triggered this Command
+	 *            The {@link SlashCommandEvent SlashCommandEvent} that triggered this Command
 	 */
 	protected abstract void execute(SlashCommandEvent event);
 
 	/**
-	 * This body is executed when an auto-complete event is received.
-	 * This only ever gets executed if an auto-complete {@link #options option}
-	 * is set.
+	 * This body is executed when an auto-complete event is received. This only ever gets executed if an auto-complete
+	 * {@link #options option} is set.
 	 *
 	 * @param event
 	 *            The event to handle.
@@ -145,24 +161,14 @@ public abstract class SlashCommand extends Command
 	}
 
 	/**
-	 * The main body method of a {@link com.readonlydev.command.Command
-	 * Command}.
-	 * <br>
-	 * This is the "response" for a successful
-	 * {@link com.readonlydev.command.Command#run(CommandEvent)
-	 * #run(CommandEvent)}.
-	 * <b>
-	 * Because this is a SlashCommand, this is called, but does nothing.
-	 * You can still override this if you want to have a separate response for
-	 * normal [prefix][name].
-	 * Keep in mind you must add it as a Command via
-	 * {@link ClientBuilder#addCommand(Command)} for it to work properly.
-	 * </b>
+	 * The main body method of a {@link com.readonlydev.command.Command Command}. <br>
+	 * This is the "response" for a successful {@link com.readonlydev.command.Command#run(CommandEvent)
+	 * #run(CommandEvent)}. <b> Because this is a SlashCommand, this is called, but does nothing. You can still override
+	 * this if you want to have a separate response for normal [prefix][name]. Keep in mind you must add it as a Command
+	 * via {@link ClientBuilder#addCommand(Command)} for it to work properly. </b>
 	 *
 	 * @param event
-	 *            The {@link com.readonlydev.command.event.CommandEvent
-	 *            CommandEvent} that
-	 *            triggered this Command
+	 *            The {@link com.readonlydev.command.event.CommandEvent CommandEvent} that triggered this Command
 	 */
 	@Override
 	protected void execute(CommandEvent event)
@@ -170,11 +176,9 @@ public abstract class SlashCommand extends Command
 	}
 
 	/**
-	 * Runs checks for the {@link SlashCommand SlashCommand} with the
-	 * given {@link SlashCommandEvent SlashCommandEvent} that called it.
-	 * <br>
-	 * Will terminate, and possibly respond with a failure message, if any
-	 * checks fail.
+	 * Runs checks for the {@link SlashCommand SlashCommand} with the given {@link SlashCommandEvent SlashCommandEvent}
+	 * that called it. <br>
+	 * Will terminate, and possibly respond with a failure message, if any checks fail.
 	 *
 	 * @param event
 	 *            The SlashCommandEvent that triggered this Command
@@ -198,12 +202,11 @@ public abstract class SlashCommand extends Command
 			return;
 		}
 
-		// required roles check
-		for (long roleId : requiredRoles)
+		if (!requiredRoles.isEmpty())
 		{
-			if (!(event.getChannelType() == ChannelType.TEXT) || event.getMember().getRoles().stream().noneMatch(r -> r.getIdLong() == roleId))
+			if (event.getMember().getRoles().stream().map(Role::getIdLong).noneMatch(requiredRoles.stream().collect(Collectors.toSet())::contains))
 			{
-				terminate(event, client.getError() + " You do not have the required Role to perform this command!", client);
+				terminate(event, client.getError() + " You do not have any of the required Roles to perform this command!", client);
 				return;
 			}
 		}
@@ -334,9 +337,8 @@ public abstract class SlashCommand extends Command
 	}
 
 	/**
-	 * Tests whether or not the {@link net.dv8tion.jda.api.entities.User User}
-	 * who triggered this
-	 * event is an owner of the bot.
+	 * Tests whether or not the {@link net.dv8tion.jda.api.entities.User User} who triggered this event is an owner of
+	 * the bot.
 	 *
 	 * @param event
 	 *            the event that triggered the command
@@ -374,34 +376,9 @@ public abstract class SlashCommand extends Command
 	}
 
 	/**
-	 * Gets the subcommand data associated with this subcommand.
-	 *
-	 * @return subcommand data
+	 * Builds and sets the CommandData for the SlashCommand upsert.
 	 */
-	public SubcommandGroupData getSubcommandGroup()
-	{
-		return subcommandGroup;
-	}
-
-	/**
-	 * Gets the options associated with this command.
-	 *
-	 * @return the OptionData array for options
-	 */
-	public List<OptionData> getOptions()
-	{
-		return options;
-	}
-
-	/**
-	 * Builds CommandData for the SlashCommand upsert.
-	 * This code is executed when we need to upsert the command.
-	 *
-	 * Useful for manual upserting.
-	 *
-	 * @return the built command data
-	 */
-	public CommandData buildCommandData()
+	public void buildCommandData()
 	{
 		// Make the command data
 		SlashCommandData data = Commands.slash(getName(), getHelp());
@@ -422,6 +399,19 @@ public abstract class SlashCommand extends Command
 				if (!child.getOptions().isEmpty())
 				{
 					subcommandData.addOptions(child.getOptions());
+				}
+
+				//Check child name localizations
+				if (!child.getNameLocalization().isEmpty())
+				{
+					//Add localizations
+					subcommandData.setNameLocalizations(child.getNameLocalization());
+				}
+				//Check child description localizations
+				if (!child.getDescriptionLocalization().isEmpty())
+				{
+					//Add localizations
+					subcommandData.setDescriptionLocalizations(child.getDescriptionLocalization());
 				}
 
 				// If there's a subcommand group
@@ -452,25 +442,9 @@ public abstract class SlashCommand extends Command
 			data.setDefaultPermissions(DefaultMemberPermissions.enabledFor(this.getUserPermissions()));
 		}
 
-		if (this.getLocalizedName() != null)
-		{
-			data.setNameLocalization(DiscordLocale.ENGLISH_US, this.getLocalizedName());
-		}
-
 		data.setGuildOnly(this.guildOnly);
 
 		this.setCommandData(data);
-		return data;
-	}
-
-	public String getLocalizedName()
-	{
-		return englishLocalizationName;
-	}
-
-	public String getGuildId()
-	{
-		return guildId;
 	}
 
 	public boolean isGuildRestricted()
@@ -507,8 +481,7 @@ public abstract class SlashCommand extends Command
 	}
 
 	/**
-	 * Gets the proper cooldown key for this Command under the provided
-	 * {@link SlashCommandEvent SlashCommandEvent}.
+	 * Gets the proper cooldown key for this Command under the provided {@link SlashCommandEvent SlashCommandEvent}.
 	 *
 	 * @param event
 	 *            The CommandEvent to generate the cooldown for.
@@ -543,8 +516,7 @@ public abstract class SlashCommand extends Command
 	}
 
 	/**
-	 * Gets an error message for this Command under the provided
-	 * {@link SlashCommandEvent SlashCommandEvent}.
+	 * Gets an error message for this Command under the provided {@link SlashCommandEvent SlashCommandEvent}.
 	 *
 	 * @param event
 	 *            The CommandEvent to generate the error message for.
@@ -553,8 +525,7 @@ public abstract class SlashCommand extends Command
 	 * @param client
 	 *            The Client for checking stuff
 	 *
-	 * @return A String error message for this command if {@code remaining > 0},
-	 *         else {@code null}.
+	 * @return A String error message for this command if {@code remaining > 0}, else {@code null}.
 	 */
 	public String getCooldownError(SlashCommandEvent event, int remaining, Client client)
 	{

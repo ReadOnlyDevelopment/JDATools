@@ -3,11 +3,10 @@ repositories {
 }
 
 ext {
-    jdaVersion = '5.0.0-alpha.19'
+    jdaVersion = '5.0.0-beta.2'
     jsonVersion = '20220320'
     lang3Version = '3.12.0'
-    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-    fasterXmlVersion = '2.13.3'
+    fasterXmlVersion = '2.14.1'
     lombokVersion = '1.18.24'
     guavaVersion = '31.1-jre'
 

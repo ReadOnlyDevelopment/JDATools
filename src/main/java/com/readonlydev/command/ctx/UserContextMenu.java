@@ -12,9 +12,6 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
-import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 /**
  * <h2><b>User Context Menus In JDATools</b></h2>
@@ -221,24 +218,5 @@ public abstract class UserContextMenu extends ContextMenu
 		{
 			event.getClient().getListener().onTerminatedUserContextMenu(event, this);
 		}
-	}
-
-	@Override
-	public CommandData buildCommandData()
-	{
-		// Make the command data
-		CommandData data = Commands.user(getName());
-
-		if (this.userPermissions == null)
-		{
-			data.setDefaultPermissions(DefaultMemberPermissions.DISABLED);
-		} else
-		{
-			data.setDefaultPermissions(DefaultMemberPermissions.enabledFor(this.userPermissions));
-		}
-
-		data.setGuildOnly(this.guildOnly);
-
-		return data;
 	}
 }
