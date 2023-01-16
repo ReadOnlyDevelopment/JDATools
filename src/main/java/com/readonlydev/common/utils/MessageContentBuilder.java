@@ -1,3 +1,27 @@
+/*
+ * This file is part of JDATools, licensed under the MIT License (MIT).
+ *
+ * Copyright (c) ROMVoid95
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package com.readonlydev.common.utils;
 
 import java.util.ArrayList;
@@ -512,7 +536,6 @@ public class MessageContentBuilder implements Appendable
 	 * @return The MessageContentBuilder instance. Useful for chaining.
 	 *
 	 * @see #clearMentions()
-	 * @see MessageAction#mention(IMentionable...)
 	 */
 	@Nonnull
 	public MessageContentBuilder mention(@Nonnull IMentionable... mentions)
@@ -532,6 +555,13 @@ public class MessageContentBuilder implements Appendable
 		return this;
 	}
 
+	public MessageContentBuilder clearMentions()
+	{
+		mentionedRoles.clear();
+		mentionedUsers.clear();
+		return this;
+	}
+
 	/**
 	 * Returns the current length of the content that will be built into a {@link Message} when {@link #build()} is
 	 * called. <br>
@@ -540,9 +570,8 @@ public class MessageContentBuilder implements Appendable
 	 * characters per message.
 	 *
 	 * <p>
-	 * <b>Hint:</b> You can use {@link #build(int, int)} or
-	 * {@link #buildAll(net.dv8tion.jda.api.utils.SplitUtil.Strategy...) buildAll(Strategy...)} as possible ways to deal
-	 * with the 2000 character cap.
+	 * <b>Hint:</b> You can use {@link #build()} or {@link #buildAll(net.dv8tion.jda.api.utils.SplitUtil.Strategy...)
+	 * buildAll(Strategy...)} as possible ways to deal with the 2000 character cap.
 	 *
 	 * @return the current length of the content that will be built into a Message.
 	 */
@@ -815,9 +844,8 @@ public class MessageContentBuilder implements Appendable
 	 * Creates a {@link Message} object from this MessageContentBuilder
 	 *
 	 * <p>
-	 * <b>Hint:</b> You can use {@link #build(int, int)} or
-	 * {@link #buildAll(net.dv8tion.jda.api.utils.SplitUtil.Strategy...) buildAll(Strategy...)} as possible ways to deal
-	 * with the 2000 character cap.
+	 * <b>Hint:</b> You can use {@link #build()} or {@link #buildAll(net.dv8tion.jda.api.utils.SplitUtil.Strategy...)
+	 * buildAll(Strategy...)} as possible ways to deal with the 2000 character cap.
 	 *
 	 * @throws java.lang.IllegalStateException
 	 *             <ul>
@@ -884,7 +912,8 @@ public class MessageContentBuilder implements Appendable
 			policy = new Strategy[]
 				{ Strategy.ANYWHERE };
 		}
-		SplitUtil.split(this.build(), Message.MAX_CONTENT_LENGTH, policy).forEach(split -> {
+		SplitUtil.split(this.build(), Message.MAX_CONTENT_LENGTH, policy).forEach(split ->
+		{
 			createBuilders.add(new MessageCreateBuilder().setContent(split));
 		});
 

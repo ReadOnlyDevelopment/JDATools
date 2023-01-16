@@ -1,24 +1,27 @@
 plugins {
+	id "com.github.ben-manes.versions" version "0.42.0"
+	id "org.cadixdev.licenser" version "0.6.1"
+	id "io.freefair.lombok" version "6.6.1"
+	id 'maven-publish'
+	id 'java-library'
     id 'eclipse'
-    id 'java-library'
-    id "com.github.ben-manes.versions" version "0.42.0"
     id 'signing'
-    id 'maven-publish'
-    id "io.freefair.lombok" version "6.6.1"
 }
 
 def baseVersion = "4.0.0"
 def isSnapshot = false
 
-version = (isSnapshot) ? baseVersion + '-SNAPSHOT.' + getBuildNumber() : baseVersion
+version = (isSnapshot) ? baseVersion + '-SNAPSHOT' : baseVersion
 group = 'com.readonlydev'
-archivesBaseName = 'jdatools'
+archivesBaseName = 'JDATools'
 
 import org.apache.tools.ant.filters.ReplaceTokens
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-
-def javaVersion = JavaVersion.VERSION_17
+java {
+	withJavadocJar()
+	withSourcesJar()
+	toolchain.languageVersion = JavaLanguageVersion.of(17)
+}
 
 apply from: 'dependencies.gradle'
 
@@ -38,25 +41,22 @@ dependencies {
     api jacksonAnnotations()
 }
 
-def projectVersion = version.toString()
-if(projectVersion.endsWith("SNAPSHOT")) {
-    projectVersion = projectVersion.replace("-", ".")
+license {
+	header = rootProject.file("HEADER.txt")
+	include '**/*.java'
 }
-def splitVerison = projectVersion.tokenize(".")
 
 task sourcesForRelease(type: Copy) {
     from('src/main/java') {
-        filter(ReplaceTokens, tokens: [
-            MAJOR:	splitVerison.get(0),
-            MINOR:  splitVerison.get(1),
-            PATCH:  splitVerison.get(2)
-        ])
+        filter(ReplaceTokens, tokens: [ VERSION: version ])
     }
     into 'build/filteredSrc'
 }
 
+compileJava.options.encoding = 'UTF-8'
+
 tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
+    options.encoding = 'UTF-8'
     source = sourcesForRelease.destinationDir
     classpath += sourceSets.main.compileClasspath
 
@@ -72,54 +72,19 @@ def setMainManifestProps = { Manifest manifest->
     ])
 }
 
-task fullBuild {
-    group 'jdatools'
-    dependsOn 'clean'
-    dependsOn 'build'
-    dependsOn 'publishToMavenLocal'
-    tasks.findByName('build').mustRunAfter 'clean'
-    tasks.findByName('publishToMavenLocal').mustRunAfter 'build'
-}
-
-def majorJavaVersion = javaVersion.getMajorVersion()
-
 javadoc {
     options.addBooleanOption('html5', true)
     options.addStringOption('Xdoclint:none', '-quiet')
-    options.setWindowTitle(archivesBaseName + ' | ' + projectVersion)
-    options.setDocTitle(archivesBaseName + ' | ' + projectVersion)
+    options.setWindowTitle(archivesBaseName + ' | ' + version)
+    options.setDocTitle(archivesBaseName + ' | ' + version)
     options.setEncoding('UTF-8')
     options.tags 'apiNote:a:API Note:', 'implSpec:a:Implementation Requirements:', 'implNote:a:Implementation Note:'
 }
 
 artifacts {
 	archives jar
-}
-
-String getBuildNumber() {
-    def versionFile = file('version.properties')
-    if (versionFile.canRead()) {
-        Properties versionProps = new Properties()
-        versionProps.load(new FileInputStream(versionFile))
-        return versionProps['build_num'].toString()
-    }
-    return "1"
-}
-
-task incrementBuild {
-    doFirst {
-        def versionFile = file('version.properties')
-        if (versionFile.canRead()) {
-            Properties versionProps = new Properties()
-            versionProps.load(new FileInputStream(versionFile))
-            def num = versionProps['build_num'].toInteger() + 1
-            println("incrementing BuildNumber to: " + num)
-            versionProps['build_num'] = num.toString()
-            versionProps.store(versionFile.newWriter(), null)
-        } else {
-            println("version.properties file not found! Ignoring.")
-        }
-    }
+	archives javadocJar
+	archives sourcesJar
 }
 
 publishing {
@@ -130,4 +95,4 @@ publishing {
     }
 }
 
-tasks.publishToMavenLocal.finalizedBy incrementBuild
+checkLicenseMain.dependsOn licenseFormat

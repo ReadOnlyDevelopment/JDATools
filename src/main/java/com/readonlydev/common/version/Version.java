@@ -1,808 +1,916 @@
 /*
- * API License
- * Copyright (c) 2021 ReadOnly Development
+ * This file is part of JDATools, licensed under the MIT License (MIT).
+ *
+ * Copyright (c) ROMVoid95
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
+ *
  * The above copyright notice and this permission notice shall be included in
- * all
- * copies or substantial portions of the Software.
+ * all copies or substantial portions of the Software.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 
 package com.readonlydev.common.version;
 
-import java.util.Objects;
+import java.util.Comparator;
 
+import com.readonlydev.common.version.expr.Expression;
+import com.readonlydev.common.version.expr.ExpressionParser;
+import com.readonlydev.common.version.expr.ExpressionParser.UnexpectedTokenException;
+import com.readonlydev.common.version.expr.LexerException;
+
+/**
+ * This class implements the Facade design pattern.
+ * It is also immutable, which makes the class thread-safe.
+ */
 public class Version implements Comparable<Version>
 {
 
-	private final String		originalValue;
-	private final String		value;
-	private final Integer		major;
-	private final Integer		minor;
-	private final Integer		patch;
-	private final String[]		suffixTokens;
-	private final String		build;
-	private final VersionType	type;
+	/**
+	 * The normal version.
+	 */
+	private final NormalVersion normal;
 
-	public Version()
+	/**
+	 * The pre-release version.
+	 */
+	private final MetadataVersion preRelease;
+
+	/**
+	 * The build metadata.
+	 */
+	private final MetadataVersion build;
+
+	/**
+	 * A separator that separates the pre-release
+	 * version from the normal version.
+	 */
+	private static final String PRE_RELEASE_PREFIX = "-";
+
+	/**
+	 * A separator that separates the build metadata from
+	 * the normal version or the pre-release version.
+	 */
+	private static final String BUILD_PREFIX = "+";
+
+	/**
+	 * A mutable builder for the immutable {@code Version} class.
+	 */
+	public static class Builder
 	{
-		this(null, VersionType.STRICT);
-	}
 
-	public Version(String value)
-	{
-		this(value, VersionType.STRICT);
-	}
+		/**
+		 * The normal version string.
+		 */
+		private String normal;
 
-	public Version(String major, String minor, String patch)
-	{
-		this(String.join(".", major, minor, patch));
-	}
+		/**
+		 * The pre-release version string.
+		 */
+		private String preRelease;
 
-	public Version(String value, VersionType type)
-	{
-		this.originalValue = value;
-		this.type = type;
-		value = value.trim();
+		/**
+		 * The build metadata string.
+		 */
+		private String build;
 
-		this.value = value;
-		String[] tokens;
-
-		if (hasPreRelease(value))
+		/**
+		 * Constructs a {@code Builder} instance.
+		 */
+		Builder()
 		{
-			tokens = value.split("-", 2);
-		} else
-		{
-			tokens = new String[]
-			{ value };
+
 		}
 
-		String	build	= null;
-		Integer	minor	= null;
-		Integer	patch	= null;
-		try
+		/**
+		 * Constructs a {@code Builder} instance with the
+		 * string representation of the normal version.
+		 *
+		 * @param normal
+		 *            the string representation of the normal version
+		 */
+		Builder(String normal)
 		{
-			String[] mainTokens;
-			if (tokens.length == 1)
-			{
-				// The build version may be in the main tokens
-				if (tokens[0].endsWith("+"))
-				{
-					throw new VersionException("The build cannot be empty.");
-				}
-				String[] tmp = tokens[0].split("\\+");
-				mainTokens = tmp[0].split("\\.");
-				if (tmp.length == 2)
-				{
-					build = tmp[1];
-				}
-			} else
-			{
-				mainTokens = tokens[0].split("\\.");
-			}
-
-			try
-			{
-				this.major = Integer.valueOf(mainTokens[0]);
-			} catch (NumberFormatException e)
-			{
-				throw new VersionException("Invalid version (no major version): " + value);
-			} catch (IndexOutOfBoundsException e)
-			{
-				throw new VersionException("Invalid version (no major version): " + value);
-			}
-
-			try
-			{
-				minor = Integer.valueOf(mainTokens[1]);
-			} catch (IndexOutOfBoundsException e)
-			{
-				if (type == VersionType.STRICT)
-				{
-					throw new VersionException("Invalid version (no minor version): " + value);
-				}
-			}
-			try
-			{
-				patch = Integer.valueOf(mainTokens[2]);
-			} catch (IndexOutOfBoundsException e)
-			{
-				if (type == VersionType.STRICT)
-				{
-					throw new VersionException("Invalid version (no patch version): " + value);
-				}
-			}
-		} catch (NumberFormatException e)
-		{
-			throw new VersionException("The version is invalid: " + value);
-		} catch (IndexOutOfBoundsException e)
-		{
-			throw new VersionException("The version is invalid: " + value);
+			this.normal = normal;
 		}
-		this.minor = minor;
-		this.patch = patch;
 
-		String[] suffix = new String[0];
-		try
+		/**
+		 * Sets the normal version.
+		 *
+		 * @param normal
+		 *            the string representation of the normal version
+		 *
+		 * @return this builder instance
+		 */
+		public Builder normal(String normal)
 		{
-			// The build version may be in the suffix tokens
-			if (tokens[1].endsWith("+"))
-			{
-				throw new VersionException("The build cannot be empty.");
-			}
-			String[] tmp = tokens[1].split("\\+");
-			if (tmp.length == 2)
-			{
-				suffix = tmp[0].split("\\.");
-				build = tmp[1];
-			} else
-			{
-				suffix = tokens[1].split("\\.");
-			}
-		} catch (IndexOutOfBoundsException ignored)
-		{
+			this.normal = normal;
+			return this;
 		}
-		this.suffixTokens = suffix;
 
+		/**
+		 * Sets the pre-release version.
+		 *
+		 * @param preRelease
+		 *            the string representation of the pre-release version
+		 *
+		 * @return this builder instance
+		 */
+		public Builder preRelease(String preRelease)
+		{
+			this.preRelease = preRelease;
+			return this;
+		}
+
+		/**
+		 * Sets the build metadata.
+		 *
+		 * @param build
+		 *            the string representation of the build metadata
+		 *
+		 * @return this builder instance
+		 */
+		public Builder buildMetadata(String build)
+		{
+			this.build = build;
+			return this;
+		}
+
+		/**
+		 * Builds a {@code Version} object.
+		 *
+		 * @return a newly built {@code Version} instance
+		 *
+		 * @throws ParseException
+		 *             when invalid version string is provided
+		 * @throws UnexpectedCharacterException
+		 *             is a special case of {@code ParseException}
+		 */
+		public Version build()
+		{
+			StringBuilder sb = new StringBuilder();
+			if (isFilled(normal))
+			{
+				sb.append(normal);
+			}
+			if (isFilled(preRelease))
+			{
+				sb.append(PRE_RELEASE_PREFIX).append(preRelease);
+			}
+			if (isFilled(build))
+			{
+				sb.append(BUILD_PREFIX).append(build);
+			}
+			return VersionParser.parseValidSemVer(sb.toString());
+		}
+
+		/**
+		 * Checks if a string has a usable value.
+		 *
+		 * @param str
+		 *            the string to check
+		 *
+		 * @return {@code true} if the string is filled or {@code false} otherwise
+		 */
+		private boolean isFilled(String str)
+		{
+			return (str != null) && !str.isEmpty();
+		}
+	}
+
+	public static Version.Builder builder()
+	{
+		return new Version.Builder();
+	}
+
+	public static Version.Builder builder(String value)
+	{
+		return new Version.Builder(value);
+	}
+
+	/**
+	 * A comparator that respects the build metadata when comparing versions.
+	 */
+	public static final Comparator<Version> BUILD_AWARE_ORDER = new BuildAwareOrder();
+
+	/**
+	 * A build-aware comparator.
+	 */
+	private static class BuildAwareOrder implements Comparator<Version>
+	{
+
+		/**
+		 * Compares two {@code Version} instances taking
+		 * into account their build metadata.
+		 *
+		 * When compared build metadata is divided into identifiers. The
+		 * numeric identifiers are compared numerically, and the alphanumeric
+		 * identifiers are compared in the ASCII sort order.
+		 *
+		 * If one of the compared versions has no defined build
+		 * metadata, this version is considered to have a lower
+		 * precedence than that of the other.
+		 *
+		 * @return {@inheritDoc}
+		 */
+		@Override
+		public int compare(Version v1, Version v2)
+		{
+			int result = v1.compareTo(v2);
+			if (result == 0)
+			{
+				result = v1.build.compareTo(v2.build);
+				if ((v1.build == MetadataVersion.NULL) || (v2.build == MetadataVersion.NULL))
+				{
+					/**
+					 * Build metadata should have a higher precedence
+					 * than the associated normal version which is the
+					 * opposite compared to pre-release versions.
+					 */
+					result = -1 * result;
+				}
+			}
+			return result;
+		}
+	}
+
+	/**
+	 * Constructs a Null {@code Version} instance.
+	 *
+	 */
+	Version()
+	{
+		this(NormalVersion.NULL, MetadataVersion.NULL, MetadataVersion.NULL);
+	}
+
+	/**
+	 * Constructs a {@code Version} instance with the normal version.
+	 *
+	 * @param normal
+	 *            the normal version
+	 */
+	Version(NormalVersion normal)
+	{
+		this(normal, MetadataVersion.NULL, MetadataVersion.NULL);
+	}
+
+	/**
+	 * Constructs a {@code Version} instance with the
+	 * normal version and the pre-release version.
+	 *
+	 * @param normal
+	 *            the normal version
+	 * @param preRelease
+	 *            the pre-release version
+	 */
+	Version(NormalVersion normal, MetadataVersion preRelease)
+	{
+		this(normal, preRelease, MetadataVersion.NULL);
+	}
+
+	/**
+	 * Constructs a {@code Version} instance with the normal
+	 * version, the pre-release version and the build metadata.
+	 *
+	 * @param normal
+	 *            the normal version
+	 * @param preRelease
+	 *            the pre-release version
+	 * @param build
+	 *            the build metadata
+	 */
+	Version(NormalVersion normal, MetadataVersion preRelease, MetadataVersion build)
+	{
+		this.normal = normal;
+		this.preRelease = preRelease;
 		this.build = build;
-
-		this.validate(type);
-	}
-
-	private void validate(VersionType type)
-	{
-		if ((this.minor == null) && (type == VersionType.STRICT))
-		{
-			throw new VersionException("Invalid version (no minor version): " + value);
-		}
-		if ((this.patch == null) && (type == VersionType.STRICT))
-		{
-			throw new VersionException("Invalid version (no patch version): " + value);
-		}
-	}
-
-	private boolean hasPreRelease(String version)
-	{
-
-		int	firstIndexOfPlus	= value.indexOf("+");
-		int	firstIndexOfHyphen	= value.indexOf("-");
-
-		if (firstIndexOfHyphen == -1)
-		{
-			return false;
-		}
-
-		return (firstIndexOfPlus == -1) || (firstIndexOfHyphen < firstIndexOfPlus);
 	}
 
 	/**
-	 * @see #isGreaterThan(Version)
+	 * Creates a new Null instance of {@code Version}
 	 *
-	 * @param version
-	 *            the version to compare
-	 *
-	 * @return true if the current version is greater than the provided version
+	 * @return a new Null instance of the {@code Version} class
 	 */
-	public boolean isGreaterThan(String version)
+	public static Version Null()
 	{
-		return this.isGreaterThan(new Version(version, this.getType()));
+		return new Version();
 	}
 
 	/**
-	 * Checks if the version is greater than another version
+	 * Creates a new instance of {@code Version} as a
+	 * result of parsing the specified version string.
 	 *
 	 * @param version
-	 *            the version to compare
+	 *            the version string to parse
 	 *
-	 * @return true if the current version is greater than the provided version
+	 * @return a new instance of the {@code Version} class
+	 *
+	 * @throws IllegalArgumentException
+	 *             if the input string is {@code NULL} or empty
+	 * @throws ParseException
+	 *             when invalid version string is provided
+	 * @throws UnexpectedCharacterException
+	 *             is a special case of {@code ParseException}
 	 */
-	public boolean isGreaterThan(Version version)
+	public static Version of(String version)
 	{
-		// Compare the main part
-		if (this.getMajor() > version.getMajor())
+		return VersionParser.parseValidSemVer(version);
+	}
+
+	/**
+	 * Creates a new instance of {@code Version}
+	 * for the specified version numbers.
+	 *
+	 * @param major
+	 *            the major version number
+	 *
+	 * @return a new instance of the {@code Version} class
+	 *
+	 * @throws IllegalArgumentException
+	 *             if a negative integer is passed
+	 *
+	 * @since 0.7.0
+	 */
+	public static Version forIntegers(int major)
+	{
+		return new Version(new NormalVersion(major, 0, 0));
+	}
+
+	/**
+	 * Creates a new instance of {@code Version}
+	 * for the specified version numbers.
+	 *
+	 * @param major
+	 *            the major version number
+	 * @param minor
+	 *            the minor version number
+	 *
+	 * @return a new instance of the {@code Version} class
+	 *
+	 * @throws IllegalArgumentException
+	 *             if a negative integer is passed
+	 *
+	 * @since 0.7.0
+	 */
+	public static Version forIntegers(int major, int minor)
+	{
+		return new Version(new NormalVersion(major, minor, 0));
+	}
+
+	/**
+	 * Creates a new instance of {@code Version}
+	 * for the specified version numbers.
+	 *
+	 * @param major
+	 *            the major version number
+	 * @param minor
+	 *            the minor version number
+	 * @param patch
+	 *            the patch version number
+	 *
+	 * @return a new instance of the {@code Version} class
+	 *
+	 * @throws IllegalArgumentException
+	 *             if a negative integer is passed
+	 *
+	 * @since 0.7.0
+	 */
+	public static Version forIntegers(int major, int minor, int patch)
+	{
+		return new Version(new NormalVersion(major, minor, patch));
+	}
+
+	/**
+	 * Checks if this version satisfies the specified SemVer Expression string.
+	 *
+	 * This method is a part of the SemVer Expressions API.
+	 *
+	 * @param expr
+	 *            the SemVer Expression string
+	 *
+	 * @return {@code true} if this version satisfies the specified
+	 *         SemVer Expression or {@code false} otherwise
+	 *
+	 * @throws ParseException
+	 *             in case of a general parse error
+	 * @throws LexerException
+	 *             when encounters an illegal character
+	 * @throws UnexpectedTokenException
+	 *             when comes across an unexpected token
+	 *
+	 * @since 0.7.0
+	 */
+	public boolean satisfies(String expr)
+	{
+		Parser<Expression> parser = ExpressionParser.newInstance();
+		return satisfies(parser.parse(expr));
+	}
+
+	/**
+	 * Checks if this version satisfies the specified SemVer Expression.
+	 *
+	 * This method is a part of the SemVer Expressions API.
+	 *
+	 * @param expr
+	 *            the SemVer Expression
+	 *
+	 * @return {@code true} if this version satisfies the specified
+	 *         SemVer Expression or {@code false} otherwise
+	 *
+	 * @since 0.9.0
+	 */
+	public boolean satisfies(Expression expr)
+	{
+		return expr.interpret(this);
+	}
+
+	/**
+	 * Increments the major version.
+	 *
+	 * @return a new instance of the {@code Version} class
+	 */
+	public Version incrementMajorVersion()
+	{
+		return new Version(normal.incrementMajor());
+	}
+
+	/**
+	 * Increments the major version and appends the pre-release version.
+	 *
+	 * @param preRelease
+	 *            the pre-release version to append
+	 *
+	 * @return a new instance of the {@code Version} class
+	 *
+	 * @throws IllegalArgumentException
+	 *             if the input string is {@code NULL} or empty
+	 * @throws ParseException
+	 *             when invalid version string is provided
+	 * @throws UnexpectedCharacterException
+	 *             is a special case of {@code ParseException}
+	 */
+	public Version incrementMajorVersion(String preRelease)
+	{
+		return new Version(normal.incrementMajor(), VersionParser.parsePreRelease(preRelease));
+	}
+
+	/**
+	 * Increments the minor version.
+	 *
+	 * @return a new instance of the {@code Version} class
+	 */
+	public Version incrementMinorVersion()
+	{
+		return new Version(normal.incrementMinor());
+	}
+
+	/**
+	 * Increments the minor version and appends the pre-release version.
+	 *
+	 * @param preRelease
+	 *            the pre-release version to append
+	 *
+	 * @return a new instance of the {@code Version} class
+	 *
+	 * @throws IllegalArgumentException
+	 *             if the input string is {@code NULL} or empty
+	 * @throws ParseException
+	 *             when invalid version string is provided
+	 * @throws UnexpectedCharacterException
+	 *             is a special case of {@code ParseException}
+	 */
+	public Version incrementMinorVersion(String preRelease)
+	{
+		return new Version(normal.incrementMinor(), VersionParser.parsePreRelease(preRelease));
+	}
+
+	/**
+	 * Increments the patch version.
+	 *
+	 * @return a new instance of the {@code Version} class
+	 */
+	public Version incrementPatchVersion()
+	{
+		return new Version(normal.incrementPatch());
+	}
+
+	/**
+	 * Increments the patch version and appends the pre-release version.
+	 *
+	 * @param preRelease
+	 *            the pre-release version to append
+	 *
+	 * @return a new instance of the {@code Version} class
+	 *
+	 * @throws IllegalArgumentException
+	 *             if the input string is {@code NULL} or empty
+	 * @throws ParseException
+	 *             when invalid version string is provided
+	 * @throws UnexpectedCharacterException
+	 *             is a special case of {@code ParseException}
+	 */
+	public Version incrementPatchVersion(String preRelease)
+	{
+		return new Version(normal.incrementPatch(), VersionParser.parsePreRelease(preRelease));
+	}
+
+	/**
+	 * Increments the pre-release version.
+	 *
+	 * @return a new instance of the {@code Version} class
+	 */
+	public Version incrementPreReleaseVersion()
+	{
+		return new Version(normal, preRelease.increment());
+	}
+
+	/**
+	 * Increments the build metadata.
+	 *
+	 * @return a new instance of the {@code Version} class
+	 */
+	public Version incrementBuildMetadata()
+	{
+		return new Version(normal, preRelease, build.increment());
+	}
+
+	/**
+	 * Sets the pre-release version.
+	 *
+	 * @param preRelease
+	 *            the pre-release version to set
+	 *
+	 * @return a new instance of the {@code Version} class
+	 *
+	 * @throws IllegalArgumentException
+	 *             if the input string is {@code NULL} or empty
+	 * @throws ParseException
+	 *             when invalid version string is provided
+	 * @throws UnexpectedCharacterException
+	 *             is a special case of {@code ParseException}
+	 */
+	public Version setPreReleaseVersion(String preRelease)
+	{
+		return new Version(normal, VersionParser.parsePreRelease(preRelease));
+	}
+
+	/**
+	 * Sets the build metadata.
+	 *
+	 * @param build
+	 *            the build metadata to set
+	 *
+	 * @return a new instance of the {@code Version} class
+	 *
+	 * @throws IllegalArgumentException
+	 *             if the input string is {@code NULL} or empty
+	 * @throws ParseException
+	 *             when invalid version string is provided
+	 * @throws UnexpectedCharacterException
+	 *             is a special case of {@code ParseException}
+	 */
+	public Version setBuildMetadata(String build)
+	{
+		return new Version(normal, preRelease, VersionParser.parseBuild(build));
+	}
+
+	/**
+	 * Returns the major version number.
+	 *
+	 * @return the major version number
+	 */
+	public Integer getMajorVersion()
+	{
+		return normal.getMajor();
+	}
+
+	/**
+	 * Returns the minor version number.
+	 *
+	 * @return the minor version number
+	 */
+	public Integer getMinorVersion()
+	{
+		return normal.getMinor();
+	}
+
+	/**
+	 * Returns the patch version number.
+	 *
+	 * @return the patch version number
+	 */
+	public Integer getPatchVersion()
+	{
+		return normal.getPatch();
+	}
+
+	/**
+	 * Returns the string representation of the normal version.
+	 *
+	 * @return the string representation of the normal version
+	 */
+	public String getNormalVersion()
+	{
+		return normal.toString();
+	}
+
+	/**
+	 * Returns the string representation of the pre-release version.
+	 *
+	 * @return the string representation of the pre-release version
+	 */
+	public String getPreReleaseVersion()
+	{
+		return preRelease.toString();
+	}
+
+	/**
+	 * Returns the string representation of the build metadata.
+	 *
+	 * @return the string representation of the build metadata
+	 */
+	public String getBuildMetadata()
+	{
+		return build.toString();
+	}
+
+	/**
+	 * Checks if this version is greater than the other version.
+	 *
+	 * @param other
+	 *            the other version to compare to
+	 *
+	 * @return {@code true} if this version is greater than the other version
+	 *         or {@code false} otherwise
+	 *
+	 * @see #compareTo(Version other)
+	 */
+	public boolean greaterThan(Version other)
+	{
+		return compareTo(other) > 0;
+	}
+
+	/**
+	 * Checks if this version is greater than the other version.
+	 *
+	 * @param other
+	 *            the other version to compare to
+	 *
+	 * @return {@code true} if this version is greater than the other version
+	 *         or {@code false} otherwise
+	 *
+	 * @see #compareTo(Version other)
+	 */
+	public boolean greaterThan(String other)
+	{
+		return greaterThan(Version.of(other));
+	}
+
+	/**
+	 * Checks if this version is greater than or equal to the other version.
+	 *
+	 * @param other
+	 *            the other version to compare to
+	 *
+	 * @return {@code true} if this version is greater than or equal
+	 *         to the other version or {@code false} otherwise
+	 *
+	 * @see #compareTo(Version other)
+	 */
+	public boolean greaterThanOrEqualTo(Version other)
+	{
+		return compareTo(other) >= 0;
+	}
+
+	/**
+	 * Checks if this version is greater than or equal to the other version.
+	 *
+	 * @param other
+	 *            the other version to compare to
+	 *
+	 * @return {@code true} if this version is greater than or equal
+	 *         to the other version or {@code false} otherwise
+	 *
+	 * @see #compareTo(Version other)
+	 */
+	public boolean greaterThanOrEqualTo(String other)
+	{
+		return greaterThanOrEqualTo(Version.of(other));
+	}
+
+	/**
+	 * Checks if this version is less than the other version.
+	 *
+	 * @param other
+	 *            the other version to compare to
+	 *
+	 * @return {@code true} if this version is less than the other version
+	 *         or {@code false} otherwise
+	 *
+	 * @see #compareTo(Version other)
+	 */
+	public boolean lessThan(Version other)
+	{
+		return compareTo(other) < 0;
+	}
+
+	/**
+	 * Checks if this version is less than the other version.
+	 *
+	 * @param other
+	 *            the other version to compare to
+	 *
+	 * @return {@code true} if this version is less than the other version
+	 *         or {@code false} otherwise
+	 *
+	 * @see #compareTo(Version other)
+	 */
+	public boolean lessThan(String other)
+	{
+		return lessThan(Version.of(other));
+	}
+
+	/**
+	 * Checks if this version is less than or equal to the other version.
+	 *
+	 * @param other
+	 *            the other version to compare to
+	 *
+	 * @return {@code true} if this version is less than or equal
+	 *         to the other version or {@code false} otherwise
+	 *
+	 * @see #compareTo(Version other)
+	 */
+	public boolean lessThanOrEqualTo(Version other)
+	{
+		return compareTo(other) <= 0;
+	}
+
+	/**
+	 * Checks if this version is less than or equal to the other version.
+	 *
+	 * @param other
+	 *            the other version to compare to
+	 *
+	 * @return {@code true} if this version is less than or equal
+	 *         to the other version or {@code false} otherwise
+	 *
+	 * @see #compareTo(Version other)
+	 */
+	public boolean lessThanOrEqualTo(String other)
+	{
+		return lessThanOrEqualTo(Version.of(other));
+	}
+
+	/**
+	 * Checks if this version equals the other version.
+	 *
+	 * The comparison is done by the {@code Version.compareTo} method.
+	 *
+	 * @param other
+	 *            the other version to compare to
+	 *
+	 * @return {@code true} if this version equals the other version
+	 *         or {@code false} otherwise
+	 *
+	 * @see #compareTo(Version other)
+	 */
+	@Override
+	public boolean equals(Object other)
+	{
+		if (this == other)
 		{
 			return true;
-		} else if (this.getMajor() < version.getMajor())
+		}
+		if (!(other instanceof Version))
 		{
 			return false;
 		}
+		return compareTo((Version) other) == 0;
+	}
 
-		int otherMinor = version.getMinor() != null ? version.getMinor() : 0;
-		if ((this.getMinor() != null) && (this.getMinor() > otherMinor))
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode()
+	{
+		int hash = 5;
+		hash = (97 * hash) + normal.hashCode();
+		hash = (97 * hash) + preRelease.hashCode();
+		return hash;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString()
+	{
+		StringBuilder sb = new StringBuilder(getNormalVersion());
+		if (!getPreReleaseVersion().isEmpty())
 		{
-			return true;
-		} else if ((this.getMinor() != null) && (this.getMinor() < otherMinor))
-		{
-			return false;
+			sb.append(PRE_RELEASE_PREFIX).append(getPreReleaseVersion());
 		}
-
-		int otherPatch = version.getPatch() != null ? version.getPatch() : 0;
-		if ((this.getPatch() != null) && (this.getPatch() > otherPatch))
+		if (!getBuildMetadata().isEmpty())
 		{
-			return true;
-		} else if ((this.getPatch() != null) && (this.getPatch() < otherPatch))
-		{
-			return false;
+			sb.append(BUILD_PREFIX).append(getBuildMetadata());
 		}
+		return sb.toString();
+	}
 
-		// Let's take a look at the suffix
-		String[]	tokens1	= this.getSuffixTokens();
-		String[]	tokens2	= version.getSuffixTokens();
-
-		// If one of the versions has no suffix, it's greater!
-		if ((tokens1.length == 0) && (tokens2.length > 0))
+	/**
+	 * Compares this version to the other version.
+	 *
+	 * This method does not take into account the versions' build
+	 * metadata. If you want to compare the versions' build metadata
+	 * use the {@code Version.compareWithBuildsTo} method or the
+	 * {@code Version.BUILD_AWARE_ORDER} comparator.
+	 *
+	 * @param other
+	 *            the other version to compare to
+	 *
+	 * @return a negative integer, zero or a positive integer if this version
+	 *         is less than, equal to or greater the the specified version
+	 *
+	 * @see #BUILD_AWARE_ORDER
+	 * @see #compareWithBuildsTo(Version other)
+	 */
+	@Override
+	public int compareTo(Version other)
+	{
+		int result = normal.compareTo(other.normal);
+		if (result == 0)
 		{
-			return true;
+			result = preRelease.compareTo(other.preRelease);
 		}
-		if ((tokens2.length == 0) && (tokens1.length > 0))
-		{
-			return false;
-		}
-
-		// Let's see if one of suffixes is greater than the other
-		int i = 0;
-		while ((i < tokens1.length) && (i < tokens2.length))
-		{
-			int cmp;
-			try
-			{
-				// Trying to resolve the suffix part with an integer
-				int	t1	= Integer.valueOf(tokens1[i]);
-				int	t2	= Integer.valueOf(tokens2[i]);
-				cmp = t1 - t2;
-			} catch (NumberFormatException e)
-			{
-				// Else, do a string comparison
-				cmp = tokens1[i].compareToIgnoreCase(tokens2[i]);
-			}
-			if (cmp < 0)
-			{
-				return false;
-			} else if (cmp > 0)
-			{
-				return true;
-			}
-			i++;
-		}
-
-		// If one of the versions has some remaining suffixes, it's greater
-		return tokens1.length > tokens2.length;
+		return result;
 	}
 
 	/**
-	 * @see #isGreaterThanOrEqualTo(Version)
+	 * Compare this version to the other version
+	 * taking into account the build metadata.
 	 *
-	 * @param version
-	 *            the version to compare
+	 * The method makes use of the {@code Version.BUILD_AWARE_ORDER} comparator.
 	 *
-	 * @return true if the current version is greater than or equal to the
-	 *         provided version
+	 * @param other
+	 *            the other version to compare to
+	 *
+	 * @return integer result of comparison compatible with
+	 *         that of the {@code Comparable.compareTo} method
+	 *
+	 * @see #BUILD_AWARE_ORDER
 	 */
-	public boolean isGreaterThanOrEqualTo(String version)
+	public int compareWithBuildsTo(Version other)
 	{
-		return this.isGreaterThanOrEqualTo(new Version(version, this.type));
+		return BUILD_AWARE_ORDER.compare(this, other);
+	}
+
+	public boolean isNullVersion()
+	{
+		return this.normal.equals(NormalVersion.NULL);
 	}
 
 	/**
-	 * Checks if the version is greater than or equal to another version
+	 * Determines if the current version is a Snapshot or not.
 	 *
-	 * @param version
-	 *            the version to compare
-	 *
-	 * @return true if the current version is greater than or equal to the
-	 *         provided version
+	 * @return true if the current version is a Snapshot
 	 */
-	public boolean isGreaterThanOrEqualTo(Version version)
+	public boolean isSnapshotVersion()
 	{
-		return this.isGreaterThan(version) || this.isEquivalentTo(version);
-	}
-
-	/**
-	 * @see #isLowerThan(Version)
-	 *
-	 * @param version
-	 *            the version to compare
-	 *
-	 * @return true if the current version is lower than the provided version
-	 */
-	public boolean isLowerThan(String version)
-	{
-		return this.isLowerThan(new Version(version, this.type));
-	}
-
-	/**
-	 * Checks if the version is lower than another version
-	 *
-	 * @param version
-	 *            the version to compare
-	 *
-	 * @return true if the current version is lower than the provided version
-	 */
-	public boolean isLowerThan(Version version)
-	{
-		return !this.isGreaterThan(version) && !this.isEquivalentTo(version);
-	}
-
-	/**
-	 * @see #isLowerThanOrEqualTo(Version)
-	 *
-	 * @param version
-	 *            the version to compare
-	 *
-	 * @return true if the current version is lower than or equal to the
-	 *         provided version
-	 */
-	public boolean isLowerThanOrEqualTo(String version)
-	{
-		return this.isLowerThanOrEqualTo(new Version(version, this.type));
-	}
-
-	/**
-	 * Checks if the version is lower than or equal to another version
-	 *
-	 * @param version
-	 *            the version to compare
-	 *
-	 * @return true if the current version is lower than or equal to the
-	 *         provided version
-	 */
-	public boolean isLowerThanOrEqualTo(Version version)
-	{
-		return !this.isGreaterThan(version);
-	}
-
-	/**
-	 * @see #isEquivalentTo(Version)
-	 *
-	 * @param version
-	 *            the version to compare
-	 *
-	 * @return true if the current version equals the provided version (build
-	 *         excluded)
-	 */
-	public boolean isEquivalentTo(String version)
-	{
-		return this.isEquivalentTo(new Version(version, this.type));
-	}
-
-	/**
-	 * Checks if the version equals another version, without taking the build
-	 * into account.
-	 *
-	 * @param version
-	 *            the version to compare
-	 *
-	 * @return true if the current version equals the provided version (build
-	 *         excluded)
-	 */
-	public boolean isEquivalentTo(Version version)
-	{
-		// Get versions without build
-		Version	sem1	= this.getBuild() == null ? this : new Version(this.getValue().replace("+" + this.getBuild(), ""));
-		Version	sem2	= version.getBuild() == null ? version : new Version(version.getValue().replace("+" + version.getBuild(), ""));
-		// Compare those new versions
-		return sem1.isEqualTo(sem2);
-	}
-
-	/**
-	 * @see #isEqualTo(Version)
-	 *
-	 * @param version
-	 *            the version to compare
-	 *
-	 * @return true if the current version equals the provided version
-	 */
-	public boolean isEqualTo(String version)
-	{
-		return this.isEqualTo(new Version(version, this.type));
-	}
-
-	/**
-	 * Checks if the version equals another version
-	 *
-	 * @param version
-	 *            the version to compare
-	 *
-	 * @return true if the current version equals the provided version
-	 */
-	public boolean isEqualTo(Version version)
-	{
-		return this.equals(version);
+		return this.preRelease.toString().equalsIgnoreCase("SNAPSHOT");
 	}
 
 	/**
 	 * Determines if the current version is stable or not.
-	 * Stable version have a major version number strictly positive and no
-	 * suffix tokens.
+	 * Stable version have a major version number strictly positive and no PreReleaseVersion.
 	 *
 	 * @return true if the current version is stable
 	 */
 	public boolean isStable()
 	{
-		return ((this.getMajor() != null) && (this.getMajor() > 0)) && ((this.getSuffixTokens() == null) || (this.getSuffixTokens().length == 0));
+		return ((this.getMajorVersion() != null) && (this.getMajorVersion() > 0)) && (this.preRelease.toString().isEmpty());
 	}
 
-	/**
-	 * @see #diff(Version)
-	 *
-	 * @param version
-	 *            the version to compare
-	 *
-	 * @return the greatest difference
-	 */
-	public GenericVersionDiff diff(String version)
+	public static class VersionComparator implements Comparator<Version>
 	{
-		return this.diff(new Version(version, this.type));
-	}
-
-	/**
-	 * Returns the greatest difference between 2 versions.
-	 * For example, if the current version is "1.2.3" and compared version is
-	 * "1.3.0", the biggest difference
-	 * is the 'MINOR' number.
-	 *
-	 * @param version
-	 *            the version to compare
-	 *
-	 * @return the greatest difference
-	 */
-	public GenericVersionDiff diff(Version version)
-	{
-		if (!Objects.equals(this.major, version.getMajor()))
+		@Override
+		public int compare(Version o1, Version o2)
 		{
-			return GenericVersionDiff.MAJOR;
+
+			return o1.compareTo(o2);
 		}
-		if (!Objects.equals(this.minor, version.getMinor()))
-		{
-			return GenericVersionDiff.MINOR;
-		}
-		if (!Objects.equals(this.patch, version.getPatch()))
-		{
-			return GenericVersionDiff.PATCH;
-		}
-		if (!areSameSuffixes(version.getSuffixTokens()))
-		{
-			return GenericVersionDiff.SUFFIX;
-		}
-		if (!Objects.equals(this.build, version.getBuild()))
-		{
-			return GenericVersionDiff.BUILD;
-		}
-		return GenericVersionDiff.NONE;
 	}
-
-	private boolean areSameSuffixes(String[] suffixTokens)
-	{
-		if ((this.suffixTokens == null) && (suffixTokens == null))
-		{
-			return true;
-		} else if ((this.suffixTokens == null) || (suffixTokens == null))
-		{
-			return false;
-		} else if (this.suffixTokens.length != suffixTokens.length)
-		{
-			return false;
-		}
-		for (int i = 0; i < this.suffixTokens.length; i++)
-		{
-			if (!this.suffixTokens[i].equals(suffixTokens[i]))
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-
-	public Version toStrict()
-	{
-		Integer	minor	= this.minor != null ? this.minor : 0;
-		Integer	patch	= this.patch != null ? this.patch : 0;
-		return Version.create(VersionType.STRICT, this.major, minor, patch, this.suffixTokens, this.build);
-	}
-
-	public Version withIncMajor()
-	{
-		return this.withIncMajor(1);
-	}
-
-	public Version withIncMajor(int increment)
-	{
-		return this.withInc(increment, 0, 0);
-	}
-
-	public Version withIncMinor()
-	{
-		return this.withIncMinor(1);
-	}
-
-	public Version withIncMinor(int increment)
-	{
-		return this.withInc(0, increment, 0);
-	}
-
-	public Version withIncPatch()
-	{
-		return this.withIncPatch(1);
-	}
-
-	public Version withIncPatch(int increment)
-	{
-		return this.withInc(0, 0, increment);
-	}
-
-	private Version withInc(int majorInc, int minorInc, int patchInc)
-	{
-		Integer	minor	= this.minor;
-		Integer	patch	= this.patch;
-		if (this.minor != null)
-		{
-			minor += minorInc;
-		}
-		if (this.patch != null)
-		{
-			patch += patchInc;
-		}
-		return with(this.major + majorInc, minor, patch, true, true);
-	}
-
-	public Version withClearedSuffix()
-	{
-		return with(this.major, this.minor, this.patch, false, true);
-	}
-
-	public Version withClearedBuild()
-	{
-		return with(this.major, this.minor, this.patch, true, false);
-	}
-
-	public Version withClearedSuffixAndBuild()
-	{
-		return with(this.major, this.minor, this.patch, false, false);
-	}
-
-	public Version withSuffix(String suffix)
-	{
-		return with(this.major, this.minor, this.patch, suffix.split("\\."), this.build);
-	}
-
-	public Version withBuild(String build)
-	{
-		return with(this.major, this.minor, this.patch, this.suffixTokens, build);
-	}
-
-	public Version nextMajor()
-	{
-		return with(this.major + 1, 0, 0, false, false);
-	}
-
-	public Version nextMinor()
-	{
-		return with(this.major, this.minor + 1, 0, false, false);
-	}
-
-	public Version nextPatch()
-	{
-		return with(this.major, this.minor, this.patch + 1, false, false);
-	}
-
-	private Version with(int major, Integer minor, Integer patch, boolean suffix, boolean build)
-	{
-		minor = this.minor != null ? minor : null;
-		patch = this.patch != null ? patch : null;
-		String		buildStr		= build ? this.build : null;
-		String[]	suffixTokens	= suffix ? this.suffixTokens : null;
-		return Version.create(this.type, major, minor, patch, suffixTokens, buildStr);
-	}
-
-	private Version with(int major, Integer minor, Integer patch, String[] suffixTokens, String build)
-	{
-		minor = this.minor != null ? minor : null;
-		patch = this.patch != null ? patch : null;
-		return Version.create(this.type, major, minor, patch, suffixTokens, build);
-	}
-
-	private static Version create(VersionType type, int major, Integer minor, Integer patch, String[] suffix, String build)
-	{
-		StringBuilder sb = new StringBuilder().append(major);
-		if (minor != null)
-		{
-			sb.append(".").append(minor);
-		}
-		if (patch != null)
-		{
-			sb.append(".").append(patch);
-		}
-		if (suffix != null)
-		{
-			boolean first = true;
-			for (String suffixToken : suffix)
-			{
-				if (first)
-				{
-					sb.append("-");
-					first = false;
-				} else
-				{
-					sb.append(".");
-				}
-				sb.append(suffixToken);
-			}
-		}
-		if (build != null)
-		{
-			sb.append("+").append(build);
-		}
-
-		return new Version(sb.toString(), type);
-	}
-
-	@Override
-	public boolean equals(Object o)
-	{
-		if (this == o)
-		{
-			return true;
-		}
-		if (!(o instanceof Version))
-		{
-			return false;
-		}
-		Version version = (Version) o;
-		return value.equals(version.value);
-	}
-
-	@Override
-	public int hashCode()
-	{
-		return value.hashCode();
-	}
-
-	@Override
-	public int compareTo(Version version)
-	{
-		if (this.isGreaterThan(version))
-		{
-			return 1;
-		} else if (this.isLowerThan(version))
-		{
-			return -1;
-		}
-		return 0;
-	}
-
-	@Override
-	public String toString()
-	{
-		return this.getValue();
-	}
-
-	/**
-	 * Get the original defaultValue as a string
-	 *
-	 * @return the original string passed in the constructor
-	 */
-	public String getOriginalValue()
-	{
-		return originalValue;
-	}
-
-	/**
-	 * Returns the version as a String
-	 *
-	 * @return the version as a String
-	 */
-	public String getValue()
-	{
-		return value;
-	}
-
-	/**
-	 * Returns the major part of the version.
-	 * Example: for "1.2.3" = 1
-	 *
-	 * @return the major part of the version
-	 */
-	public Integer getMajor()
-	{
-		return this.major;
-	}
-
-	/**
-	 * Returns the minor part of the version.
-	 * Example: for "1.2.3" = 2
-	 *
-	 * @return the minor part of the version
-	 */
-	public Integer getMinor()
-	{
-		return this.minor;
-	}
-
-	/**
-	 * Returns the patch part of the version.
-	 * Example: for "1.2.3" = 3
-	 *
-	 * @return the patch part of the version
-	 */
-	public Integer getPatch()
-	{
-		return this.patch;
-	}
-
-	/**
-	 * Returns the suffix of the version.
-	 * Example: for "1.2.3-beta.4+sha98450956" = {"beta", "4"}
-	 *
-	 * @return the suffix of the version
-	 */
-	public String[] getSuffixTokens()
-	{
-		return suffixTokens;
-	}
-
-	/**
-	 * Returns the build of the version.
-	 * Example: for "1.2.3-beta.4+sha98450956" = "sha98450956"
-	 *
-	 * @return the build of the version
-	 */
-	public String getBuild()
-	{
-		return build;
-	}
-
-	public VersionType getType()
-	{
-		return type;
-	}
-
-	/**
-	 * The types of diffs between two versions.
-	 */
-	public enum GenericVersionDiff
-	{
-		NONE,
-		MAJOR,
-		MINOR,
-		PATCH,
-		SUFFIX,
-		BUILD
-	}
-
-	/**
-	 * The different types of supported version systems.
-	 */
-	public enum VersionType
-	{
-		/**
-		 * The default type of version.
-		 * Major, minor and patch parts are required.
-		 * Suffixes and build are optional.
-		 */
-		STRICT,
-
-		/**
-		 * Major part is required.
-		 * Minor, patch, suffixes and build are optional.
-		 */
-		LOOSE,
-
-		/**
-		 * Follows the (simi-strict) Minecraft Versioning.
-		 * See https://mcforge.readthedocs.io/en/latest/conventions/versioning/
-		 */
-		MC
-	}
-
 }

@@ -1,3 +1,27 @@
+/*
+ * This file is part of JDATools, licensed under the MIT License (MIT).
+ *
+ * Copyright (c) ROMVoid95
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package com.readonlydev.common.waiter;
 
 import java.util.HashMap;
@@ -26,7 +50,7 @@ import net.dv8tion.jda.internal.utils.Checks;
  * <p>
  * Creating an EventWaiter requires provision and/or creation of a {@link java.util.concurrent.ScheduledExecutorService
  * Executor}, and thus a proper shutdown of said executor. The default constructor for an EventWaiter sets up a working,
- * "live", EventWaiter whose shutdown is triggered via JDA firing a {@link net.dv8tion.jda.api.events.ShutdownEvent
+ * "live", EventWaiter whose shutdown is triggered via JDA firing a {@link net.dv8tion.jda.api.events.session.ShutdownEvent
  * ShutdownEvent}. <br>
  * A more "shutdown adaptable" constructor allows the provision of a {@code ScheduledExecutorService} and a choice of
  * how exactly shutdown will be handled (see {@link EventWaiter#EventWaiter(ScheduledExecutorService, boolean)} for more
@@ -66,7 +90,7 @@ public class EventWaiter implements EventListener
 	 * {@code shutdownAutomatically} is required to be manually specified by developers as a way of verifying a contract
 	 * that the developer will conform to the behavior of the newly generated EventWaiter:
 	 * <ul>
-	 * <li>If {@code true}, shutdown is handled when a {@link net.dv8tion.jda.api.events.ShutdownEvent ShutdownEvent} is
+	 * <li>If {@code true}, shutdown is handled when a {@link net.dv8tion.jda.api.events.session.ShutdownEvent ShutdownEvent} is
 	 * fired. This means that any external functions of the provided Executor is now impossible and any externally
 	 * queued tasks are lost if they have yet to be run.</li>
 	 * <li>If {@code false}, shutdown is now placed as a responsibility of the developer, and no attempt will be made to
@@ -82,7 +106,7 @@ public class EventWaiter implements EventListener
 	 *            The ScheduledExecutorService to use for this EventWaiter's threadpool.
 	 * @param shutdownAutomatically
 	 *            Whether or not the {@code threadpool} will shutdown automatically when a
-	 *            {@link net.dv8tion.jda.api.events.ShutdownEvent ShutdownEvent} is fired.
+	 *            {@link net.dv8tion.jda.api.events.session.ShutdownEvent ShutdownEvent} is fired.
 	 *
 	 * @throws java.lang.IllegalArgumentException
 	 *             If the threadpool provided is {@code null} or

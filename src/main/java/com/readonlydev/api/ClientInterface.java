@@ -1,3 +1,26 @@
+/*
+ * This file is part of JDATools, licensed under the MIT License (MIT).
+ *
+ * Copyright (c) ROMVoid95
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 
 package com.readonlydev.api;
 
@@ -43,7 +66,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
  *           <p>
  *           <b>2)</b> Always create and add the ClientImpl to JDA <b>BEFORE</b> you build it, or there is a chance some
  *           minor errors will occur, <b>especially</b> if JDA has already fired a
- *           {@link net.dv8tion.jda.api.events.ReadyEvent ReadyEvent}.
+ *           {@link net.dv8tion.jda.api.events.session.ReadyEvent ReadyEvent}.
  *           <p>
  *           <b>3)</b> Do not provide anything other than a String representing a long (and furthermore a User ID) as an
  *           Owner ID or a CoOwner ID. This will generate errors, but not stop the creation of the ClientImpl which will
@@ -541,7 +564,7 @@ public interface ClientInterface
 
 	/**
 	 * Upserts all interactions globally. <b>This may take up to an hour.</b><br>
-	 * This runs after the {@link net.dv8tion.jda.api.events.ReadyEvent} has been fired
+	 * This runs after the {@link net.dv8tion.jda.api.events.session.ReadyEvent ReadyEvent} has been fired
 	 *
 	 * @param jda
 	 *            The JDA instance to use
@@ -552,7 +575,7 @@ public interface ClientInterface
 
 	/**
 	 * Upserts all interactions to the provided server.<br>
-	 * This runs after the {@link net.dv8tion.jda.api.events.ReadyEvent} has been fired <br>
+	 * This runs after the {@net.dv8tion.jda.api.events.session.ReadyEvent ReadyEvent} has been fired <br>
 	 *
 	 * @param jda
 	 *            The JDA instance to use

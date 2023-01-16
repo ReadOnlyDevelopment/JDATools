@@ -1,3 +1,27 @@
+/*
+ * This file is part of JDATools, licensed under the MIT License (MIT).
+ *
+ * Copyright (c) ROMVoid95
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 /**
  * Copyright (c) 2022 ReadOnlyDevelopment
  *
@@ -8,8 +32,10 @@ package com.readonlydev.command.event;
 import java.io.File;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import com.readonlydev.command.client.Client;
+import com.readonlydev.settings.GuildSettingsManager;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
@@ -146,5 +172,63 @@ public class UserContextMenuEvent extends UserContextInteractionEvent
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Gets the settings of the guild in which this context menu was used.
+	 *
+	 * @param <S> the type of the settings
+	 * @return the settings, or {@code null} if either of the following conditions are met:
+	 * <ul>
+	 *     <li>this interaction didn't happen in a guild</li>
+	 *     <li>the client's {@link GuildSettingsManager} is null</li>
+	 *     <li>the {@link GuildSettingsManager} returned null settings for the guild</li>
+	 * </ul>
+	 */
+	@Nullable
+	public <S> S getGuildSettings()
+	{
+		if (!isFromGuild()) {
+			return null;
+		}
+		final GuildSettingsManager<S> manager = getClient().getSettingsManager();
+		if (manager == null)
+		{
+			return null;
+		}
+		return manager.getSettings(getGuild());
+	}
+
+	/**
+	 * Gets the settings of the guild in which this context menu was used.
+	 *
+	 * @param settingsClazz the class of the settings
+	 * @param <S> the type of the settings
+	 * @return the settings, or {@code null} if either of the following conditions are met:
+	 * <ul>
+	 *     <li>this interaction didn't happen in a guild</li>
+	 *      <li>the client's {@link GuildSettingsManager} is null</li>
+	 *      <li>the {@link GuildSettingsManager} returned null settings for the guild</li>
+	 *      <li>the {@link GuildSettingsManager} returned settings that are not assignable to the {@code settingsClazz}</li>
+	 * </ul>
+	 */
+	@Nullable
+	@SuppressWarnings("rawtypes")
+	public <S> S getGuildSettings(Class<? extends S> settingsClazz)
+	{
+		if (!isFromGuild()) {
+			return null;
+		}
+		final GuildSettingsManager manager = getClient().getSettingsManager();
+		if (manager == null)
+		{
+			return null;
+		}
+		final Object settings = manager.getSettings(getGuild());
+		if (!settingsClazz.isInstance(settings))
+		{
+			return null;
+		}
+		return settingsClazz.cast(settings);
 	}
 }
