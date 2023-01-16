@@ -3,3 +3,17 @@ JDATools is a fork of [JDATools](https://github.com/JDA-Applications/JDA-Utiliti
 
 ## Packages
 Unlike JDA-Utilities, JDATools has combined the seperate packages and removed the Examples package in favor a monolithic library spec
+
+## Using
+*Add Jitpack to Repositories*
+```gradle
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+```
+
+*Add Dependency*
+```gradle
+dependencies {
+    implementation 'com.github.ReadOnlyDevelopment:JDATools:<VERSION>'
+}
