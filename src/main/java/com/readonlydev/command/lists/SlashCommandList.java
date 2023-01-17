@@ -47,7 +47,7 @@ public class SlashCommandList extends SpecialList<SlashCommandList, SlashCommand
 
 	private SlashCommandList(NoDuplicateList<SlashCommand> noDuplicateList)
 	{
-		super(noDuplicateList.collection());
+		super(noDuplicateList.distinctCollection());
 		this.commandNames = noDuplicateList.mapped(SlashCommand::getName);
 	}
 

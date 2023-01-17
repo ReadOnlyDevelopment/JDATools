@@ -47,7 +47,7 @@ public class ContextMenuList extends SpecialList<ContextMenuList, ContextMenu>
 
 	private ContextMenuList(NoDuplicateList<ContextMenu> noDuplicateList)
 	{
-		super(noDuplicateList.collection());
+		super(noDuplicateList.distinctCollection());
 		this.commandNames = noDuplicateList.mapped(ContextMenu::getName);
 	}
 

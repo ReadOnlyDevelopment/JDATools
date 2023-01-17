@@ -118,7 +118,6 @@ public abstract class SlashCommand extends Command
 	@Getter
 	protected Map<DiscordLocale, String> descriptionLocalization = new HashMap<>();
 
-	@Setter
 	protected String guildId = null;
 
 	@Getter
