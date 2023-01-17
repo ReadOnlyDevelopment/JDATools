@@ -61,8 +61,6 @@ import com.readonlydev.command.ctx.UserContextMenu;
 import com.readonlydev.command.event.CommandEvent;
 import com.readonlydev.command.event.MessageContextMenuEvent;
 import com.readonlydev.command.event.UserContextMenuEvent;
-import com.readonlydev.command.lists.ContextMenuList;
-import com.readonlydev.command.lists.SlashCommandList;
 import com.readonlydev.command.slash.SlashCommand;
 import com.readonlydev.command.slash.SlashCommandEvent;
 import com.readonlydev.common.utils.FixedSizeCache;
@@ -92,11 +90,10 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.internal.utils.Checks;
 
 /**
- * An implementation of {@link com.readonlydev.api.ClientInterface Client} to be used by a bot.
- * <p>
- * This is a listener usable with {@link net.dv8tion.jda.api.JDA JDA}, as it implements
- * {@link net.dv8tion.jda.api.hooks.EventListener EventListener} in order to catch and use different kinds of
- * {@link net.dv8tion.jda.api.events.Event Event}s. The primary usage of this is where the Client implementation takes
+ * An implementation of {@link com.readonlydev.api.ClientInterface Client} to be used by a bot. <p> This is a listener
+ * usable with {@link net.dv8tion.jda.api.JDA JDA}, as it implements {@link net.dv8tion.jda.api.hooks.EventListener
+ * EventListener} in order to catch and use different kinds of {@link net.dv8tion.jda.api.events.Event Event}s. The
+ * primary usage of this is where the Client implementation takes
  * {@link net.dv8tion.jda.api.events.message.MessageReceivedEvent MessageReceivedEvent}s, and automatically processes
  * arguments, and provide them to a {@link com.readonlydev.command.Command Command} for running and execution.
  */
@@ -118,16 +115,8 @@ public class Client implements ClientInterface, EventListener
 	private final BiFunction<MessageReceivedEvent, Command, Boolean>	commandPreProcessBiFunction;
 	private final String												serverInvite;
 	private final HashMap<String, Integer>								commandIndex;
-	private final HashMap<String, Integer>								slashCommandIndex;
 	private final ArrayList<Command>									commands;
-	private final ArrayList<SlashCommand>								slashCommands;
-	@SuppressWarnings("unused")
-	private final ArrayList<String>										slashCommandIds;
-	private final ArrayList<ContextMenu>								contextMenus;
-	private final HashMap<Category, List<Command>>						categoryToCommandListMap;
-	private final HashMap<String, Integer>								contextMenuIndex;
 	private final LinkedList<ServerCommands>							serverCommands;
-	private final LinkedList<SlashCommand>								globalSlashCommands;
 	private final boolean												embedAllReplies;
 	private final String												success;
 	private final String												warning;
@@ -142,12 +131,32 @@ public class Client implements ClientInterface, EventListener
 	private final ScheduledExecutorService								executor;
 	private final GuildSettingsManager<?>								manager;
 
+	private final LinkedList<SlashCommand>	totalSlashCommands;
+	private final HashMap<String, Integer>	slashCommandIndex;
+
+	private final LinkedList<ContextMenu>	totalContextMenus;
+	private final HashMap<String, Integer>	contextMenuIndex;
+
+	private final HashMap<Category, List<Command>> categoryToCommandListMap;
+
 	private String			textPrefix;
 	private CommandListener	listener	= null;
 	private int				totalGuilds;
 
-	public Client(String ownerId, String[] coOwnerIds, String prefix, String[] prefixes, Function<MessageReceivedEvent, String> prefixFunction, Function<MessageReceivedEvent, Boolean> commandPreProcessFunction, BiFunction<MessageReceivedEvent, Command, Boolean> commandPreProcessBiFunction, Activity activity, OnlineStatus status, String serverInvite, String success, String warning, String error, ArrayList<Command> commands,
-		ArrayList<SlashCommand> slashCommands, ArrayList<ContextMenu> contextMenus, LinkedList<ServerCommands> serverCommands, LinkedList<SlashCommand> globalSlashCommands, boolean embedAllReplies, boolean useHelp, boolean shutdownAutomatically, Consumer<CommandEvent> helpConsumer, String helpWord, ScheduledExecutorService executor, int linkedCacheSize, GuildSettingsManager<?> manager)
+	public Client(
+		//@noformat
+		String ownerId, String[] coOwnerIds, String prefix, String[] prefixes,
+		Function<MessageReceivedEvent, String> prefixFunction,
+		Function<MessageReceivedEvent, Boolean> commandPreProcessFunction,
+		BiFunction<MessageReceivedEvent, Command, Boolean> commandPreProcessBiFunction,
+		Activity activity, OnlineStatus status, String serverInvite, String success,
+		String warning, String error, ArrayList<Command> commands,
+		ArrayList<ContextMenu> contextMenus, LinkedList<ServerCommands> serverCommands,
+		LinkedList<SlashCommand> globalSlashCommands, boolean embedAllReplies,
+		boolean useHelp, boolean shutdownAutomatically, Consumer<CommandEvent> helpConsumer,
+		String helpWord, ScheduledExecutorService executor, int linkedCacheSize, GuildSettingsManager<?> manager
+		)
+	//@format
 	{
 		Checks.check(ownerId != null, "Owner ID was set null or not set! Please provide an User ID to register as the owner!");
 		if (!SafeIdUtil.checkId(ownerId))
@@ -195,16 +204,14 @@ public class Client implements ClientInterface, EventListener
 		this.warning = warning == null ? "" : warning;
 		this.error = error == null ? "" : error;
 		this.commandIndex = new HashMap<>();
+		this.totalSlashCommands = new LinkedList<>();
 		this.slashCommandIndex = new HashMap<>();
+		this.totalContextMenus = new LinkedList<>();
+		this.contextMenuIndex = new HashMap<>();
 		this.commands = new ArrayList<>();
-		this.slashCommands = new ArrayList<>();
-		this.slashCommandIds = new ArrayList<>();
-		this.contextMenus = new ArrayList<>();
 		this.categoryToCommandListMap = new HashMap<>();
 		this.categoryToCommandListMap.put(new Category("Uncategorized"), new ArrayList<>());
-		this.contextMenuIndex = new HashMap<>();
-		this.serverCommands = serverCommands;
-		this.globalSlashCommands = globalSlashCommands;
+		this.serverCommands = new LinkedList<>();
 		this.embedAllReplies = embedAllReplies;
 		this.cooldowns = new HashMap<>();
 		this.uses = new HashMap<>();
@@ -256,16 +263,29 @@ public class Client implements ClientInterface, EventListener
 		{
 			addCommand(command);
 		}
-		// Load slash commands
-		for (SlashCommand command : slashCommands)
+		// Load GlobalSlashCommands commands
+		for (SlashCommand command : globalSlashCommands)
 		{
-			addSlashCommand(command);
+			indexSlashCommand(command);
 		}
 
 		// Load context menus
 		for (ContextMenu menu : contextMenus)
 		{
 			addContextMenu(menu);
+		}
+
+		for (ServerCommands serverCmds : serverCommands)
+		{
+			for (SlashCommand serverSlashCmd : serverCmds.getSlashCommands())
+			{
+				indexSlashCommand(serverSlashCmd);
+			}
+
+			for (ContextMenu serverMenus : serverCmds.getContextMenus())
+			{
+				addContextMenu(serverMenus);
+			}
 		}
 	}
 
@@ -288,20 +308,21 @@ public class Client implements ClientInterface, EventListener
 	}
 
 	@Override
-	public List<SlashCommand> getSlashCommands()
+	public List<ServerCommands> getServerCommands()
 	{
-		return slashCommands;
+		return serverCommands;
 	}
 
+	@Override
 	public List<SlashCommand> getGlobalSlashCommands()
 	{
-		return globalSlashCommands;
+		return totalSlashCommands.stream().filter(SlashCommand::isGlobalCommand).toList();
 	}
 
 	@Override
 	public List<ContextMenu> getContextMenus()
 	{
-		return contextMenus;
+		return totalContextMenus;
 	}
 
 	@Override
@@ -423,49 +444,49 @@ public class Client implements ClientInterface, EventListener
 	}
 
 	@Override
-	public void addSlashCommand(SlashCommand command)
+	public void indexSlashCommand(SlashCommand slashCommand, int index)
 	{
-		addSlashCommand(command, slashCommands.size());
-	}
-
-	@Override
-	public void addSlashCommand(SlashCommand command, int index)
-	{
-		if ((index > slashCommands.size()) || (index < 0))
+		if ((index > totalSlashCommands.size()) || (index < 0))
 		{
-			throw new ArrayIndexOutOfBoundsException("Index specified is invalid: [" + index + "/" + slashCommands.size() + "]");
+			throw new ArrayIndexOutOfBoundsException("Index specified is invalid: [" + index + "/" + totalSlashCommands.size() + "]");
 		}
 		synchronized (slashCommandIndex)
 		{
-			String name = command.getName().toLowerCase(Locale.ROOT);
+			String name = slashCommand.getName().toLowerCase(Locale.ROOT);
 			// check for collision
 			if (slashCommandIndex.containsKey(name))
 			{
 				throw new IllegalArgumentException("Command added has a name that has already been indexed: \"" + name + "\"!");
 			}
 			// shift if not append
-			if (index < slashCommands.size())
+			if (index < totalSlashCommands.size())
 			{
 				slashCommandIndex.entrySet().stream().filter(entry -> entry.getValue() >= index).collect(Collectors.toList()).forEach(entry -> slashCommandIndex.put(entry.getKey(), entry.getValue() + 1));
 			}
 			// add
 			slashCommandIndex.put(name, index);
 		}
-		slashCommands.add(index, command);
+		totalSlashCommands.add(index, slashCommand);
+	}
+
+	@Override
+	public void indexSlashCommand(SlashCommand command)
+	{
+		indexSlashCommand(command, totalContextMenus.size());
 	}
 
 	@Override
 	public void addContextMenu(ContextMenu menu)
 	{
-		addContextMenu(menu, contextMenus.size());
+		addContextMenu(menu, totalContextMenus.size());
 	}
 
 	@Override
 	public void addContextMenu(ContextMenu menu, int index)
 	{
-		if ((index > contextMenus.size()) || (index < 0))
+		if ((index > totalContextMenus.size()) || (index < 0))
 		{
-			throw new ArrayIndexOutOfBoundsException("Index specified is invalid: [" + index + "/" + contextMenus.size() + "]");
+			throw new ArrayIndexOutOfBoundsException("Index specified is invalid: [" + index + "/" + totalContextMenus.size() + "]");
 		}
 		synchronized (contextMenuIndex)
 		{
@@ -487,7 +508,7 @@ public class Client implements ClientInterface, EventListener
 			// add
 			contextMenuIndex.put(name, index);
 		}
-		contextMenus.add(index, menu);
+		totalContextMenus.add(index, menu);
 	}
 
 	@Override
@@ -707,34 +728,17 @@ public class Client implements ClientInterface, EventListener
 
 	public void upsertServerCommands(JDA jda)
 	{
-		SlashCommandList	slashCommands	= SlashCommandList.from(getSlashCommands());
-		ContextMenuList		contextMenus	= ContextMenuList.from(getContextMenus());
-
-		for (SlashCommand command : slashCommands)
+		if (serverCommands.isEmpty())
 		{
-			command.buildCommandData();
-		}
-
-		for (ContextMenu menu : contextMenus)
-		{
-			menu.buildCommandData();
+			return;
 		}
 
 		for (ServerCommands server : serverCommands)
 		{
-			List<CommandData>	data				= new ArrayList<>();
-			SlashCommandList	serverSlashCmds		= SlashCommandList.from(server.getSlashCommands());
-			ContextMenuList		serverContextMenus	= ContextMenuList.from(server.getContextMenus());
+			List<CommandData> data = new ArrayList<>();
 
-			for (SlashCommand command : serverSlashCmds)
-			{
-				data.add(command.getCommandData());
-			}
-
-			for (ContextMenu menu : serverContextMenus)
-			{
-				data.add(menu.getCommandData());
-			}
+			data.addAll(server.getSlashCommands().stream().map(SlashCommand::getCommandData).toList());
+			data.addAll(server.getContextMenus().stream().map(ContextMenu::getCommandData).toList());
 
 			// Attempt to retrieve the provided guild
 			Guild guild = jda.getGuildById(server.getServerId());
@@ -744,8 +748,11 @@ public class Client implements ClientInterface, EventListener
 				return;
 			} else
 			{
-				// Upsert the commands + their privileges
-				guild.updateCommands().addCommands(data).queue(priv -> LOG.info("Successfully added " + serverSlashCmds.size() + " slash commands and " + contextMenus.size() + " menus to server " + guild.getName()), error -> LOG.error("Could not upsert commands! Does the bot have the applications.commands scope?" + error));
+				//@noformat
+				guild.updateCommands().addCommands(data).queue(
+					priv -> LOG.info("Successfully added " + server.getSlashCommands().size() + " slash commands and " + server.getContextMenus().size() + " menus to server " + guild.getName()),
+					error -> LOG.error("Could not upsert commands! Does the bot have the applications.commands scope?" + error));
+				//@format
 			}
 		}
 	}
@@ -753,16 +760,11 @@ public class Client implements ClientInterface, EventListener
 	public void upsertGlobalSlashCommands(JDA jda)
 	{
 		// Get all commands
-		List<CommandData>	data			= new ArrayList<>();
-		List<SlashCommand>	slashCommands	= getGlobalSlashCommands();
+		List<SlashCommand> globalCommands = totalSlashCommands.stream().filter(SlashCommand::isGlobalCommand).toList();
+		List<CommandData> data = new ArrayList<>();
+		data.addAll(globalCommands.stream().map(SlashCommand::getCommandData).toList());
 
-		// Build the command and privilege data
-		for (SlashCommand command : slashCommands)
-		{
-			data.add(command.getCommandData());
-		}
-
-		jda.updateCommands().addCommands(data).queue(commands -> LOG.info("Successfully added " + slashCommands.size() + " slash commands!"));
+		jda.updateCommands().addCommands(data).queue(commands -> LOG.info("Successfully added " + globalCommands.size() + " global slash commands!"));
 	}
 
 	private void onMessageReceived(MessageReceivedEvent event)
@@ -884,7 +886,7 @@ public class Client implements ClientInterface, EventListener
 		{
 			for (String pre : prefixes)
 			{
-				if(pre != null)
+				if (pre != null)
 				{
 					if (lowerCaseContent.startsWith(pre.toLowerCase(Locale.ROOT)))
 					{
@@ -914,18 +916,13 @@ public class Client implements ClientInterface, EventListener
 	}
 
 	/**
-	 * Processes the message raw content and returns the "parts" of the message <br>
-	 * These parts include:
-	 * <ul>
-	 * <li>Used prefix</li>
-	 * <li>Command name</li>
-	 * <li>Arguments</li>
-	 * </ul>
+	 * Processes the message raw content and returns the "parts" of the message <br> These parts include: <ul> <li>Used
+	 * prefix</li> <li>Command name</li> <li>Arguments</li> </ul>
 	 *
 	 * @param rawContent
-	 *            The raw content of the incoming message
+	 *                     The raw content of the incoming message
 	 * @param prefixLength
-	 *            The length of the prefix that has been successfully detected before calling this method
+	 *                     The length of the prefix that has been successfully detected before calling this method
 	 *
 	 * @return A MessageParts objects with all the parts cited above
 	 */
@@ -1015,7 +1012,7 @@ public class Client implements ClientInterface, EventListener
 		synchronized (slashCommandIndex)
 		{
 			int i = slashCommandIndex.getOrDefault(parts[0].toLowerCase(Locale.ROOT), -1);
-			command = i != -1 ? slashCommands.get(i) : null;
+			command = i != -1 ? totalSlashCommands.get(i) : null;
 		}
 
 		if (command == null)
@@ -1059,7 +1056,7 @@ public class Client implements ClientInterface, EventListener
 		{
 			ContextMenu	c;
 			int			i	= contextMenuIndex.getOrDefault(event.getName(), -1);
-			c = i != -1 ? contextMenus.get(i) : null;
+			c = i != -1 ? totalContextMenus.get(i) : null;
 
 			if (c instanceof UserContextMenu)
 			{
@@ -1094,7 +1091,7 @@ public class Client implements ClientInterface, EventListener
 			// Do not lowercase, as there could be 2 menus with the same name,
 			// but different letter cases
 			int i = contextMenuIndex.getOrDefault(event.getName(), -1);
-			c = i != -1 ? contextMenus.get(i) : null;
+			c = i != -1 ? totalContextMenus.get(i) : null;
 
 			if (c instanceof MessageContextMenu)
 			{

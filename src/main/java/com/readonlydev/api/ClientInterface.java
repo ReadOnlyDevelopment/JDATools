@@ -33,6 +33,7 @@ import java.util.function.Function;
 import com.readonlydev.command.Command;
 import com.readonlydev.command.Command.Category;
 import com.readonlydev.command.CommandListener;
+import com.readonlydev.command.client.ServerCommands;
 import com.readonlydev.command.ctx.ContextMenu;
 import com.readonlydev.command.slash.SlashCommand;
 import com.readonlydev.settings.GuildSettingsManager;
@@ -206,7 +207,7 @@ public interface ClientInterface
 	 * @throws java.lang.IllegalArgumentException
 	 *             If the SlashCommand provided has a name or alias that has already been registered
 	 */
-	void addSlashCommand(SlashCommand command);
+	void indexSlashCommand(SlashCommand command);
 
 	/**
 	 * Adds a single {@link com.readonlydev.command.slash.SlashCommand SlashCommand} to this Client's registered
@@ -237,7 +238,7 @@ public interface ClientInterface
 	 * @throws java.lang.IllegalArgumentException
 	 *             If the Command provided has a name or alias that has already been registered to an index
 	 */
-	void addSlashCommand(SlashCommand command, int index);
+	void indexSlashCommand(SlashCommand command, int index);
 
 	/**
 	 * Adds a single {@link ContextMenu} to this CommandClient's registered Context Menus.
@@ -312,13 +313,15 @@ public interface ClientInterface
 	 */
 	List<Command> getCommands();
 
+	List<ServerCommands> getServerCommands();
+
 	/**
 	 * Returns the list of registered {@link com.readonlydev.command.slash.SlashCommand SlashCommand}s during this
 	 * session.
 	 *
 	 * @return A never-null List of Slash Commands registered during this session
 	 */
-	List<SlashCommand> getSlashCommands();
+	List<SlashCommand> getGlobalSlashCommands();
 
 	/**
 	 * Returns the list of registered {@link ContextMenu}s during this session.

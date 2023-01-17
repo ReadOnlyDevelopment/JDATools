@@ -24,7 +24,6 @@
 
 package com.readonlydev.command.client;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,14 +35,12 @@ import com.readonlydev.common.utils.SafeIdUtil;
 public final class ServerCommands
 {
 	private final long			serverId;
-	private List<SlashCommand>	slashCommands;
-	private List<ContextMenu>	contextMenus;
+	private List<SlashCommand>	slashCommands = new LinkedList<>();
+	private List<ContextMenu>	contextMenus = new LinkedList<>();
 
 	public ServerCommands(long serverId)
 	{
 		this.serverId = serverId;
-		this.slashCommands = new LinkedList<>();
-		this.contextMenus = new LinkedList<>();
 	}
 
 	public ServerCommands(String serverId)
@@ -53,19 +50,12 @@ public final class ServerCommands
 
 	public ServerCommands addAllCommands(Collection<SlashCommand> commandCollection)
 	{
-		slashCommands.addAll(commandCollection);
+		for(SlashCommand cmd : commandCollection)
+		{
+			cmd.setGuildId(this.serverId);
+			this.slashCommands.add(cmd);
+		}
 		return this;
-	}
-
-	public ServerCommands addAllCommands(SlashCommand... commands)
-	{
-		slashCommands.addAll(Arrays.asList(commands));
-		return this;
-	}
-
-	public void addContextMenus(ContextMenu... menus)
-	{
-		contextMenus.addAll(Arrays.asList(menus));
 	}
 
 	long getServerId()

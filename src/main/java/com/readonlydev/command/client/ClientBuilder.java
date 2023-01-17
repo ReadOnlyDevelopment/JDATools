@@ -49,10 +49,9 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
- * A simple builder used to create a {@link com.readonlydev.command.client.Client ClientImpl}.
- * <p>
- * Once built, add the {@link com.readonlydev.api.ClientInterface Client} as an EventListener to
- * {@link net.dv8tion.jda.api.JDA JDA} and it will automatically handle commands with ease!
+ * A simple builder used to create a {@link com.readonlydev.command.client.Client ClientImpl}. <p> Once built, add the
+ * {@link com.readonlydev.api.ClientInterface Client} as an EventListener to {@link net.dv8tion.jda.api.JDA JDA} and it
+ * will automatically handle commands with ease!
  */
 public class ClientBuilder
 {
@@ -71,11 +70,10 @@ public class ClientBuilder
 	private String												warning;
 	private String												error;
 	private final LinkedList<Command>							commands					= new LinkedList<>();
-	private final LinkedList<SlashCommand>						slashCommands				= new LinkedList<>();
 	private final LinkedList<ContextMenu>						contextMenus				= new LinkedList<>();
+	private final LinkedList<ServerCommands>					serverCommands				= new LinkedList<>();
+	private final LinkedList<SlashCommand>						globalSlashCommands			= new LinkedList<>();
 	final HashMap<Category, List<Command>>						categoryToCommandListMap	= new LinkedHashMap<Command.Category, List<Command>>();
-	private LinkedList<ServerCommands>							serverCommands				= new LinkedList<>();
-	private LinkedList<SlashCommand>							globalCommands				= new LinkedList<>();
 	private boolean												embedAllReplies				= false;
 	private CommandListener										listener;
 	private boolean												useHelp						= true;
@@ -87,8 +85,8 @@ public class ClientBuilder
 	private GuildSettingsManager<?>								manager						= null;
 
 	/**
-	 * Builds a {@link com.readonlydev.command.client.Client ClientImpl} with the provided settings. <br>
-	 * Once built, only the {@link com.readonlydev.command.CommandListener CommandListener}, and
+	 * Builds a {@link com.readonlydev.command.client.Client ClientImpl} with the provided settings. <br> Once built,
+	 * only the {@link com.readonlydev.command.CommandListener CommandListener}, and
 	 * {@link com.readonlydev.command.Command Command}s can be changed.
 	 *
 	 * @return The Client built.
@@ -96,7 +94,16 @@ public class ClientBuilder
 	public Client build()
 	{
 		// @noformat
-		Client client = new Client(ownerId, coOwnerIds, prefix, prefixes, prefixFunction, commandPreProcessFunction, commandPreProcessBiFunction, activity, status, serverInvite, success, warning, error, new ArrayList<>(commands), new ArrayList<>(slashCommands), new ArrayList<>(contextMenus), serverCommands, globalCommands, embedAllReplies, useHelp, shutdownAutomatically, helpConsumer, helpWord, executor, linkedCacheSize, manager);
+		Client client = new Client(
+			ownerId, coOwnerIds, prefix, prefixes,
+			prefixFunction, commandPreProcessFunction,
+			commandPreProcessBiFunction, activity, status,
+			serverInvite, success, warning, error,
+			new ArrayList<>(commands), new ArrayList<>(contextMenus),
+			serverCommands, globalSlashCommands, embedAllReplies,
+			useHelp, shutdownAutomatically, helpConsumer,
+			helpWord, executor, linkedCacheSize, manager
+			);
 		if (listener != null)
 		{
 			client.setListener(listener);
@@ -106,12 +113,11 @@ public class ClientBuilder
 	}
 
 	/**
-	 * Sets the owner for the bot. <br>
-	 * Make sure to verify that the ID provided is ISnowflake compatible when setting this. If it is not, this will warn
-	 * the developer.
+	 * Sets the owner for the bot. <br> Make sure to verify that the ID provided is ISnowflake compatible when setting
+	 * this. If it is not, this will warn the developer.
 	 *
 	 * @param ownerId
-	 *            The ID of the owner.
+	 *                The ID of the owner.
 	 *
 	 * @return This builder
 	 */
@@ -122,12 +128,11 @@ public class ClientBuilder
 	}
 
 	/**
-	 * Sets the one or more CoOwners of the bot. <br>
-	 * Make sure to verify that all of the IDs provided are ISnowflake compatible when setting this. If it is not, this
-	 * will warn the developer which ones are not.
+	 * Sets the one or more CoOwners of the bot. <br> Make sure to verify that all of the IDs provided are ISnowflake
+	 * compatible when setting this. If it is not, this will warn the developer which ones are not.
 	 *
 	 * @param coOwnerIds
-	 *            The ID(s) of the CoOwners
+	 *                   The ID(s) of the CoOwners
 	 *
 	 * @return This builder
 	 */
@@ -138,11 +143,11 @@ public class ClientBuilder
 	}
 
 	/**
-	 * Sets the bot's prefix. <br>
-	 * If set null, empty, or not set at all, the bot will use a mention {@literal @Botname} as a prefix.
+	 * Sets the bot's prefix. <br> If set null, empty, or not set at all, the bot will use a mention {@literal @Botname}
+	 * as a prefix.
 	 *
 	 * @param prefix
-	 *            The prefix for the bot to use
+	 *               The prefix for the bot to use
 	 *
 	 * @return This builder
 	 */
@@ -156,7 +161,7 @@ public class ClientBuilder
 	 * Sets an array of prefixes in case it's not enough. Be careful.
 	 *
 	 * @param prefixes
-	 *            The prefixes to use
+	 *                 The prefixes to use
 	 *
 	 * @return This builder
 	 */
@@ -170,7 +175,7 @@ public class ClientBuilder
 	 * Sets the Collection of prefixes in case it's not enough. Be careful.
 	 *
 	 * @param prefixCollection
-	 *            The Collection of prefixes to use
+	 *                         The Collection of prefixes to use
 	 *
 	 * @return This builder
 	 */
@@ -181,12 +186,12 @@ public class ClientBuilder
 	}
 
 	/**
-	 * Sets the Prefix Function. Used if you want custom prefixes per server. <br>
-	 * Be careful, this function should be quick, as it's executed every time MessageReceivedEvent is called. <br>
-	 * If function returns null, it will be ignored.
+	 * Sets the Prefix Function. Used if you want custom prefixes per server. <br> Be careful, this function should be
+	 * quick, as it's executed every time MessageReceivedEvent is called. <br> If function returns null, it will be
+	 * ignored.
 	 *
 	 * @param prefixFunction
-	 *            The prefix function to execute to use
+	 *                       The prefix function to execute to use
 	 *
 	 * @return This builder
 	 */
@@ -197,13 +202,12 @@ public class ClientBuilder
 	}
 
 	/**
-	 * Sets the pre-process function. This code is executed before every command.<br>
-	 * Returning "true" will allow processing to proceed.<br>
-	 * Returning "false" or "null" will prevent the Command from executing.<br>
-	 * You can use Command to see which command will run.<br>
+	 * Sets the pre-process function. This code is executed before every command.<br> Returning "true" will allow
+	 * processing to proceed.<br> Returning "false" or "null" will prevent the Command from executing.<br> You can use
+	 * Command to see which command will run.<br>
 	 *
 	 * @param commandPreProcessBiFunction
-	 *            The function to execute
+	 *                                    The function to execute
 	 *
 	 * @return This builder
 	 */
@@ -218,8 +222,9 @@ public class ClientBuilder
 	 * a help command or not.
 	 *
 	 * @param useHelp
-	 *            {@code false} to disable the help command builder, otherwise the Client will use either the default or
-	 *            one provided via {@link com.readonlydev.command.client.ClientBuilder#setHelpConsumer(Consumer)}}.
+	 *                {@code false} to disable the help command builder, otherwise the Client will use either the
+	 *                default or one provided via
+	 *                {@link com.readonlydev.command.client.ClientBuilder#setHelpConsumer(Consumer)}}.
 	 *
 	 * @return This builder
 	 */
@@ -230,12 +235,12 @@ public class ClientBuilder
 	}
 
 	/**
-	 * Sets the consumer to run as the bot's help command. <br>
-	 * Setting it to {@code null} or not setting this at all will cause the bot to use the default help builder.
+	 * Sets the consumer to run as the bot's help command. <br> Setting it to {@code null} or not setting this at all
+	 * will cause the bot to use the default help builder.
 	 *
 	 * @param helpConsumer
-	 *            A consumer to accept a {@link com.readonlydev.command.event.CommandEvent CommandEvent} when a help
-	 *            command is called.
+	 *                     A consumer to accept a {@link com.readonlydev.command.event.CommandEvent CommandEvent} when a
+	 *                     help command is called.
 	 *
 	 * @return This builder
 	 */
@@ -246,11 +251,11 @@ public class ClientBuilder
 	}
 
 	/**
-	 * Sets the word used to trigger the command list. <br>
-	 * Setting this to {@code null} or not setting this at all will set the help word to {@code "help"}.
+	 * Sets the word used to trigger the command list. <br> Setting this to {@code null} or not setting this at all will
+	 * set the help word to {@code "help"}.
 	 *
 	 * @param helpWord
-	 *            The word to trigger the help command
+	 *                 The word to trigger the help command
 	 *
 	 * @return This builder
 	 */
@@ -264,7 +269,7 @@ public class ClientBuilder
 	 * Sets the bot's support server invite.
 	 *
 	 * @param serverInvite
-	 *            The support server invite
+	 *                     The support server invite
 	 *
 	 * @return This builder
 	 */
@@ -278,11 +283,11 @@ public class ClientBuilder
 	 * Sets the emojis for success, warning, and failure.
 	 *
 	 * @param success
-	 *            Emoji for success
+	 *                Emoji for success
 	 * @param warning
-	 *            Emoji for warning
+	 *                Emoji for warning
 	 * @param error
-	 *            Emoji for failure
+	 *                Emoji for failure
 	 *
 	 * @return This builder
 	 */
@@ -295,11 +300,11 @@ public class ClientBuilder
 	}
 
 	/**
-	 * Sets the {@link net.dv8tion.jda.api.entities.Activity Activity} to use when the bot is ready. <br>
-	 * Can be set to {@code null} for JDA Utilities to not set it.
+	 * Sets the {@link net.dv8tion.jda.api.entities.Activity Activity} to use when the bot is ready. <br> Can be set to
+	 * {@code null} for JDA Utilities to not set it.
 	 *
 	 * @param activity
-	 *            The Game to use when the bot is ready
+	 *                 The Game to use when the bot is ready
 	 *
 	 * @return This builder
 	 */
@@ -326,7 +331,7 @@ public class ClientBuilder
 	 * ONLINE
 	 *
 	 * @param status
-	 *            The status to set
+	 *               The status to set
 	 *
 	 * @return This builder
 	 */
@@ -341,7 +346,7 @@ public class ClientBuilder
 	 * {@link com.readonlydev.command.client.Client ClientImpl} for this session.
 	 *
 	 * @param command
-	 *            The command to add
+	 *                The command to add
 	 *
 	 * @return This builder
 	 */
@@ -361,12 +366,12 @@ public class ClientBuilder
 
 	/**
 	 * Adds and registers all {@link com.readonlydev.command.Command Command}s in the collection to the
-	 * {@link com.readonlydev.command.client.Client ClientImpl} for this session. <br>
-	 * This is the same as running a forEach loop on the Collection
-	 * {@link com.readonlydev.command.client.ClientBuilder#addCommand(Command)} multiple times.
+	 * {@link com.readonlydev.command.client.Client ClientImpl} for this session. <br> This is the same as running a
+	 * forEach loop on the Collection {@link com.readonlydev.command.client.ClientBuilder#addCommand(Command)} multiple
+	 * times.
 	 *
 	 * @param commands
-	 *            The Commands Collection to add
+	 *                 The Commands Collection to add
 	 *
 	 * @return This builder
 	 */
@@ -378,12 +383,11 @@ public class ClientBuilder
 
 	/**
 	 * Adds and registers multiple {@link com.readonlydev.command.Command Command}s to the
-	 * {@link com.readonlydev.command.client.Client ClientImpl} for this session. <br>
-	 * This is the same as calling {@link com.readonlydev.command.client.ClientBuilder#addCommand(Command)} multiple
-	 * times.
+	 * {@link com.readonlydev.command.client.Client ClientImpl} for this session. <br> This is the same as calling
+	 * {@link com.readonlydev.command.client.ClientBuilder#addCommand(Command)} multiple times.
 	 *
 	 * @param commands
-	 *            The Commands to add
+	 *                 The Commands to add
 	 *
 	 * @return This builder
 	 */
@@ -396,73 +400,66 @@ public class ClientBuilder
 		return this;
 	}
 
-	public ClientBuilder addGlobalSlashCommands(SlashCommand... slashCommands)
+	/**
+	 * Adds a {@link com.readonlydev.command.slash.SlashCommand SlashCommand} and registers it to the
+	 * {@link com.readonlydev.command.client.Client ClientImpl} for this session.
+	 *
+	 * @param slashCommand
+	 *                     The SlashCommand to add
+	 *
+	 * @return This builder
+	 */
+	public ClientBuilder addGlobalSlashCommand(SlashCommand slashCommand)
 	{
-		for (SlashCommand command : slashCommands)
+		if (!this.globalSlashCommands.contains(slashCommand))
 		{
-			this.addGlobalSlashCommand(command);
+			this.globalSlashCommands.add(slashCommand);
 		}
 		return this;
 	}
 
-	public ClientBuilder addGlobalSlashCommand(SlashCommand command)
+	/**
+	 * Adds and registers all {@link com.readonlydev.command.slash.SlashCommand SlashCommand}s in the array to the
+	 * {@link com.readonlydev.command.client.Client ClientImpl} for this session. <br> This is the same as running a
+	 * forEach loop on the Collection {@link com.readonlydev.command.client.ClientBuilder#addSlashCommand(SlashCommand)}
+	 * multiple times.
+	 *
+	 * @param slashCommands
+	 *                      The SlashCommands Array to add
+	 *
+	 * @return This builder
+	 */
+	public ClientBuilder addGlobalSlashCommands(SlashCommand... slashCommands)
 	{
-		if (!this.slashCommands.contains(command))
+		for (SlashCommand command : slashCommands)
 		{
-			this.addSlashCommand(command);
+			if (!this.globalSlashCommands.contains(command))
+			{
+				this.globalSlashCommands.add(command);
+			}
 		}
-		globalCommands.add(command);
 		return this;
 	}
 
 	/**
 	 * Adds and registers all {@link com.readonlydev.command.slash.SlashCommand SlashCommand}s in the collection to the
-	 * {@link com.readonlydev.command.client.Client ClientImpl} for this session. <br>
-	 * This is the same as running a forEach loop on the Collection
-	 * {@link com.readonlydev.command.client.ClientBuilder#addSlashCommand(SlashCommand)} multiple times.
-	 *
-	 * @param commands
-	 *            The SlashCommands Collection to add
-	 *
-	 * @return This builder
-	 */
-	public ClientBuilder addSlashCommands(Collection<SlashCommand> commands)
-	{
-		commands.forEach(command -> this.addSlashCommand(command));
-		return this;
-	}
-
-	/**
-	 * Adds a {@link com.readonlydev.command.slash.SlashCommand SlashCommand} and registers it to the
-	 * {@link com.readonlydev.command.client.Client ClientImpl} for this session.
-	 *
-	 * @param command
-	 *            The SlashCommand to add
-	 *
-	 * @return This builder
-	 */
-	public ClientBuilder addSlashCommand(SlashCommand command)
-	{
-		slashCommands.add(command);
-		return this;
-	}
-
-	/**
-	 * Adds and registers multiple {@link com.readonlydev.command.slash.SlashCommand SlashCommand}s to the
-	 * {@link com.readonlydev.command.client.Client ClientImpl} for this session. <br>
-	 * This is the same as calling {@link com.readonlydev.command.client.ClientBuilder#addSlashCommand(SlashCommand)}
+	 * {@link com.readonlydev.command.client.Client ClientImpl} for this session. <br> This is the same as running a
+	 * forEach loop on the Collection {@link com.readonlydev.command.client.ClientBuilder#addSlashCommand(SlashCommand)}
 	 * multiple times.
 	 *
-	 * @param commands
-	 *            The Commands to add
+	 * @param slashCommands
+	 *                      The SlashCommands Collection to add
 	 *
 	 * @return This builder
 	 */
-	public ClientBuilder addSlashCommands(SlashCommand... commands)
+	public ClientBuilder addGlobalSlashCommands(Collection<SlashCommand> slashCommands)
 	{
-		for (SlashCommand command : commands)
+		for (SlashCommand command : slashCommands)
 		{
-			this.addSlashCommand(command);
+			if (!this.globalSlashCommands.contains(command))
+			{
+				this.globalSlashCommands.add(command);
+			}
 		}
 		return this;
 	}
@@ -472,7 +469,7 @@ public class ClientBuilder
 	 * {@link com.readonlydev.command.client.Client Client} for this session.
 	 *
 	 * @param contextMenu
-	 *            The Context Menu to add
+	 *                    The Context Menu to add
 	 *
 	 * @return This builder
 	 */
@@ -484,12 +481,11 @@ public class ClientBuilder
 
 	/**
 	 * Adds and registers multiple {@link com.readonlydev.command.slash.SlashCommand SlashCommand}s to the
-	 * {@link com.readonlydev.command.client.Client Client} for this session. <br>
-	 * This is the same as calling {@link com.readonlydev.command.client.ClientBuilder#addSlashCommand(SlashCommand)}
-	 * multiple times.
+	 * {@link com.readonlydev.command.client.Client Client} for this session. <br> This is the same as calling
+	 * {@link com.readonlydev.command.client.ClientBuilder#addSlashCommand(SlashCommand)} multiple times.
 	 *
 	 * @param contextMenus
-	 *            The Context Menus to add
+	 *                     The Context Menus to add
 	 *
 	 * @return This builder
 	 */
@@ -506,20 +502,13 @@ public class ClientBuilder
 	{
 		for (ServerCommands svrCmds : serverCommands)
 		{
-			this.addServerCommands(svrCmds);
+			this.serverCommands.add(svrCmds);
 		}
 		return this;
 	}
 
 	public ClientBuilder addServerCommands(ServerCommands serverCommands)
 	{
-		for (SlashCommand cmd : serverCommands.getSlashCommands())
-		{
-			if (!this.slashCommands.contains(cmd))
-			{
-				this.addSlashCommand(cmd);
-			}
-		}
 		this.serverCommands.add(serverCommands);
 		return this;
 	}
@@ -540,7 +529,7 @@ public class ClientBuilder
 	 * {@link com.readonlydev.command.client.Client ClientImpl}.
 	 *
 	 * @param listener
-	 *            The CommandListener for the ClientImpl
+	 *                 The CommandListener for the ClientImpl
 	 *
 	 * @return This builder
 	 */
@@ -555,7 +544,7 @@ public class ClientBuilder
 	 * {@link com.readonlydev.command.client.Client ClientImpl}.
 	 *
 	 * @param executor
-	 *            The ScheduledExecutorService for the ClientImpl
+	 *                 The ScheduledExecutorService for the ClientImpl
 	 *
 	 * @return This builder
 	 */
@@ -570,7 +559,8 @@ public class ClientBuilder
 	 * {@link net.dv8tion.jda.api.events.session.ShutdownEvent ShutdownEvent} is received.
 	 *
 	 * @param shutdownAutomatically
-	 *            {@code false} to disable calling the shutdown method when a ShutdownEvent is received
+	 *                              {@code false} to disable calling the shutdown method when a ShutdownEvent is
+	 *                              received
 	 *
 	 * @return This builder
 	 */
@@ -583,16 +573,13 @@ public class ClientBuilder
 	/**
 	 * Sets the internal size of the client's {@link com.readonlydev.common.utils.FixedSizeCache FixedSizeCache} used
 	 * for caching and pairing the bot's response {@link net.dv8tion.jda.api.entities.Message Message}s with the calling
-	 * Message's ID.
-	 * <p>
-	 * Higher cache size means that decay of cache contents will most likely occur later, allowing the deletion of
-	 * responses when the call is deleted to last for a longer duration. However this also means larger memory usage.
-	 * <p>
-	 * Setting {@code 0} or negative will cause the client to not use linked caching <b>at all</b>.
+	 * Message's ID. <p> Higher cache size means that decay of cache contents will most likely occur later, allowing the
+	 * deletion of responses when the call is deleted to last for a longer duration. However this also means larger
+	 * memory usage. <p> Setting {@code 0} or negative will cause the client to not use linked caching <b>at all</b>.
 	 *
 	 * @param linkedCacheSize
-	 *            The maximum number of paired responses that can be cached, or {@code <1} if the built
-	 *            {@link com.readonlydev.api.ClientInterface Client} will not use linked caching.
+	 *                        The maximum number of paired responses that can be cached, or {@code <1} if the built
+	 *                        {@link com.readonlydev.api.ClientInterface Client} will not use linked caching.
 	 *
 	 * @return This builder
 	 */
@@ -607,7 +594,7 @@ public class ClientBuilder
 	 * using this builder.
 	 *
 	 * @param manager
-	 *            The GuildSettingsManager to set.
+	 *                The GuildSettingsManager to set.
 	 *
 	 * @return This builder
 	 */

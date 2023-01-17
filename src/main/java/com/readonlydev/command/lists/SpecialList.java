@@ -24,8 +24,8 @@
 
 package com.readonlydev.command.lists;
 
+import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
 
 import lombok.NoArgsConstructor;
 
@@ -35,7 +35,7 @@ public abstract class SpecialList<T, V> extends LinkedList<V>
 
 	private static final long serialVersionUID = 1L;
 
-	public SpecialList(List<V> fromList)
+	public SpecialList(Collection<V> fromList)
 	{
 		this.addAll(fromList);
 	}

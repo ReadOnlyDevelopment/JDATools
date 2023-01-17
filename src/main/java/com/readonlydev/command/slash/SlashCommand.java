@@ -36,6 +36,7 @@ import com.readonlydev.command.Command;
 import com.readonlydev.command.client.Client;
 import com.readonlydev.command.client.ClientBuilder;
 import com.readonlydev.command.event.CommandEvent;
+import com.readonlydev.common.utils.SafeIdUtil;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -469,6 +470,11 @@ public abstract class SlashCommand extends Command
 		data.setGuildOnly(this.guildOnly);
 
 		this.setCommandData(data);
+	}
+
+	public void setGuildId(long guildId)
+	{
+		this.guildId = SafeIdUtil.safeConvert(guildId);
 	}
 
 	public boolean isGuildRestricted()

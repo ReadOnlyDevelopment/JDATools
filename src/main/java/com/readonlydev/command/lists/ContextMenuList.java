@@ -24,9 +24,12 @@
 
 package com.readonlydev.command.lists;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import com.readonlydev.command.ctx.ContextMenu;
+import com.readonlydev.common.utils.NoDuplicateList;
 
 import lombok.NoArgsConstructor;
 
@@ -35,14 +38,47 @@ public class ContextMenuList extends SpecialList<ContextMenuList, ContextMenu>
 {
 	private static final long serialVersionUID = -6654979706221716102L;
 
-	public static ContextMenuList from(List<ContextMenu> list)
+	private List<String> commandNames;
+
+	public static ContextMenuList from(Collection<ContextMenu> list)
 	{
-		return new ContextMenuList(list);
+		return new ContextMenuList(new NoDuplicateList<>(list));
 	}
 
-	private ContextMenuList(List<ContextMenu> fromList)
+	private ContextMenuList(NoDuplicateList<ContextMenu> noDuplicateList)
 	{
-		super(fromList);
+		super(noDuplicateList.collection());
+		this.commandNames = noDuplicateList.mapped(ContextMenu::getName);
+	}
+
+	private boolean notInList(String e)
+	{
+		return this.commandNames.lastIndexOf(e) == -1;
+	}
+
+	@Override
+	public boolean add(ContextMenu element)
+	{
+		if(notInList(element.getName()))
+		{
+			return super.add(element);
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean addAll(Collection<? extends ContextMenu> c)
+	{
+		List<ContextMenu> temp = new ArrayList<>();
+		for(ContextMenu sc : c)
+		{
+			if(notInList(sc.getName()))
+			{
+				temp.add(sc);
+			}
+		}
+		return super.addAll(temp);
 	}
 
 	@Override

@@ -24,9 +24,12 @@
 
 package com.readonlydev.command.lists;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import com.readonlydev.command.slash.SlashCommand;
+import com.readonlydev.common.utils.NoDuplicateList;
 
 import lombok.NoArgsConstructor;
 
@@ -35,14 +38,47 @@ public class SlashCommandList extends SpecialList<SlashCommandList, SlashCommand
 {
 	private static final long serialVersionUID = -7049482075284773427L;
 
-	public static SlashCommandList from(List<SlashCommand> list)
+	private List<String> commandNames;
+
+	public static SlashCommandList from(Collection<SlashCommand> list)
 	{
-		return new SlashCommandList(list);
+		return new SlashCommandList(new NoDuplicateList<>(list));
 	}
 
-	private SlashCommandList(List<SlashCommand> fromList)
+	private SlashCommandList(NoDuplicateList<SlashCommand> noDuplicateList)
 	{
-		super(fromList);
+		super(noDuplicateList.collection());
+		this.commandNames = noDuplicateList.mapped(SlashCommand::getName);
+	}
+
+	private boolean notInList(String e)
+	{
+		return this.commandNames.lastIndexOf(e) == -1;
+	}
+
+	@Override
+	public boolean add(SlashCommand element)
+	{
+		if(notInList(element.getName()))
+		{
+			return super.add(element);
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean addAll(Collection<? extends SlashCommand> c)
+	{
+		List<SlashCommand> temp = new ArrayList<>();
+		for(SlashCommand sc : c)
+		{
+			if(notInList(sc.getName()))
+			{
+				temp.add(sc);
+			}
+		}
+		return super.addAll(temp);
 	}
 
 	@Override
