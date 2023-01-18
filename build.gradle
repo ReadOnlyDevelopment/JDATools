@@ -92,6 +92,11 @@ publishing {
         mavenJava(MavenPublication) {
         	from components.java
         }
+        mavenSnapshot(MavenPublication) {
+            from components.java
+            version = "master-SNAPSHOT"
+        }
+
     }
 }
 
