@@ -3,13 +3,11 @@ com.readonlydev.api.annotation
 com.readonlydev.command
 com.readonlydev.command.arg
 com.readonlydev.command.arg.parse
-com.readonlydev.command.client
 com.readonlydev.command.ctx
 com.readonlydev.command.event
 com.readonlydev.command.included
 com.readonlydev.command.lists
 com.readonlydev.command.operation
-com.readonlydev.command.slash
 com.readonlydev.common
 com.readonlydev.common.data
 com.readonlydev.common.utils
