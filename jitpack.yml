@@ -4,5 +4,3 @@ before_install:
   - chmod +x ./gradlew
 install:
   - ./gradlew publishToMavenLocal
-env:
- GROUP: "com.readonlydevelopment"

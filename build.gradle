@@ -12,7 +12,7 @@ def baseVersion = "4.0.2"
 def isSnapshot = false
 
 version = (isSnapshot) ? baseVersion + '-SNAPSHOT' : baseVersion
-group = 'com.readonlydev'
+group = 'com.github.ReadOnlyDevelopment'
 archivesBaseName = 'JDATools'
 
 import org.apache.tools.ant.filters.ReplaceTokens
