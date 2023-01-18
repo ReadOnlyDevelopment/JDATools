@@ -1,0 +1,6 @@
+jdk:
+  - openjdk17
+install:
+  - ./gradlew publishToMavenLocal
+env:
+ GROUP: "com.readonlydevelopment"
