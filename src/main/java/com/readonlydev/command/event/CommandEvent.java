@@ -31,10 +31,10 @@ import java.util.function.Consumer;
 import org.jetbrains.annotations.Nullable;
 
 import com.readonlydev.api.ClientInterface;
+import com.readonlydev.command.Client;
+import com.readonlydev.command.ClientBuilder;
 import com.readonlydev.command.Command;
 import com.readonlydev.command.arg.parse.ArgumentIndex;
-import com.readonlydev.command.client.Client;
-import com.readonlydev.command.client.ClientBuilder;
 import com.readonlydev.common.utils.ResultLevel;
 import com.readonlydev.settings.GuildSettingsManager;
 

@@ -33,9 +33,9 @@ import java.util.function.Function;
 import com.readonlydev.command.Command;
 import com.readonlydev.command.Command.Category;
 import com.readonlydev.command.CommandListener;
-import com.readonlydev.command.client.ServerCommands;
+import com.readonlydev.command.ServerCommands;
+import com.readonlydev.command.SlashCommand;
 import com.readonlydev.command.ctx.ContextMenu;
-import com.readonlydev.command.slash.SlashCommand;
 import com.readonlydev.settings.GuildSettingsManager;
 
 import net.dv8tion.jda.api.JDA;
@@ -45,7 +45,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 /**
  * A Bot Client interface implemented on objects used to hold bot data.
  * <p>
- * This is implemented in {@link com.readonlydev.command.client.Client ClientImpl} alongside implementation of
+ * This is implemented in {@link com.readonlydev.command.Client ClientImpl} alongside implementation of
  * {@link net.dv8tion.jda.api.hooks.EventListener EventListener} to create a compounded "Client Listener" which catches
  * specific kinds of events thrown by JDA and processes them automatically to handle and execute
  * {@link com.readonlydev.command.Command Command}s.
@@ -75,13 +75,13 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
  *           ID, that'll just flat out throw an {@link java.lang.IllegalArgumentException IllegalArgumentException}).
  *           <p>
  *           <b>4)</b> Do not provide strings when using
- *           {@link com.readonlydev.command.client.ClientBuilder#setEmojis(String, String, String)
+ *           {@link com.readonlydev.command.ClientBuilder#setEmojis(String, String, String)
  *           ClientBuilder#setEmojis(String, String, String)} that are not unicode emojis or that do not match the
  *           custom emote format specified in {@link net.dv8tion.jda.api.entities.emoji.Emoji#getFormatted()
  *           Emote#getAsMention()} (IE: {@code <:EmoteName:EmoteID>}).
  *           <p>
  *           <b>5)</b> Avoid using
- *           {@link com.readonlydev.command.client.Client#linkIds(long, net.dv8tion.jda.api.entities.Message)}. This
+ *           {@link com.readonlydev.command.Client#linkIds(long, net.dv8tion.jda.api.entities.Message)}. This
  *           will create errors and has no real purpose outside of it's current usage.
  */
 public interface ClientInterface
@@ -183,7 +183,7 @@ public interface ClientInterface
 	}
 
 	/**
-	 * Adds a single {@link com.readonlydev.command.slash.SlashCommand SlashCommand} to this Client's registered
+	 * Adds a single {@link com.readonlydev.command.SlashCommand SlashCommand} to this Client's registered
 	 * SlashCommand.
 	 * <p>
 	 * For Client's containing 20 commands or less, command calls by users will have the bot iterate through the entire
@@ -193,7 +193,7 @@ public interface ClientInterface
 	 * To prevent delay a Client that has more that 20 Commands registered to it will begin to use <b>indexed calls</b>.
 	 * <br>
 	 * Indexed calls use a {@link java.util.HashMap HashMap} which links their
-	 * {@link com.readonlydev.command.slash.SlashCommand#name name} to the index that which they are located at in the
+	 * {@link com.readonlydev.command.SlashCommand#name name} to the index that which they are located at in the
 	 * ArrayList they are stored.
 	 * <p>
 	 * This means that all insertion and removal of SlashCommands must reorganize the index maintained by the HashMap.
@@ -210,7 +210,7 @@ public interface ClientInterface
 	void indexSlashCommand(SlashCommand command);
 
 	/**
-	 * Adds a single {@link com.readonlydev.command.slash.SlashCommand SlashCommand} to this Client's registered
+	 * Adds a single {@link com.readonlydev.command.SlashCommand SlashCommand} to this Client's registered
 	 * Commands at the specified index.
 	 * <p>
 	 * For Client's containing 20 commands or less, command calls by users will have the bot iterate through the entire
@@ -316,7 +316,7 @@ public interface ClientInterface
 	List<ServerCommands> getServerCommands();
 
 	/**
-	 * Returns the list of registered {@link com.readonlydev.command.slash.SlashCommand SlashCommand}s during this
+	 * Returns the list of registered {@link com.readonlydev.command.SlashCommand SlashCommand}s during this
 	 * session.
 	 *
 	 * @return A never-null List of Slash Commands registered during this session
@@ -521,7 +521,7 @@ public interface ClientInterface
 	 *
 	 * @return {@code true} if the bot uses linked deletion, {@code false} otherwise.
 	 *
-	 * @see com.readonlydev.command.client.ClientBuilder#setLinkedCacheSize(int) ClientBuilder#setLinkedCacheSize(int)
+	 * @see com.readonlydev.command.ClientBuilder#setLinkedCacheSize(int) ClientBuilder#setLinkedCacheSize(int)
 	 */
 	boolean usesLinkedDeletion();
 
@@ -531,7 +531,7 @@ public interface ClientInterface
 	 * <p>
 	 * The returning object for this is specified via provision of a
 	 * {@link com.readonlydev.settings.GuildSettingsManager GuildSettingsManager} to
-	 * {@link com.readonlydev.command.client.ClientBuilder#setGuildSettingsManager(com.readonlydev.settings.GuildSettingsManager)
+	 * {@link com.readonlydev.command.ClientBuilder#setGuildSettingsManager(com.readonlydev.settings.GuildSettingsManager)
 	 * ClientBuilder#setGuildSettingsManager(GuildSettingsManager)}, more specifically
 	 * {@link GuildSettingsManager#getSettings(net.dv8tion.jda.api.entities.Guild)
 	 * GuildSettingsManager#getSettings(Guild)}.

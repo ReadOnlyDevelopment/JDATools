@@ -43,7 +43,6 @@ import com.readonlydev.command.arg.CommandArgument;
 import com.readonlydev.command.arg.parse.ArgumentIndex;
 import com.readonlydev.command.event.CommandEvent;
 import com.readonlydev.command.operation.UserInteraction;
-import com.readonlydev.command.slash.SlashCommand;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.GuildVoiceState;

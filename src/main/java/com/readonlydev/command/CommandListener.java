@@ -31,15 +31,13 @@
 
 package com.readonlydev.command;
 
-import com.readonlydev.command.client.Client;
 import com.readonlydev.command.ctx.ContextMenu;
 import com.readonlydev.command.ctx.MessageContextMenu;
 import com.readonlydev.command.ctx.UserContextMenu;
 import com.readonlydev.command.event.CommandEvent;
 import com.readonlydev.command.event.MessageContextMenuEvent;
+import com.readonlydev.command.event.SlashCommandEvent;
 import com.readonlydev.command.event.UserContextMenuEvent;
-import com.readonlydev.command.slash.SlashCommand;
-import com.readonlydev.command.slash.SlashCommandEvent;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -289,7 +287,7 @@ public interface CommandListener
 	}
 
 	/**
-	 * Called when a {@link com.readonlydev.command.slash.SlashCommand
+	 * Called when a {@link com.readonlydev.command.SlashCommand
 	 * SlashCommand} catches a {@link java.lang.Throwable Throwable} <b>during
 	 * execution</b>.
 	 * <p>

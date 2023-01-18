@@ -22,15 +22,14 @@
  * THE SOFTWARE.
  */
 
-package com.readonlydev.command.slash;
+package com.readonlydev.command.event;
 
 import javax.annotation.Nullable;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import com.readonlydev.command.client.Client;
-import com.readonlydev.command.event.Event;
+import com.readonlydev.command.Client;
 import com.readonlydev.settings.GuildSettingsManager;
 
 import net.dv8tion.jda.api.entities.IMentionable;

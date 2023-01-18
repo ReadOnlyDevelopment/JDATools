@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package com.readonlydev.command.client;
+package com.readonlydev.command;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,12 +36,9 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import com.readonlydev.command.Command;
 import com.readonlydev.command.Command.Category;
-import com.readonlydev.command.CommandListener;
 import com.readonlydev.command.ctx.ContextMenu;
 import com.readonlydev.command.event.CommandEvent;
-import com.readonlydev.command.slash.SlashCommand;
 import com.readonlydev.settings.GuildSettingsManager;
 
 import net.dv8tion.jda.api.OnlineStatus;
@@ -49,7 +46,7 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
- * A simple builder used to create a {@link com.readonlydev.command.client.Client ClientImpl}. <p> Once built, add the
+ * A simple builder used to create a {@link com.readonlydev.command.Client ClientImpl}. <p> Once built, add the
  * {@link com.readonlydev.api.ClientInterface Client} as an EventListener to {@link net.dv8tion.jda.api.JDA JDA} and it
  * will automatically handle commands with ease!
  */
@@ -85,7 +82,7 @@ public class ClientBuilder
 	private GuildSettingsManager<?>								manager						= null;
 
 	/**
-	 * Builds a {@link com.readonlydev.command.client.Client ClientImpl} with the provided settings. <br> Once built,
+	 * Builds a {@link com.readonlydev.command.Client ClientImpl} with the provided settings. <br> Once built,
 	 * only the {@link com.readonlydev.command.CommandListener CommandListener}, and
 	 * {@link com.readonlydev.command.Command Command}s can be changed.
 	 *
@@ -224,7 +221,7 @@ public class ClientBuilder
 	 * @param useHelp
 	 *                {@code false} to disable the help command builder, otherwise the Client will use either the
 	 *                default or one provided via
-	 *                {@link com.readonlydev.command.client.ClientBuilder#setHelpConsumer(Consumer)}}.
+	 *                {@link com.readonlydev.command.ClientBuilder#setHelpConsumer(Consumer)}}.
 	 *
 	 * @return This builder
 	 */
@@ -343,7 +340,7 @@ public class ClientBuilder
 
 	/**
 	 * Adds a {@link com.readonlydev.command.Command Command} and registers it to the
-	 * {@link com.readonlydev.command.client.Client ClientImpl} for this session.
+	 * {@link com.readonlydev.command.Client ClientImpl} for this session.
 	 *
 	 * @param command
 	 *                The command to add
@@ -366,8 +363,8 @@ public class ClientBuilder
 
 	/**
 	 * Adds and registers all {@link com.readonlydev.command.Command Command}s in the collection to the
-	 * {@link com.readonlydev.command.client.Client ClientImpl} for this session. <br> This is the same as running a
-	 * forEach loop on the Collection {@link com.readonlydev.command.client.ClientBuilder#addCommand(Command)} multiple
+	 * {@link com.readonlydev.command.Client ClientImpl} for this session. <br> This is the same as running a
+	 * forEach loop on the Collection {@link com.readonlydev.command.ClientBuilder#addCommand(Command)} multiple
 	 * times.
 	 *
 	 * @param commands
@@ -383,8 +380,8 @@ public class ClientBuilder
 
 	/**
 	 * Adds and registers multiple {@link com.readonlydev.command.Command Command}s to the
-	 * {@link com.readonlydev.command.client.Client ClientImpl} for this session. <br> This is the same as calling
-	 * {@link com.readonlydev.command.client.ClientBuilder#addCommand(Command)} multiple times.
+	 * {@link com.readonlydev.command.Client ClientImpl} for this session. <br> This is the same as calling
+	 * {@link com.readonlydev.command.ClientBuilder#addCommand(Command)} multiple times.
 	 *
 	 * @param commands
 	 *                 The Commands to add
@@ -401,8 +398,8 @@ public class ClientBuilder
 	}
 
 	/**
-	 * Adds a {@link com.readonlydev.command.slash.SlashCommand SlashCommand} and registers it to the
-	 * {@link com.readonlydev.command.client.Client ClientImpl} for this session.
+	 * Adds a {@link com.readonlydev.command.SlashCommand SlashCommand} and registers it to the
+	 * {@link com.readonlydev.command.Client ClientImpl} for this session.
 	 *
 	 * @param slashCommand
 	 *                     The SlashCommand to add
@@ -419,9 +416,9 @@ public class ClientBuilder
 	}
 
 	/**
-	 * Adds and registers all {@link com.readonlydev.command.slash.SlashCommand SlashCommand}s in the array to the
-	 * {@link com.readonlydev.command.client.Client ClientImpl} for this session. <br> This is the same as running a
-	 * forEach loop on the Collection {@link com.readonlydev.command.client.ClientBuilder#addSlashCommand(SlashCommand)}
+	 * Adds and registers all {@link com.readonlydev.command.SlashCommand SlashCommand}s in the array to the
+	 * {@link com.readonlydev.command.Client ClientImpl} for this session. <br> This is the same as running a
+	 * forEach loop on the Collection {@link com.readonlydev.command.ClientBuilder#addSlashCommand(SlashCommand)}
 	 * multiple times.
 	 *
 	 * @param slashCommands
@@ -442,9 +439,9 @@ public class ClientBuilder
 	}
 
 	/**
-	 * Adds and registers all {@link com.readonlydev.command.slash.SlashCommand SlashCommand}s in the collection to the
-	 * {@link com.readonlydev.command.client.Client ClientImpl} for this session. <br> This is the same as running a
-	 * forEach loop on the Collection {@link com.readonlydev.command.client.ClientBuilder#addSlashCommand(SlashCommand)}
+	 * Adds and registers all {@link com.readonlydev.command.SlashCommand SlashCommand}s in the collection to the
+	 * {@link com.readonlydev.command.Client ClientImpl} for this session. <br> This is the same as running a
+	 * forEach loop on the Collection {@link com.readonlydev.command.ClientBuilder#addSlashCommand(SlashCommand)}
 	 * multiple times.
 	 *
 	 * @param slashCommands
@@ -465,8 +462,8 @@ public class ClientBuilder
 	}
 
 	/**
-	 * Adds a {@link com.readonlydev.command.slash.SlashCommand SlashCommand} and registers it to the
-	 * {@link com.readonlydev.command.client.Client Client} for this session.
+	 * Adds a {@link com.readonlydev.command.SlashCommand SlashCommand} and registers it to the
+	 * {@link com.readonlydev.command.Client Client} for this session.
 	 *
 	 * @param contextMenu
 	 *                    The Context Menu to add
@@ -480,9 +477,9 @@ public class ClientBuilder
 	}
 
 	/**
-	 * Adds and registers multiple {@link com.readonlydev.command.slash.SlashCommand SlashCommand}s to the
-	 * {@link com.readonlydev.command.client.Client Client} for this session. <br> This is the same as calling
-	 * {@link com.readonlydev.command.client.ClientBuilder#addSlashCommand(SlashCommand)} multiple times.
+	 * Adds and registers multiple {@link com.readonlydev.command.SlashCommand SlashCommand}s to the
+	 * {@link com.readonlydev.command.Client Client} for this session. <br> This is the same as calling
+	 * {@link com.readonlydev.command.ClientBuilder#addSlashCommand(SlashCommand)} multiple times.
 	 *
 	 * @param contextMenus
 	 *                     The Context Menus to add
@@ -526,7 +523,7 @@ public class ClientBuilder
 
 	/**
 	 * Sets the {@link com.readonlydev.command.CommandListener CommandListener} for the
-	 * {@link com.readonlydev.command.client.Client ClientImpl}.
+	 * {@link com.readonlydev.command.Client ClientImpl}.
 	 *
 	 * @param listener
 	 *                 The CommandListener for the ClientImpl
@@ -541,7 +538,7 @@ public class ClientBuilder
 
 	/**
 	 * Sets the {@link java.util.concurrent.ScheduledExecutorService ScheduledExecutorService} for the
-	 * {@link com.readonlydev.command.client.Client ClientImpl}.
+	 * {@link com.readonlydev.command.Client ClientImpl}.
 	 *
 	 * @param executor
 	 *                 The ScheduledExecutorService for the ClientImpl

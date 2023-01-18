@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.readonlydev.command.slash.SlashCommand;
+import com.readonlydev.command.SlashCommand;
 import com.readonlydev.common.utils.NoDuplicateList;
 
 import lombok.NoArgsConstructor;

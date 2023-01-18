@@ -34,7 +34,7 @@ import java.io.File;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import com.readonlydev.command.client.Client;
+import com.readonlydev.command.Client;
 import com.readonlydev.settings.GuildSettingsManager;
 
 import net.dv8tion.jda.api.JDA;

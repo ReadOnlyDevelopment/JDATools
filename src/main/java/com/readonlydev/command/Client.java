@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package com.readonlydev.command.client;
+package com.readonlydev.command;
 
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
@@ -51,18 +51,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.readonlydev.api.ClientInterface;
-import com.readonlydev.command.Command;
 import com.readonlydev.command.Command.Category;
-import com.readonlydev.command.CommandListener;
 import com.readonlydev.command.arg.parse.ArgumentIndex;
 import com.readonlydev.command.ctx.ContextMenu;
 import com.readonlydev.command.ctx.MessageContextMenu;
 import com.readonlydev.command.ctx.UserContextMenu;
 import com.readonlydev.command.event.CommandEvent;
 import com.readonlydev.command.event.MessageContextMenuEvent;
+import com.readonlydev.command.event.SlashCommandEvent;
 import com.readonlydev.command.event.UserContextMenuEvent;
-import com.readonlydev.command.slash.SlashCommand;
-import com.readonlydev.command.slash.SlashCommandEvent;
 import com.readonlydev.common.utils.FixedSizeCache;
 import com.readonlydev.common.utils.SafeIdUtil;
 import com.readonlydev.settings.GuildSettingsManager;
@@ -130,6 +127,8 @@ public class Client implements ClientInterface, EventListener
 	private final String												helpWord;
 	private final ScheduledExecutorService								executor;
 	private final GuildSettingsManager<?>								manager;
+
+	private final LinkedList<SlashCommand> globalCommands;
 
 	private final LinkedList<SlashCommand>	totalSlashCommands;
 	private final HashMap<String, Integer>	slashCommandIndex;
@@ -208,6 +207,7 @@ public class Client implements ClientInterface, EventListener
 		this.slashCommandIndex = new HashMap<>();
 		this.totalContextMenus = new LinkedList<>();
 		this.contextMenuIndex = new HashMap<>();
+		this.globalCommands = new LinkedList<>();
 		this.commands = new ArrayList<>();
 		this.categoryToCommandListMap = new HashMap<>();
 		this.categoryToCommandListMap.put(new Category("Uncategorized"), new ArrayList<>());
@@ -267,6 +267,7 @@ public class Client implements ClientInterface, EventListener
 		for (SlashCommand command : globalSlashCommands)
 		{
 			indexSlashCommand(command);
+			globalCommands.add(command);
 		}
 
 		// Load context menus
@@ -277,6 +278,8 @@ public class Client implements ClientInterface, EventListener
 
 		for (ServerCommands serverCmds : serverCommands)
 		{
+			this.serverCommands.add(serverCmds);
+
 			for (SlashCommand serverSlashCmd : serverCmds.getSlashCommands())
 			{
 				indexSlashCommand(serverSlashCmd);
@@ -316,7 +319,7 @@ public class Client implements ClientInterface, EventListener
 	@Override
 	public List<SlashCommand> getGlobalSlashCommands()
 	{
-		return totalSlashCommands.stream().filter(SlashCommand::isGlobalCommand).toList();
+		return globalCommands;
 	}
 
 	@Override
@@ -718,10 +721,7 @@ public class Client implements ClientInterface, EventListener
 			manager.init(event.getJDA());
 		}
 
-		if (!serverCommands.isEmpty())
-		{
-			upsertServerCommands(event.getJDA());
-		}
+		upsertServerCommands(event.getJDA());
 
 		upsertGlobalSlashCommands(event.getJDA());
 	}
@@ -730,6 +730,7 @@ public class Client implements ClientInterface, EventListener
 	{
 		if (serverCommands.isEmpty())
 		{
+			LOG.info("ServerCommands is empty. Skipping guildCommandUpsert");
 			return;
 		}
 
@@ -737,17 +738,26 @@ public class Client implements ClientInterface, EventListener
 		{
 			List<CommandData> data = new ArrayList<>();
 
-			data.addAll(server.getSlashCommands().stream().map(SlashCommand::getCommandData).toList());
-			data.addAll(server.getContextMenus().stream().map(ContextMenu::getCommandData).toList());
+			for(SlashCommand cmd : server.getSlashCommands())
+			{
+				data.add(cmd.build());
+			}
+
+			for(ContextMenu ctx : server.getContextMenus())
+			{
+				data.add(ctx.build());
+			}
 
 			// Attempt to retrieve the provided guild
-			Guild guild = jda.getGuildById(server.getServerId());
+			Guild guild = jda.getGuildById(server.getGuildIdLong());
 			if (guild == null)
 			{
-				LOG.error("Specified guild '{}' is null! Slash Commands will NOT be added!", server.getServerId());
+				LOG.error("Specified guild '{}' is null! Slash Commands will NOT be added!", server.getGuildIdLong());
 				return;
 			} else
 			{
+				guild.updateCommands().queue();
+
 				//@noformat
 				guild.updateCommands().addCommands(data).queue(
 					priv -> LOG.info("Successfully added " + server.getSlashCommands().size() + " slash commands and " + server.getContextMenus().size() + " menus to server " + guild.getName()),
@@ -760,9 +770,11 @@ public class Client implements ClientInterface, EventListener
 	public void upsertGlobalSlashCommands(JDA jda)
 	{
 		// Get all commands
-		List<SlashCommand> globalCommands = totalSlashCommands.stream().filter(SlashCommand::isGlobalCommand).toList();
 		List<CommandData> data = new ArrayList<>();
-		data.addAll(globalCommands.stream().map(SlashCommand::getCommandData).toList());
+		for(SlashCommand cmd : globalCommands)
+		{
+			data.add(cmd.build());
+		}
 
 		jda.updateCommands().addCommands(data).queue(commands -> LOG.info("Successfully added " + globalCommands.size() + " global slash commands!"));
 	}
@@ -988,6 +1000,7 @@ public class Client implements ClientInterface, EventListener
 				listener.onSlashCommand(commandEvent, command);
 			}
 			uses.put(command.getName(), uses.getOrDefault(command.getName(), 0) + 1);
+
 			command.run(commandEvent);
 			// Command is done
 		}

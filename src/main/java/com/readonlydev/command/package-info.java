@@ -26,7 +26,7 @@
  * Items in this package pertain to the {@link com.readonlydev.api.ClientInterface Client} and
  * {@link com.readonlydev.command.Command Commands}.
  * <p>
- * All of the contents are used heavily in the {@link com.readonlydev.command.client.Client ClientImpl}, and are
+ * All of the contents are used heavily in the {@link com.readonlydev.command.Client ClientImpl}, and are
  * summarized as follows:
  * <ul>
  * <li>{@link com.readonlydev.command.CommandBuilder CommandBuilder} <br>
@@ -35,7 +35,7 @@
  * An abstract class that can be inherited by classes to create Commands compatible with the {@code ClientImpl}.</li>
  * <li>{@link com.readonlydev.api.ClientInterface Client} <br>
  * An interface used for getting info set when building a {@code ClientImpl}.</li>
- * <li>{@link com.readonlydev.command.client.ClientBuilder ClientBuilder} <br>
+ * <li>{@link com.readonlydev.command.ClientBuilder ClientBuilder} <br>
  * A builder system used to create a {@code ClientImpl} across several optional chained methods.</li>
  * <li>{@link com.readonlydev.command.event.CommandEvent CommandEvent} <br>
  * A wrapper for a {@link net.dv8tion.jda.api.events.message.MessageReceivedEvent MessageReceivedEvent}, {@code Client}, and String

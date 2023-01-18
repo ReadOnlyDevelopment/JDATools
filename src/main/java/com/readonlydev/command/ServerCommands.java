@@ -22,54 +22,19 @@
  * THE SOFTWARE.
  */
 
-package com.readonlydev.command.client;
+package com.readonlydev.command;
 
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
 import com.readonlydev.command.ctx.ContextMenu;
-import com.readonlydev.command.slash.SlashCommand;
-import com.readonlydev.common.utils.SafeIdUtil;
 
+import lombok.Data;
+
+@Data
 public final class ServerCommands
 {
-	private final long			serverId;
-	private List<SlashCommand>	slashCommands = new LinkedList<>();
-	private List<ContextMenu>	contextMenus = new LinkedList<>();
-
-	public ServerCommands(long serverId)
-	{
-		this.serverId = serverId;
-	}
-
-	public ServerCommands(String serverId)
-	{
-		this(SafeIdUtil.safeConvert(serverId));
-	}
-
-	public ServerCommands addAllCommands(Collection<SlashCommand> commandCollection)
-	{
-		for(SlashCommand cmd : commandCollection)
-		{
-			cmd.setGuildId(this.serverId);
-			this.slashCommands.add(cmd);
-		}
-		return this;
-	}
-
-	long getServerId()
-	{
-		return serverId;
-	}
-
-	List<SlashCommand> getSlashCommands()
-	{
-		return slashCommands;
-	}
-
-	List<ContextMenu> getContextMenus()
-	{
-		return contextMenus;
-	}
+	private long				guildIdLong;
+	private List<SlashCommand>	slashCommands	= new LinkedList<>();
+	private List<ContextMenu>	contextMenus	= new LinkedList<>();
 }

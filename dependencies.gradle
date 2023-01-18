@@ -3,7 +3,7 @@ repositories {
 }
 
 ext {
-    jdaVersion = '5.0.0-beta.2'
+    jdaVersion = '5.0.0-beta.3'
     jsonVersion = '20220320'
     lang3Version = '3.12.0'
     fasterXmlVersion = '2.14.1'

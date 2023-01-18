@@ -22,9 +22,10 @@
  * THE SOFTWARE.
  */
 
-package com.readonlydev.command.slash;
+package com.readonlydev.command;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,14 +33,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.readonlydev.api.CooldownScope;
-import com.readonlydev.command.Command;
-import com.readonlydev.command.client.Client;
-import com.readonlydev.command.client.ClientBuilder;
 import com.readonlydev.command.event.CommandEvent;
-import com.readonlydev.common.utils.SafeIdUtil;
+import com.readonlydev.command.event.SlashCommandEvent;
 
 import lombok.Getter;
-import lombok.Setter;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
@@ -49,7 +46,6 @@ import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.interactions.DiscordLocale;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
@@ -82,21 +78,26 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandGroupData;
  */
 public abstract class SlashCommand extends Command
 {
+	protected void name(final String name)
+	{
+		this.name = name;
+	}
+
+	protected void description(final String description)
+	{
+		this.help = description;
+	}
+
+	protected void options(OptionData... options)
+	{
+		this.options = Arrays.asList(options);
+	}
+
 	protected List<Long> requiredRoles = new LinkedList<>();
 
 	/**
 	 * Localization of slash command name. Allows discord to change the language of the name of slash commands in the
 	 * client.<br>
-	 * Example:<br>
-	 *
-	 * <pre>
-	 * <code>
-	 *     public Command() {
-	 *          this.name = "help"
-	 *          this.nameLocalization = Map.of(DiscordLocale.GERMAN, "hilfe", DiscordLocale.RUSSIAN, "помощь");
-	 *     }
-	 *</code>
-	 * </pre>
 	 */
 	@Getter
 	protected Map<DiscordLocale, String> nameLocalization = new HashMap<>();
@@ -104,25 +105,9 @@ public abstract class SlashCommand extends Command
 	/**
 	 * Localization of slash command description. Allows discord to change the language of the description of slash
 	 * commands in the client.<br>
-	 * Example:<br>
-	 *
-	 * <pre>
-	 * <code>
-	 *     public Command() {
-	 *          this.description = "all commands"
-	 *          this.descriptionLocalization = Map.of(DiscordLocale.GERMAN, "alle Befehle", DiscordLocale.RUSSIAN, "все команды");
-	 *     }
-	 *</code>
-	 * </pre>
 	 */
 	@Getter
 	protected Map<DiscordLocale, String> descriptionLocalization = new HashMap<>();
-
-	protected String guildId = null;
-
-	@Getter
-	@Setter
-	public CommandData commandData;
 
 	/**
 	 * The child commands of the command. These are used in the format {@code /<parent name>
@@ -161,6 +146,11 @@ public abstract class SlashCommand extends Command
 	 */
 	@Getter
 	protected List<OptionData> options = new ArrayList<>();
+
+	protected void directMessagesAllowed()
+	{
+		this.guildOnly = false;
+	}
 
 	/**
 	 * The main body method of a {@link SlashCommand SlashCommand}. <br>
@@ -207,7 +197,7 @@ public abstract class SlashCommand extends Command
 	 * @param event
 	 *            The SlashCommandEvent that triggered this Command
 	 */
-	public final void run(SlashCommandEvent event)
+	void run(SlashCommandEvent event)
 	{
 		// set the client
 		Client client = event.getClient();
@@ -402,7 +392,7 @@ public abstract class SlashCommand extends Command
 	/**
 	 * Builds and sets the CommandData for the SlashCommand upsert.
 	 */
-	public void buildCommandData()
+	public SlashCommandData build()
 	{
 		// Make the command data
 		SlashCommandData data = Commands.slash(getName(), getHelp());
@@ -468,22 +458,7 @@ public abstract class SlashCommand extends Command
 
 		data.setGuildOnly(this.guildOnly);
 
-		this.setCommandData(data);
-	}
-
-	public void setGuildId(long guildId)
-	{
-		this.guildId = SafeIdUtil.safeConvert(guildId);
-	}
-
-	public boolean isGuildRestricted()
-	{
-		return guildId != null;
-	}
-
-	public boolean isGlobalCommand()
-	{
-		return guildId == null;
+		return data;
 	}
 
 	/**
@@ -495,6 +470,11 @@ public abstract class SlashCommand extends Command
 	public SlashCommand[] getChildren()
 	{
 		return children;
+	}
+
+	void terminate(SlashCommandEvent event, String message)
+	{
+		terminate(event, message, event.getClient());
 	}
 
 	private void terminate(SlashCommandEvent event, String message, Client client)

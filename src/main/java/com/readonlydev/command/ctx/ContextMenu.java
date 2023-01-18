@@ -28,11 +28,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.readonlydev.api.CooldownScope;
-import com.readonlydev.command.client.Client;
+import com.readonlydev.command.Client;
 import com.readonlydev.command.operation.UserInteraction;
 
 import lombok.Getter;
-import lombok.Setter;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.DiscordLocale;
@@ -47,10 +46,6 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
  */
 public abstract class ContextMenu extends UserInteraction
 {
-	@Getter
-	@Setter
-	public CommandData commandData;
-
 	/**
 	 * The name of the command. This appears in the context menu.
 	 * Can be 1-32 characters long. Spaces are allowed.
@@ -65,6 +60,11 @@ public abstract class ContextMenu extends UserInteraction
 	 */
 	@Getter
 	protected Map<DiscordLocale, String> nameLocalization = new HashMap<>();
+
+	protected void directMessagesAllowed()
+	{
+		this.guildOnly = false;
+	}
 
 	/**
 	 * Gets the type of context menu.
@@ -159,7 +159,7 @@ public abstract class ContextMenu extends UserInteraction
 	/**
 	 * Builds and sets the CommandData for the ContextMenu upsert.
 	 */
-	public void buildCommandData()
+	public CommandData build()
 	{
 		// Make the command data
 		CommandData data = Commands.context(getType(), name);
@@ -181,6 +181,6 @@ public abstract class ContextMenu extends UserInteraction
 			data.setNameLocalizations(getNameLocalization());
 		}
 
-		this.setCommandData(data);
+		return data;
 	}
 }
