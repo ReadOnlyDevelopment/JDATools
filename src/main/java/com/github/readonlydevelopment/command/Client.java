@@ -756,8 +756,6 @@ public class Client implements ClientInterface, EventListener
 				return;
 			} else
 			{
-				guild.updateCommands().queue();
-
 				//@noformat
 				guild.updateCommands().addCommands(data).queue(
 					priv -> LOG.info("Successfully added " + server.getSlashCommands().size() + " slash commands and " + server.getContextMenus().size() + " menus to server " + guild.getName()),

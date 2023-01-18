@@ -91,10 +91,12 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
         	from components.java
+        	groupId = 'com.github.ReadOnlyDevelopment'
         }
         mavenSnapshot(MavenPublication) {
             from components.java
             version = "master-SNAPSHOT"
+            groupId = 'com.github.ReadOnlyDevelopment'
         }
 
     }
