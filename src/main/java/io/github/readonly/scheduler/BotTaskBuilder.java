@@ -102,8 +102,8 @@ public class BotTaskBuilder implements Task.Builder {
 	}
 
 	@Override
-	public Task submit(Object plugin) {
-		BotContainer pluginContainer = this.scheduler.checkBotInstance(plugin);
+	public Task submit(BotContainer instance) {
+		BotContainer pluginContainer = this.scheduler.checkBotInstance(instance);
 		checkState(this.consumer != null, "Runnable task not set");
 		String name;
 		if (this.name == null) {

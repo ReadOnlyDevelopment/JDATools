@@ -8,6 +8,7 @@ import com.google.common.util.concurrent.AbstractScheduledService.Scheduler;
 import io.github.readonly.api.BotContainer;
 import io.github.readonly.api.identity.Identifiable;
 import io.github.readonly.api.util.ResettableBuilder;
+import io.github.readonly.scheduler.BotScheduler;
 
 public interface Task extends Identifiable {
 
@@ -17,7 +18,7 @@ public interface Task extends Identifiable {
 	 * @return The new builder
 	 */
 	static Builder builder() {
-		return Sponge.getRegistry().createBuilder(Builder.class);
+		return BotScheduler.instance.createTaskBuilder();
 	}
 
 	/**
@@ -203,7 +204,6 @@ public interface Task extends Identifiable {
 		 *     a plugin instance
 		 * @throws IllegalStateException If the builder is incomplete
 		 */
-		Task submit(Object plugin);
-
+		Task submit(BotContainer instance);
 	}
 }

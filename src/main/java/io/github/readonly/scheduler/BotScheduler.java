@@ -44,6 +44,7 @@ import io.github.readonly.api.scheduler.Scheduler;
 import io.github.readonly.api.scheduler.Task;
 import io.github.readonly.api.scheduler.TaskService;
 import io.github.readonly.common.util.Functional;
+import io.github.readonly.discordbot.DiscordBot;
 
 public class BotScheduler implements Scheduler {
 
@@ -51,6 +52,8 @@ public class BotScheduler implements Scheduler {
 	public static final long TICK_DURATION_NS = TimeUnit.NANOSECONDS.convert(TICK_DURATION_MS, TimeUnit.MILLISECONDS);
 	private final AsyncScheduler asyncScheduler = new AsyncScheduler();
 	private final SyncScheduler syncScheduler = new SyncScheduler();
+
+	public static BotScheduler instance = new BotScheduler();
 
 	@Override
 	public Task.Builder createTaskBuilder() {
@@ -139,7 +142,7 @@ public class BotScheduler implements Scheduler {
 	 * @throws IllegalArgumentException If the object is not a plugin instance
 	 */
 	BotContainer checkBotInstance(Object plugin) {
-		Optional<BotContainer> optPlugin = plugin instanceof BotContainer ? Optional.of((BotContainer)plugin) : Optional.empty();
+		Optional<BotContainer> optPlugin = plugin instanceof DiscordBot ? Optional.of((BotContainer)plugin) : Optional.empty();
 		checkArgument(optPlugin.isPresent(), "Provided object is not a plugin instance");
 		return optPlugin.get();
 	}
