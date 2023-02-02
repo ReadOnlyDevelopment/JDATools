@@ -1,21 +1,19 @@
 plugins {
-	id "com.github.ben-manes.versions" version "0.42.0"
-	id "org.cadixdev.licenser" version "0.6.1"
-	id "io.freefair.lombok" version "6.6.1"
 	id 'maven-publish'
 	id 'java-library'
     id 'eclipse'
     id 'signing'
+	alias(libs.plugins.versions)
+	alias(libs.plugins.licenser)
+	alias(libs.plugins.lombok)
 }
 
-def baseVersion = "4.0.2"
+def baseVersion = "4.0.3"
 def isSnapshot = false
 
 version = (isSnapshot) ? baseVersion + '-SNAPSHOT' : baseVersion
-group = 'com.github.ReadOnlyDevelopment'
+group = 'io.github.readonly'
 archivesBaseName = 'JDATools'
-
-import org.apache.tools.ant.filters.ReplaceTokens
 
 java {
 	withJavadocJar()
@@ -23,22 +21,20 @@ java {
 	toolchain.languageVersion = JavaLanguageVersion.of(17)
 }
 
-apply from: 'dependencies.gradle'
-
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    api jda() {
-		exclude module: 'opus-java'
-	}
-    api guava()
-    api lang3()
-    implementation json()
-    api jacksonCore()
-    api jacksonDatabind()
-    api jacksonAnnotations()
+	api(libs.jda) { exclude module: 'opus-java' }
+	implementation libs.json
+	api libs.slf4j
+    api libs.guava
+    api libs.guice
+    api libs.commons.lang3
+    api libs.jackson.core
+    api libs.jackson.databind
+    api libs.jackson.annotations
 }
 
 license {
@@ -46,21 +42,11 @@ license {
 	include '**/*.java'
 }
 
-task sourcesForRelease(type: Copy) {
-    from('src/main/java') {
-        filter(ReplaceTokens, tokens: [ VERSION: version ])
-    }
-    into 'build/filteredSrc'
-}
-
 compileJava.options.encoding = 'UTF-8'
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
-    source = sourcesForRelease.destinationDir
     classpath += sourceSets.main.compileClasspath
-
-    dependsOn sourcesForRelease
 }
 
 def setMainManifestProps = { Manifest manifest->

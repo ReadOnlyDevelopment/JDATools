@@ -1,0 +1,33 @@
+[metadata]
+version = "1.0"
+
+[versions]
+
+jda = "5.0.0-beta.3"
+json = "20220320"
+lang3 = "3.12.0"
+jackson = "2.14.1"
+lombok = "1.18.24"
+guava = "31.1-jre"
+guice = "5.1.0"
+slf4j = "1.7.32"
+licenser = "0.6.1"
+lombokplugin = "6.6.1"
+versionsPlugin = "0.42.0"
+
+[libraries]
+json = { module = "org.json:json", version.ref = "json" }
+jda = { module = "net.dv8tion:JDA", version.ref = "jda" }
+slf4j = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
+guice = { module = "com.google.inject:guice", version.ref = "guice" }
+lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
+commons-lang3 = { module = "org.apache.commons:commons-lang3", version.ref = "lang3" }
+jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
+jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version.ref = "jackson" }
+
+[plugins]
+versions = { id = "com.github.ben-manes.versions", version.ref = "versionsPlugin" }
+licenser = { id = "org.cadixdev.licenser", version.ref = "licenser" }
+lombok = { id = "io.freefair.lombok", version.ref = "lombokplugin" }
