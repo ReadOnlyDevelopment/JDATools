@@ -40,16 +40,16 @@ import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.ImmutableList;
 
 import io.github.readonly.api.BotContainer;
-import io.github.readonly.api.scheduler.Task;
+import io.github.readonly.api.scheduler.ITask;
 import io.github.readonly.api.scheduler.TaskService;
 
 class TaskExecutorService extends AbstractExecutorService implements TaskService {
 
-	private final Supplier<Task.Builder> taskBuilderProvider;
+	private final Supplier<ITask.Builder> taskBuilderProvider;
 	private final AbstractScheduler scheduler;
 	private final BotContainer bot;
 
-	protected TaskExecutorService(Supplier<Task.Builder> taskBuilderProvider, AbstractScheduler scheduler, BotContainer plugin) {
+	protected TaskExecutorService(Supplier<ITask.Builder> taskBuilderProvider, AbstractScheduler scheduler, BotContainer plugin) {
 		this.taskBuilderProvider = taskBuilderProvider;
 		this.scheduler = scheduler;
 		this.bot = plugin;
@@ -96,7 +96,7 @@ class TaskExecutorService extends AbstractExecutorService implements TaskService
 	public TaskFuture<?> schedule(Runnable command, long delay, TimeUnit unit) {
 		final FutureTask<?> runnable = new FutureTask<>(command, null);
 
-		final Task task = this.createTask(runnable)
+		final ITask task = this.createTask(runnable)
 			.delay(delay, unit)
 			.submit(this.bot);
 
@@ -107,7 +107,7 @@ class TaskExecutorService extends AbstractExecutorService implements TaskService
 	public <V> TaskFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit) {
 		final FutureTask<V> runnable = new FutureTask<>(callable);
 
-		final Task task = this.createTask(runnable)
+		final ITask task = this.createTask(runnable)
 			.delay(delay, unit)
 			.submit(this.bot);
 
@@ -118,7 +118,7 @@ class TaskExecutorService extends AbstractExecutorService implements TaskService
 	public TaskFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) {
 		final RepeatableFutureTask<?> runnable = new RepeatableFutureTask<>(command);
 
-		final Task task = this.createTask(runnable)
+		final ITask task = this.createTask(runnable)
 			.delay(initialDelay, unit)
 			.interval(period, unit)
 			.submit(this.bot);
@@ -135,7 +135,7 @@ class TaskExecutorService extends AbstractExecutorService implements TaskService
 		return this.scheduleAtFixedRate(command, initialDelay, delay, unit);
 	}
 
-	private Task.Builder createTask(Runnable command) {
+	private ITask.Builder createTask(Runnable command) {
 		return this.taskBuilderProvider.get().execute(command);
 	}
 
@@ -152,7 +152,7 @@ class TaskExecutorService extends AbstractExecutorService implements TaskService
 		}
 
 		@Override
-		public Task getTask() {
+		public ITask getTask() {
 			return this.task;
 		}
 
@@ -233,13 +233,13 @@ class TaskExecutorService extends AbstractExecutorService implements TaskService
 	 */
 	private static class RepeatableFutureTask<V> extends FutureTask<V> {
 
-		@Nullable private Task owningTask = null;
+		@Nullable private ITask owningTask = null;
 
 		protected RepeatableFutureTask(Runnable runnable) {
 			super(runnable, null);
 		}
 
-		protected void setTask(Task task) {
+		protected void setTask(ITask task) {
 			this.owningTask = task;
 
 			// Since it is set after being scheduled, it might have thrown

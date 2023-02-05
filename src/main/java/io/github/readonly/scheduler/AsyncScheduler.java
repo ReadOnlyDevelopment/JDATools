@@ -33,7 +33,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import io.github.readonly.api.scheduler.Task;
+import io.github.readonly.api.scheduler.ITask;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -73,10 +73,10 @@ public class AsyncScheduler extends AbstractScheduler {
 	private void recalibrateMinimumTimeout() {
 		this.lock.lock();
 		try {
-			Set<Task> tasks = this.getScheduledTasks();
+			Set<ITask> tasks = this.getScheduledTasks();
 			this.minimumTimeout = Long.MAX_VALUE;
 			long now = System.nanoTime();
-			for (Task tmpTask : tasks) {
+			for (ITask tmpTask : tasks) {
 				ScheduledTask task = (ScheduledTask) tmpTask;
 				if (task.getState() == ScheduledTask.ScheduledTaskState.EXECUTING) {
 					// bail out for this task. We'll signal when we complete the task.

@@ -24,6 +24,10 @@
 
 package io.github.readonly.discordbot;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+
 import io.github.readonly.api.BotContainer;
 import io.github.readonly.command.Client;
 import io.github.readonly.command.ClientBuilder;
@@ -33,6 +37,15 @@ import lombok.Getter;
 @Getter
 public abstract class DiscordBot<T> implements BotContainer
 {
+	public static final String VERSION;
+	static {
+		var version = DiscordBot.class.getPackage().getImplementationVersion();
+		if (version == null) {
+			version = "DEV " + DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.now(ZoneOffset.UTC));
+		}
+		VERSION = version;
+	}
+
 	private final EventWaiter eventWaiter = new EventWaiter();
 	private final ClientBuilder clientBuilder = new ClientBuilder();
 	private Client client;

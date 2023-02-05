@@ -49,15 +49,6 @@ tasks.withType(JavaCompile) {
     classpath += sourceSets.main.compileClasspath
 }
 
-def setMainManifestProps = { Manifest manifest->
-    manifest.mainAttributes ([
-        'Implementation-Title':     archivesBaseName,
-        'Implementation-Version':   version,
-        'Implementation-Vendor':    'ReadOnly Development',
-        'Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-    ])
-}
-
 javadoc {
     options.addBooleanOption('html5', true)
     options.addStringOption('Xdoclint:none', '-quiet')

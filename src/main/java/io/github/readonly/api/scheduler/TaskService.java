@@ -22,6 +22,6 @@ public interface TaskService extends ScheduledExecutorService
 
 	interface TaskFuture<V> extends RunnableScheduledFuture<V>
 	{
-		Task getTask();
+		ITask getTask();
 	}
 }

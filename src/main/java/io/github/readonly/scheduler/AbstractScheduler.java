@@ -33,7 +33,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import io.github.readonly.api.BotContainer;
-import io.github.readonly.api.scheduler.Task;
+import io.github.readonly.api.scheduler.ITask;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -94,16 +94,16 @@ abstract class AbstractScheduler
 		this.taskMap.remove(task.getUniqueId());
 	}
 
-	protected Optional<Task> getTask(UUID id)
+	protected Optional<ITask> getTask(UUID id)
 	{
-		return Optional.<Task>ofNullable(this.taskMap.get(id));
+		return Optional.<ITask>ofNullable(this.taskMap.get(id));
 	}
 
-	protected Set<Task> getScheduledTasks()
+	protected Set<ITask> getScheduledTasks()
 	{
 		synchronized (this.taskMap)
 		{
-			return Sets.<Task>newHashSet(this.taskMap.values());
+			return Sets.<ITask>newHashSet(this.taskMap.values());
 		}
 	}
 

@@ -32,18 +32,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import io.github.readonly.api.BotContainer;
-import io.github.readonly.api.scheduler.Task;
+import io.github.readonly.api.scheduler.ITask;
 
-public class BotTaskBuilder implements Task.Builder {
+public class BotTaskBuilder implements ITask.Builder {
 
 	private final BotScheduler scheduler;
-	private Consumer<Task> consumer;
+	private Consumer<ITask> consumer;
 	private ScheduledTask.TaskSynchronicity syncType;
 	private String name;
-	private long delay; //nanoseconds or ticks
-	private long interval; //nanoseconds or ticks
-	private boolean delayIsTicks;
-	private boolean intervalIsTicks;
+	private long delay;
+	private long interval;
 
 	public BotTaskBuilder(BotScheduler scheduler) {
 		this.scheduler = scheduler;
@@ -51,58 +49,40 @@ public class BotTaskBuilder implements Task.Builder {
 	}
 
 	@Override
-	public Task.Builder async() {
+	public ITask.Builder async() {
 		this.syncType = ScheduledTask.TaskSynchronicity.ASYNCHRONOUS;
 		return this;
 	}
 
 	@Override
-	public Task.Builder execute(Consumer<Task> executor) {
+	public ITask.Builder execute(Consumer<ITask> executor) {
 		this.consumer = checkNotNull(executor, "executor");
 		return this;
 	}
 
 	@Override
-	public Task.Builder delay(long delay, TimeUnit unit) {
+	public ITask.Builder delay(long delay, TimeUnit unit) {
 		checkArgument(delay >= 0, "Delay cannot be negative");
 		this.delay = checkNotNull(unit, "unit").toNanos(delay);
-		this.delayIsTicks = false;
 		return this;
 	}
 
 	@Override
-	public Task.Builder delayTicks(long delay) {
-		checkArgument(delay >= 0, "Delay cannot be negative");
-		this.delay = delay;
-		this.delayIsTicks = true;
-		return this;
-	}
-
-	@Override
-	public Task.Builder interval(long interval, TimeUnit unit) {
+	public ITask.Builder interval(long interval, TimeUnit unit) {
 		checkArgument(interval >= 0, "Interval cannot be negative");
 		this.interval = checkNotNull(unit, "unit").toNanos(interval);
-		this.intervalIsTicks = false;
 		return this;
 	}
 
 	@Override
-	public Task.Builder intervalTicks(long interval) {
-		checkArgument(interval >= 0, "Interval cannot be negative");
-		this.interval = interval;
-		this.intervalIsTicks = true;
-		return this;
-	}
-
-	@Override
-	public Task.Builder name(String name) {
+	public ITask.Builder name(String name) {
 		checkArgument(checkNotNull(name, "name").length() > 0, "Name cannot be empty");
 		this.name = name;
 		return this;
 	}
 
 	@Override
-	public Task submit(BotContainer instance) {
+	public ITask submit(BotContainer instance) {
 		BotContainer pluginContainer = this.scheduler.checkBotInstance(instance);
 		checkState(this.consumer != null, "Runnable task not set");
 		String name;
@@ -113,36 +93,27 @@ public class BotTaskBuilder implements Task.Builder {
 		}
 		long delay = this.delay;
 		long interval = this.interval;
-		boolean delayIsTicks = this.delayIsTicks;
-		boolean intervalIsTicks = this.intervalIsTicks;
-		if (this.syncType == ScheduledTask.TaskSynchronicity.ASYNCHRONOUS) {
-			delay = delayIsTicks ? delay * BotScheduler.TICK_DURATION_NS : delay;
-			interval = intervalIsTicks ? interval * BotScheduler.TICK_DURATION_NS : interval;
-			delayIsTicks = intervalIsTicks = false;
-		}
-		ScheduledTask task = new ScheduledTask(this.syncType, this.consumer, name, delay, delayIsTicks, interval, intervalIsTicks, pluginContainer);
+		ScheduledTask task = new ScheduledTask(this.syncType, this.consumer, name, delay, interval, pluginContainer);
 		this.scheduler.submit(task);
 		return task;
 	}
 
 	@Override
-	public Task.Builder from(Task value) {
+	public ITask.Builder from(ITask value) {
 		this.syncType = value.isAsynchronous() ? ScheduledTask.TaskSynchronicity.ASYNCHRONOUS : ScheduledTask.TaskSynchronicity.SYNCHRONOUS;
 		this.consumer = value.getConsumer();
 		this.interval = value.getInterval();
 		this.delay = value.getDelay();
-		this.delayIsTicks = false;
 		this.name = value.getName();
 		return this;
 	}
 
 	@Override
-	public Task.Builder reset() {
+	public ITask.Builder reset() {
 		this.syncType = ScheduledTask.TaskSynchronicity.SYNCHRONOUS;
 		this.consumer = null;
 		this.interval = 0;
 		this.delay = 0;
-		this.delayIsTicks = false;
 		this.name = null;
 		return this;
 	}

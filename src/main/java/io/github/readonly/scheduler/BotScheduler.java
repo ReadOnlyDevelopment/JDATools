@@ -41,7 +41,7 @@ import com.google.common.collect.Sets;
 
 import io.github.readonly.api.BotContainer;
 import io.github.readonly.api.scheduler.Scheduler;
-import io.github.readonly.api.scheduler.Task;
+import io.github.readonly.api.scheduler.ITask;
 import io.github.readonly.api.scheduler.TaskService;
 import io.github.readonly.common.util.Functional;
 import io.github.readonly.discordbot.DiscordBot;
@@ -56,13 +56,13 @@ public class BotScheduler implements Scheduler {
 	public static BotScheduler instance = new BotScheduler();
 
 	@Override
-	public Task.Builder createTaskBuilder() {
+	public ITask.Builder createTaskBuilder() {
 		return new BotTaskBuilder(this);
 	}
 
 	@Override
-	public Optional<Task> getTaskById(UUID id) {
-		Optional<Task> optTask = this.syncScheduler.getTask(id);
+	public Optional<ITask> getTaskById(UUID id) {
+		Optional<ITask> optTask = this.syncScheduler.getTask(id);
 		if (optTask.isPresent()) {
 			return optTask;
 		}
@@ -70,11 +70,11 @@ public class BotScheduler implements Scheduler {
 	}
 
 	@Override
-	public Set<Task> getTasksByName(String pattern) {
+	public Set<ITask> getTasksByName(String pattern) {
 		Pattern searchPattern = Pattern.compile(checkNotNull(pattern, "pattern"));
-		Set<Task> matchingTasks = this.getScheduledTasks();
+		Set<ITask> matchingTasks = this.getScheduledTasks();
 
-		Iterator<Task> it = matchingTasks.iterator();
+		Iterator<ITask> it = matchingTasks.iterator();
 		while (it.hasNext()) {
 			Matcher matcher = searchPattern.matcher(it.next().getName());
 			if (!matcher.matches()) {
@@ -86,15 +86,15 @@ public class BotScheduler implements Scheduler {
 	}
 
 	@Override
-	public Set<Task> getScheduledTasks() {
-		Set<Task> allTasks = Sets.newHashSet();
+	public Set<ITask> getScheduledTasks() {
+		Set<ITask> allTasks = Sets.newHashSet();
 		allTasks.addAll(this.asyncScheduler.getScheduledTasks());
 		allTasks.addAll(this.syncScheduler.getScheduledTasks());
 		return allTasks;
 	}
 
 	@Override
-	public Set<Task> getScheduledTasks(boolean async) {
+	public Set<ITask> getScheduledTasks(boolean async) {
 		if (async) {
 			return this.asyncScheduler.getScheduledTasks();
 		}
@@ -102,11 +102,11 @@ public class BotScheduler implements Scheduler {
 	}
 
 	@Override
-	public Set<Task> getScheduledTasks(Object plugin) {
+	public Set<ITask> getScheduledTasks(Object plugin) {
 		String testOwnerId = checkBotInstance(plugin).getId();
 
-		Set<Task> allTasks = this.getScheduledTasks();
-		Iterator<Task> it = allTasks.iterator();
+		Set<ITask> allTasks = this.getScheduledTasks();
+		Iterator<ITask> it = allTasks.iterator();
 
 		while (it.hasNext()) {
 			String taskOwnerId = it.next().getOwner().getId();
@@ -147,7 +147,7 @@ public class BotScheduler implements Scheduler {
 		return optPlugin.get();
 	}
 
-	private AbstractScheduler getDelegate(Task task) {
+	private AbstractScheduler getDelegate(ITask task) {
 		if (task.isAsynchronous()) {
 			return this.asyncScheduler;
 		}

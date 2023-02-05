@@ -8,11 +8,11 @@ import java.util.concurrent.ExecutorService;
 public interface Scheduler
 {
 	/**
-	 * Gets a new instance of a {@link Task.Builder}.
+	 * Gets a new instance of a {@link ITask.Builder}.
 	 *
 	 * @return A new task builder
 	 */
-	Task.Builder createTaskBuilder();
+	ITask.Builder createTaskBuilder();
 
 	/**
 	 * Retrieves a scheduled or running task by its unique ID.
@@ -20,24 +20,24 @@ public interface Scheduler
 	 * @param id The id of the task
 	 * @return The scheduled or running task, or {@link Optional#empty()}
 	 */
-	Optional<Task> getTaskById(UUID id);
+	Optional<ITask> getTaskById(UUID id);
 
 	/**
-	 * Returns a set of {@link Task}s that match the Regular Expression pattern.
+	 * Returns a set of {@link ITask}s that match the Regular Expression pattern.
 	 *
 	 * @param pattern The regular expression pattern applied to the name of
 	 *        tasks
-	 * @return A set of {@link Task}s that have names that match the pattern,
+	 * @return A set of {@link ITask}s that have names that match the pattern,
 	 *         the set will be empty if no names match
 	 */
-	Set<Task> getTasksByName(String pattern);
+	Set<ITask> getTasksByName(String pattern);
 
 	/**
 	 * Returns a set of all currently scheduled tasks.
 	 *
 	 * @return A set of scheduled tasks
 	 */
-	Set<Task> getScheduledTasks();
+	Set<ITask> getScheduledTasks();
 
 	/**
 	 * Returns a set of all currently scheduled tasks for either asynchronous or
@@ -46,7 +46,7 @@ public interface Scheduler
 	 * @param async True to get all async tasks, false to get all sync tasks
 	 * @return A set of scheduled tasks for the given sync type
 	 */
-	Set<Task> getScheduledTasks(boolean async);
+	Set<ITask> getScheduledTasks(boolean async);
 
 	/**
 	 * Returns a set of all currently scheduled tasks owned by the given plugin.
@@ -54,7 +54,7 @@ public interface Scheduler
 	 * @param plugin The plugin that created the tasks
 	 * @return A set of scheduled tasks
 	 */
-	Set<Task> getScheduledTasks(Object plugin);
+	Set<ITask> getScheduledTasks(Object plugin);
 
 	/**
 	 * Gets the ideal delay between ticks in milliseconds. The server aims to
@@ -81,7 +81,7 @@ public interface Scheduler
 	 * @param plugin The plugin that will own the created tasks
 	 * @return A new executor service that can be used to execute
 	 *     asynchronous tasks
-	 * @see Task.Builder#async()
+	 * @see ITask.Builder#async()
 	 */
 	TaskService createAsyncExecutor(Object plugin);
 }

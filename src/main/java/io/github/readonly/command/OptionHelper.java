@@ -113,6 +113,18 @@ public class OptionHelper
 		return option == null ? defaultValue : option.getAsString();
 	}
 
+	public static int optInteger(@NotNull SlashCommandInteractionEvent event, @NotNull String key)
+	{
+		return optInteger(event, key, -1);
+	}
+
+	public static int optInteger(@NotNull SlashCommandInteractionEvent event, @NotNull String key, @Nullable int defaultValue)
+	{
+		OptionMapping option = event.getOption(key);
+
+		return option == null ? defaultValue : option.getAsInt();
+	}
+
 	/**
 	 * Gets the provided Option Key as a boolean value, or returns {@code false} if the option cannot be found.
 	 *

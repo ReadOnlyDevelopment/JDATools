@@ -10,10 +10,10 @@ import io.github.readonly.api.identity.Identifiable;
 import io.github.readonly.api.util.ResettableBuilder;
 import io.github.readonly.scheduler.BotScheduler;
 
-public interface Task extends Identifiable {
+public interface ITask extends Identifiable {
 
 	/**
-	 * Creates a new {@link Builder} to build a {@link Task}.
+	 * Creates a new {@link Builder} to build a {@link ITask}.
 	 *
 	 * @return The new builder
 	 */
@@ -62,11 +62,11 @@ public interface Task extends Identifiable {
 	boolean cancel();
 
 	/**
-	 * Gets the {@link Consumer}<{@link Task}> that this task is running.
+	 * Gets the {@link Consumer}<{@link ITask}> that this task is running.
 	 *
 	 * @return The consumer
 	 */
-	Consumer<Task> getConsumer();
+	Consumer<ITask> getConsumer();
 
 	/**
 	 * Gets whether this task is asynchronous.
@@ -76,9 +76,9 @@ public interface Task extends Identifiable {
 	boolean isAsynchronous();
 
 	/**
-	 * Represents a builder to create a {@link Task}.
+	 * Represents a builder to create a {@link ITask}.
 	 */
-	interface Builder extends ResettableBuilder<Task, Builder> {
+	interface Builder extends ResettableBuilder<ITask, Builder> {
 
 		/**
 		 * Sets whether the task should run asynchronous, outside of the main
@@ -120,7 +120,7 @@ public interface Task extends Identifiable {
 		 * @param executor The executor to run
 		 * @return This builder, for chaining
 		 */
-		Builder execute(Consumer<Task> executor);
+		Builder execute(Consumer<ITask> executor);
 
 		/**
 		 * Sets the delay before the task runs. This delay is an initial offset,
@@ -133,16 +133,6 @@ public interface Task extends Identifiable {
 		 * @throws IllegalArgumentException If the delay is below 0
 		 */
 		Builder delay(long delay, TimeUnit unit);
-
-		/**
-		 * Sets the delay before the task runs, in unit ticks.
-		 *
-		 * @param ticks The delay in ticks
-		 * @return This builder, for chaining
-		 * @throws IllegalArgumentException If the delay is below 0
-		 * @see #delay(long, TimeUnit)
-		 */
-		Builder delayTicks(long ticks);
 
 		/**
 		 * Sets the interval between repetitions of the task. The task will not
@@ -161,16 +151,6 @@ public interface Task extends Identifiable {
 		 * @throws IllegalArgumentException If the interval is below 0
 		 */
 		Builder interval(long interval, TimeUnit unit);
-
-		/**
-		 * Sets the interval in unit ticks between repetitions of the task.
-		 *
-		 * @param ticks The number of ticks between runs
-		 * @return This builder, for chaining
-		 * @throws IllegalArgumentException If the interval is below 0
-		 * @see #interval(long, TimeUnit)
-		 */
-		Builder intervalTicks(long ticks);
 
 		/**
 		 * Sets the name of the task, the name cannot be blank.
@@ -199,11 +179,11 @@ public interface Task extends Identifiable {
 		 * created.
 		 *
 		 * @param plugin The owner of the task
-		 * @return A new instance of a {@link Task}
+		 * @return A new instance of a {@link ITask}
 		 * @throws IllegalArgumentException If the object passed in is not
 		 *     a plugin instance
 		 * @throws IllegalStateException If the builder is incomplete
 		 */
-		Task submit(BotContainer instance);
+		ITask submit(BotContainer instance);
 	}
 }

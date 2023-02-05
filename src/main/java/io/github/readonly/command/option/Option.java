@@ -60,6 +60,21 @@ public class Option extends Opt
 		return Option.number(name, description, maxValue).setRequiredRange(toDouble(minValue), toDouble(maxValue));
 	}
 
+	public static final OptionData integer(@Nonnull String name, @Nonnull String description)
+	{
+		return new OptionData(OptionType.INTEGER, name, description);
+	}
+
+	public static final OptionData integer(@Nonnull String name, @Nonnull String description, @Nonnull int maxValue)
+	{
+		return Option.number(name, description).setRequiredRange(OptionData.MIN_NEGATIVE_NUMBER, toDouble(maxValue));
+	}
+
+	public static final OptionData integer(@Nonnull String name, @Nonnull String description, @Nonnull int minValue, @Nonnull int maxValue)
+	{
+		return Option.number(name, description, maxValue).setRequiredRange(toDouble(minValue), toDouble(maxValue));
+	}
+
 	public static final OptionData role(@Nonnull String name, @Nonnull String description)
 	{
 		return new OptionData(OptionType.ROLE, name, description);

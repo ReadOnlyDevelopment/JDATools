@@ -59,6 +59,21 @@ public class RequiredOption extends Opt
 		return number(name, description).setRequiredRange(toDouble(minValue), toDouble(maxValue));
 	}
 
+	public static final OptionData integer(@Nonnull String name, @Nonnull String description)
+	{
+		return Option.integer(name, description).setRequired(true);
+	}
+
+	public static final OptionData integer(@Nonnull String name, @Nonnull String description, @Nonnull int maxValue)
+	{
+		return integer(name, description).setRequiredRange(OptionData.MIN_NEGATIVE_NUMBER, toDouble(maxValue));
+	}
+
+	public static final OptionData integer(@Nonnull String name, @Nonnull String description, @Nonnull int minValue, @Nonnull int maxValue)
+	{
+		return integer(name, description).setRequiredRange(toDouble(minValue), toDouble(maxValue));
+	}
+
 	public static final OptionData role(@Nonnull String name, @Nonnull String description)
 	{
 		return Option.role(name, description).setRequired(true);

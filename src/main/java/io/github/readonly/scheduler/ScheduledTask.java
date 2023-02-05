@@ -31,20 +31,18 @@ import java.util.function.Consumer;
 import com.google.common.base.MoreObjects;
 
 import io.github.readonly.api.BotContainer;
-import io.github.readonly.api.scheduler.Task;
+import io.github.readonly.api.scheduler.ITask;
 
 /**
- * An internal representation of a {@link Task} created by a plugin.
+ * An internal representation of a {@link ITask} created by a plugin.
  */
-public class ScheduledTask implements Task
+public class ScheduledTask implements ITask
 {
 
 	final long						offset;			//nanoseconds or ticks
 	final long						period;			//nanoseconds or ticks
-	final boolean					delayIsTicks;
-	final boolean					intervalIsTicks;
 	private final BotContainer		owner;
-	private final Consumer<Task>	consumer;
+	private final Consumer<ITask>	consumer;
 	private long					timestamp;
 
 	// As this state is going to be read by multiple threads
@@ -88,14 +86,12 @@ public class ScheduledTask implements Task
 		}
 	}
 
-	ScheduledTask(TaskSynchronicity syncType, Consumer<Task> task, String taskName, long delay, boolean delayIsTicks, long interval, boolean intervalIsTicks, BotContainer BotContainer)
+	ScheduledTask(TaskSynchronicity syncType, Consumer<ITask> task, String taskName, long delay, long interval, BotContainer BotContainer)
 	{
 		// All tasks begin waiting.
 		this.setState(ScheduledTaskState.WAITING);
 		this.offset = delay;
-		this.delayIsTicks = delayIsTicks;
 		this.period = interval;
-		this.intervalIsTicks = intervalIsTicks;
 		this.owner = BotContainer;
 		this.consumer = task;
 		this.id = UUID.randomUUID();
@@ -114,20 +110,12 @@ public class ScheduledTask implements Task
 	@Override
 	public long getDelay()
 	{
-		if (this.delayIsTicks)
-		{
-			return this.offset;
-		}
 		return TimeUnit.NANOSECONDS.toMillis(this.offset);
 	}
 
 	@Override
 	public long getInterval()
 	{
-		if (this.intervalIsTicks)
-		{
-			return this.period;
-		}
 		return TimeUnit.NANOSECONDS.toMillis(this.period);
 	}
 
@@ -144,7 +132,7 @@ public class ScheduledTask implements Task
 	}
 
 	@Override
-	public Consumer<Task> getConsumer()
+	public Consumer<ITask> getConsumer()
 	{
 		return this.consumer;
 	}

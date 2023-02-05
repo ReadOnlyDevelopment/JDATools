@@ -14,6 +14,14 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class Async {
 
+	public static final ScheduledExecutorService CURSE_FORGE_UPDATE_SCHEDULER = Executors.newScheduledThreadPool(1,
+		r -> setThreadDaemon(new Thread(r, "CurseForgeUpdateChecker"), true));
+
+	public static Thread setThreadDaemon(final Thread thread, final boolean isDaemon) {
+		thread.setDaemon(isDaemon);
+		return thread;
+	}
+
 	/**
 	 * Current.
 	 *
