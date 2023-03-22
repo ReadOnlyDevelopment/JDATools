@@ -3,7 +3,7 @@ version = "1.0"
 
 [versions]
 
-jda = "5.0.0-beta.3"
+jda = "5.0.0-beta.4"
 json = "20220320"
 lang3 = "3.12.0"
 jackson = "2.14.1"

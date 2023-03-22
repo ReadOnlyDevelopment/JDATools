@@ -19,6 +19,7 @@
 
 package io.github.readonly.common.util;
 
+import java.awt.Color;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -260,6 +261,11 @@ public class RGB {
 		str = PATTERN_LEADING_JUNK.matcher(str).replaceFirst("");
 		int color = UnsignedInts.parseUnsignedInt(str, 16);
 		return new RGB(color);
+	}
+
+	public static RGB colorToRGB(Color c)
+	{
+		return new RGB(c.getRGB());
 	}
 
 	/**
