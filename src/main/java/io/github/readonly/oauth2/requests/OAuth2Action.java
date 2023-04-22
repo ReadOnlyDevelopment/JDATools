@@ -30,7 +30,7 @@ import java.util.function.Consumer;
 import javax.annotation.WillClose;
 
 import io.github.readonly.oauth2.entities.impl.OAuth2ClientImpl;
-import net.dv8tion.jda.internal.requests.Method;
+import net.dv8tion.jda.api.requests.Method;
 import net.dv8tion.jda.internal.utils.Checks;
 import okhttp3.Headers;
 import okhttp3.Request;
@@ -171,7 +171,7 @@ public abstract class OAuth2Action<T>
 	 * when using this, that this method blocks the thread it is called in.
 	 *
 	 * @return the value constructed from the response
-	 * 
+	 *
 	 * @throws java.io.IOException
 	 *             on unsuccessful execution
 	 */
