@@ -8,7 +8,7 @@ plugins {
 	alias(libs.plugins.lombok)
 }
 
-def baseVersion = "4.0.3"
+def baseVersion = "4.0.4"
 def isSnapshot = false
 
 version = (isSnapshot) ? baseVersion + '-SNAPSHOT' : baseVersion
