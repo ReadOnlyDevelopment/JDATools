@@ -30,6 +30,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import io.github.readonly.command.Client;
+import io.github.readonly.command.DiscordInfo;
 import io.github.readonly.settings.GuildSettingsManager;
 import net.dv8tion.jda.api.entities.IMentionable;
 import net.dv8tion.jda.api.entities.Member;
@@ -45,11 +46,18 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 public class SlashCommandEvent extends SlashCommandInteractionEvent implements Event<SlashCommandInteractionEvent>
 {
 	private final Client client;
+	private final DiscordInfo info;
 
 	public SlashCommandEvent(SlashCommandInteractionEvent event, Client client)
 	{
 		super(event.getJDA(), event.getResponseNumber(), event);
+		this.info = DiscordInfo.of(event.getUser());
 		this.client = client;
+	}
+
+	public DiscordInfo getInfo()
+	{
+		return info;
 	}
 
 	/**

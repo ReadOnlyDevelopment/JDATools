@@ -24,7 +24,13 @@
 
 package io.github.readonly.doc.annotation.docstandard;
 
-import java.lang.annotation.*;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 import io.github.readonly.doc.ConvertedBy;
 import io.github.readonly.doc.DocMultiple;
@@ -46,7 +52,7 @@ import io.github.readonly.doc.annotation.DocConverter;
  * multiples of these can be attached to a class or method.
  * <p>
  * Below is a visual of what this should generally look like:
- * 
+ *
  * <pre>
  *     <b>Possible Errors:</b>
  *     • "I encountered an issue while processing this command!" - Houston had a problem!
@@ -62,7 +68,7 @@ import io.github.readonly.doc.annotation.DocConverter;
 @Repeatable(Errors.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(
-{ ElementType.TYPE, ElementType.METHOD })
+	{ ElementType.TYPE, ElementType.METHOD })
 public @interface Error
 {
 	/**
@@ -107,7 +113,9 @@ public @interface Error
 		{
 			StringBuilder b = new StringBuilder(annotation.prefix());
 			if (!annotation.response().isEmpty())
+			{
 				b.append("\"").append(annotation.response()).append("\" - ");
+			}
 			b.append(annotation.value());
 			return b.toString();
 		}

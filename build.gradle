@@ -8,12 +8,18 @@ plugins {
 	alias(libs.plugins.lombok)
 }
 
-def baseVersion = "4.0.4"
+wrapper {
+	gradleVersion = '8.1.1'
+}
+
+def baseVersion = "4.0.7"
 def isSnapshot = false
 
 version = (isSnapshot) ? baseVersion + '-SNAPSHOT' : baseVersion
 group = 'io.github.readonly'
 archivesBaseName = 'JDATools'
+
+dependencyUpdates.gradleReleaseChannel="current"
 
 java {
 	withJavadocJar()
@@ -28,7 +34,7 @@ repositories {
 dependencies {
 	api(libs.jda) { exclude module: 'opus-java' }
 	implementation libs.json
-	api libs.slf4j
+	compileOnly libs.slf4j
     api libs.guava
     api libs.guice
     api libs.commons.lang3
@@ -42,11 +48,10 @@ license {
 	include '**/*.java'
 }
 
-compileJava.options.encoding = 'UTF-8'
-
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
-    classpath += sourceSets.main.compileClasspath
+tasks.withType(JavaCompile).configureEach {
+	classpath += sourceSets.main.compileClasspath
+	options.deprecation = true
+	options.encoding = 'UTF-8'
 }
 
 javadoc {

@@ -66,9 +66,9 @@ public class ClientBuilder
 	private String												warning;
 	private String												error;
 	private final LinkedList<Command>							commands					= new LinkedList<>();
-	private final LinkedList<ContextMenu>						contextMenus				= new LinkedList<>();
 	private final LinkedList<ServerCommands>					serverCommands				= new LinkedList<>();
 	private final LinkedList<SlashCommand>						globalSlashCommands			= new LinkedList<>();
+	private final LinkedList<ContextMenu>						globalUserInteractions		= new LinkedList<>();
 	final HashMap<Category, List<Command>>						categoryToCommandListMap	= new LinkedHashMap<Command.Category, List<Command>>();
 	private boolean												embedAllReplies				= false;
 	private CommandListener										listener;
@@ -95,8 +95,8 @@ public class ClientBuilder
 			prefixFunction, commandPreProcessFunction,
 			commandPreProcessBiFunction, activity, status,
 			serverInvite, success, warning, error,
-			new ArrayList<>(commands), new ArrayList<>(contextMenus),
-			serverCommands, globalSlashCommands, embedAllReplies,
+			new ArrayList<>(commands), serverCommands,
+			globalSlashCommands, globalUserInteractions, embedAllReplies,
 			useHelp, shutdownAutomatically, helpConsumer,
 			helpWord, executor, linkedCacheSize, manager
 			);
@@ -471,7 +471,7 @@ public class ClientBuilder
 	 */
 	public ClientBuilder addContextMenu(ContextMenu contextMenu)
 	{
-		contextMenus.add(contextMenu);
+		globalUserInteractions.add(contextMenu);
 		return this;
 	}
 

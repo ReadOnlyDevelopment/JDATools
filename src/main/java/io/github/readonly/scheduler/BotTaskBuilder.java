@@ -1,8 +1,7 @@
 /*
- * This file is part of Sponge, licensed under the MIT License (MIT).
+ * This file is part of JDATools, licensed under the MIT License (MIT).
  *
- * Copyright (c) SpongePowered <https://www.spongepowered.org>
- * Copyright (c) contributors
+ * Copyright (c) ROMVoid95
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package io.github.readonly.scheduler;
 
 import static com.google.common.base.Preconditions.checkArgument;

@@ -248,7 +248,7 @@ public interface ClientInterface
 	 * @throws java.lang.IllegalArgumentException
 	 *             If the Context Menu provided has a name that has already been registered
 	 */
-	void addContextMenu(ContextMenu menu);
+	void indexContextMenu(ContextMenu menu);
 
 	/**
 	 * Adds a single {@link ContextMenu} to this CommandClient's registered Context Menus.
@@ -261,7 +261,7 @@ public interface ClientInterface
 	 * @throws java.lang.IllegalArgumentException
 	 *             If the Context Menu provided has a name that has already been registered
 	 */
-	void addContextMenu(ContextMenu menu, int index);
+	void indexContextMenu(ContextMenu menu, int index);
 
 	/**
 	 * Removes a single {@link io.github.readonly.command.Command Command} from this Client's registered Commands at the

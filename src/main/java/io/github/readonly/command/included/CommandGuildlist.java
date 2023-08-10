@@ -102,7 +102,7 @@ public class CommandGuildlist extends Command
 		public MessageEmbed apply(Guild g)
 		{
 			embed.setTitle(g.getName(), g.getIconUrl());
-			embed.setDescription(format("Owner", g.getOwner().getUser().getAsTag()));
+			embed.setDescription(format("Owner", g.getOwner().getUser().getName()));
 			embed.appendDescription(format("Members", g.getMemberCount()));
 			embed.appendDescription(format("Created", time(g.getTimeCreated())));
 			embed.setThumbnail(g.getIconUrl()).build();

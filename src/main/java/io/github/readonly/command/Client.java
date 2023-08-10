@@ -130,7 +130,8 @@ public class Client implements ClientInterface, EventListener
 	private final ScheduledExecutorService								executor;
 	private final GuildSettingsManager<?>								manager;
 
-	private final LinkedList<SlashCommand> globalCommands;
+	private final LinkedList<SlashCommand> globalSlashCommands;
+	private final LinkedList<ContextMenu> globalUserInteractions;
 
 	private final LinkedList<SlashCommand>	totalSlashCommands;
 	private final HashMap<String, Integer>	slashCommandIndex;
@@ -154,8 +155,8 @@ public class Client implements ClientInterface, EventListener
 		BiFunction<MessageReceivedEvent, Command, Boolean> commandPreProcessBiFunction,
 		Activity activity, OnlineStatus status, String serverInvite, String success,
 		String warning, String error, ArrayList<Command> commands,
-		ArrayList<ContextMenu> contextMenus, LinkedList<ServerCommands> serverCommands,
-		LinkedList<SlashCommand> globalSlashCommands, boolean embedAllReplies,
+		LinkedList<ServerCommands> serverCommands, LinkedList<SlashCommand> slashCommands,
+		LinkedList<ContextMenu> userInteractions, boolean embedAllReplies,
 		boolean useHelp, boolean shutdownAutomatically, Consumer<CommandEvent> helpConsumer,
 		String helpWord, ScheduledExecutorService executor, int linkedCacheSize, GuildSettingsManager<?> manager
 		)
@@ -211,7 +212,8 @@ public class Client implements ClientInterface, EventListener
 		this.slashCommandIndex = new HashMap<>();
 		this.totalContextMenus = new LinkedList<>();
 		this.contextMenuIndex = new HashMap<>();
-		this.globalCommands = new LinkedList<>();
+		this.globalSlashCommands = new LinkedList<>();
+		this.globalUserInteractions = new LinkedList<>();
 		this.commands = new ArrayList<>();
 		this.categoryToCommandListMap = new HashMap<>();
 		this.categoryToCommandListMap.put(new Category("Uncategorized"), new ArrayList<>());
@@ -245,7 +247,7 @@ public class Client implements ClientInterface, EventListener
 			User owner = event.getJDA().getUserById(ownerId);
 			if (owner != null)
 			{
-				builder.append("\n\nFor additional help, contact **").append(owner.getName()).append("**#").append(owner.getDiscriminator());
+				builder.append("\n\nFor additional help, contact **").append(owner.getName());
 				if (serverInvite != null)
 				{
 					builder.append(" or join ").append(serverInvite);
@@ -269,16 +271,16 @@ public class Client implements ClientInterface, EventListener
 			addCommand(command);
 		}
 		// Load GlobalSlashCommands commands
-		for (SlashCommand command : globalSlashCommands)
+		for (SlashCommand command : slashCommands)
 		{
 			indexSlashCommand(command);
-			globalCommands.add(command);
+			globalSlashCommands.add(command);
 		}
 
-		// Load context menus
-		for (ContextMenu menu : contextMenus)
+		for(ContextMenu ctxMenu : userInteractions)
 		{
-			addContextMenu(menu);
+			indexContextMenu(ctxMenu);
+			globalUserInteractions.add(ctxMenu);
 		}
 
 		for (ServerCommands serverCmds : serverCommands)
@@ -292,7 +294,7 @@ public class Client implements ClientInterface, EventListener
 
 			for (ContextMenu serverMenus : serverCmds.getContextMenus())
 			{
-				addContextMenu(serverMenus);
+				indexContextMenu(serverMenus);
 			}
 		}
 	}
@@ -324,7 +326,7 @@ public class Client implements ClientInterface, EventListener
 	@Override
 	public List<SlashCommand> getGlobalSlashCommands()
 	{
-		return globalCommands;
+		return globalSlashCommands;
 	}
 
 	@Override
@@ -488,13 +490,13 @@ public class Client implements ClientInterface, EventListener
 	}
 
 	@Override
-	public void addContextMenu(ContextMenu menu)
+	public void indexContextMenu(ContextMenu menu)
 	{
-		addContextMenu(menu, totalContextMenus.size());
+		indexContextMenu(menu, totalContextMenus.size());
 	}
 
 	@Override
-	public void addContextMenu(ContextMenu menu, int index)
+	public void indexContextMenu(ContextMenu menu, int index)
 	{
 		if ((index > totalContextMenus.size()) || (index < 0))
 		{
@@ -769,7 +771,7 @@ public class Client implements ClientInterface, EventListener
 			{
 				//@noformat
 				guild.updateCommands().addCommands(data).queue(
-					priv -> LOG.info("Successfully added " + server.getSlashCommands().size() + " slash commands and " + server.getContextMenus().size() + " menus to server " + guild.getName()),
+					priv -> LOG.info("Successfully added " + server.getSlashCommands().size() + " slash commands and " + server.getContextMenus().size() + "context menus to server " + guild.getName()),
 					error -> LOG.error("Could not upsert commands! Does the bot have the applications.commands scope?" + error));
 				//@format
 			}
@@ -780,12 +782,17 @@ public class Client implements ClientInterface, EventListener
 	{
 		// Get all commands
 		List<CommandData> data = new ArrayList<>();
-		for (SlashCommand cmd : globalCommands)
+		for (SlashCommand cmd : globalSlashCommands)
 		{
 			data.add(cmd.build());
 		}
 
-		jda.updateCommands().addCommands(data).queue(commands -> LOG.info("Successfully added " + globalCommands.size() + " global slash commands!"));
+		for (ContextMenu ctx : globalUserInteractions)
+		{
+			data.add(ctx.build());
+		}
+
+		jda.updateCommands().addCommands(data).queue(commands -> LOG.info("Successfully added " + globalSlashCommands.size() + " global slash commands and" + globalUserInteractions.size() + "context menus"));
 	}
 
 	private void onMessageReceived(MessageReceivedEvent event)
