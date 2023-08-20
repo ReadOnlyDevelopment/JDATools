@@ -46,6 +46,7 @@ import net.dv8tion.jda.api.events.message.GenericMessageEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
@@ -131,6 +132,12 @@ public class Slideshow extends Menu
 	public void display(Message message)
 	{
 		paginate(message, 1);
+	}
+
+	@Override
+	public void display(InteractionHook hook)
+	{
+		hook.retrieveOriginal().queue(t -> paginate(t, 1));
 	}
 
 	/**

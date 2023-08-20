@@ -40,6 +40,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
@@ -94,6 +95,12 @@ public class ButtonMenu extends Menu
 	public void display(Message message)
 	{
 		initialize(message.editMessage(getMessage()));
+	}
+
+	@Override
+	public void display(InteractionHook hook)
+	{
+		initialize(hook.editOriginal(getMessage()));
 	}
 
 	// Initializes the ButtonMenu using a Message RestAction

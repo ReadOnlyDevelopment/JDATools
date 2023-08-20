@@ -35,13 +35,13 @@ import io.github.readonly.common.waiter.EventWaiter;
 import lombok.Getter;
 
 @Getter
-public abstract class DiscordBot<T> implements BotContainer
+public abstract class DiscordBot implements BotContainer
 {
 	public static final String VERSION;
 	static {
 		var version = DiscordBot.class.getPackage().getImplementationVersion();
 		if (version == null) {
-			version = "DEV " + DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.now(ZoneOffset.UTC));
+			version = "DEV " + DateTimeFormatter.ISO_INSTANT.format(OffsetDateTime.now(ZoneOffset.UTC));
 		}
 		VERSION = version;
 	}

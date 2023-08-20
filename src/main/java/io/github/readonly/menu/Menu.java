@@ -39,49 +39,29 @@ import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 
 /**
- * A frame for wrapping an {@link io.github.readonly.common.waiter.EventWaiter
- * EventWaiter}
- * into a "action, reaction" menu that waits on forms of user input such as
- * reactions,
- * or key-phrases.
+ * A frame for wrapping an {@link io.github.readonly.common.waiter.EventWaiter EventWaiter} into a "action, reaction"
+ * menu that waits on forms of user input such as reactions, or key-phrases.
  *
- * <p>
- * Classes extending this are able to take a provided
- * {@link Message}
- * or {@link MessageChannel
- * MessageChannel} and display a visualized "Menu"
- * as or in it.
+ * <p> Classes extending this are able to take a provided {@link Message} or {@link MessageChannel MessageChannel} and
+ * display a visualized "Menu" as or in it.
  *
- * <p>
- * The JDA-Utilities default implementations of this superclass typically handle
- * input through
- * the assistance of things such as
- * {@link MessageReaction reactions},
- * but the actual implementation is only limited to the events provided by
- * Discord and handled through JDA.
+ * <p> The JDA-Utilities default implementations of this superclass typically handle input through the assistance of
+ * things such as {@link MessageReaction reactions}, but the actual implementation is only limited to the events
+ * provided by Discord and handled through JDA.
  *
- * <p>
- * For custom implementations, readability of creating and integrating may be
- * improved
- * by the implementation of a companion builder may be helpful (see the
- * documentation on
- * {@link Menu.Builder Menu.Builder} for more info).
+ * <p> For custom implementations, readability of creating and integrating may be improved by the implementation of a
+ * companion builder may be helpful (see the documentation on {@link Menu.Builder Menu.Builder} for more info).
  *
  * @see io.github.readonly.common.waiter.EventWaiter
  * @see Menu.Builder
  *
  * @author John Grosh
  *
- * @implNote
- *           While the standard JDA-Utilities implementations of this and Menu
- *           are
- *           all handled as {@link MessageEmbed
- *           embeds},
- *           there is no bias or advantage of implementing a custom Menu as a
- *           message
- *           without an embed.
+ * @implNote While the standard JDA-Utilities implementations of this and Menu are all handled as {@link MessageEmbed
+ *               embeds}, there is no bias or advantage of implementing a custom Menu as a message without an embed.
  */
 public abstract class Menu
 {
@@ -101,42 +81,32 @@ public abstract class Menu
 	}
 
 	/**
-	 * Displays this Menu in a
-	 * {@link MessageChannel
-	 * MessageChannel}.
-	 * 
+	 * Displays this Menu in a {@link MessageChannel MessageChannel}.
+	 *
 	 * @param channel
-	 *            The MessageChannel to display this Menu in
+	 *                The MessageChannel to display this Menu in
 	 */
 	public abstract void display(MessageChannel channel);
 
 	/**
-	 * Displays this Menu as a designated
-	 * {@link Message}.
-	 * <br>
-	 * The Message provided must be one sent by the bot! Trying to provided a
-	 * Message
-	 * authored by another {@link net.dv8tion.jda.api.entities.User User} will
-	 * prevent the
-	 * Menu from being displayed!
-	 * 
+	 * Displays this Menu as a designated {@link Message}. <br> The Message provided must be one sent by the bot! Trying
+	 * to provided a Message authored by another {@link net.dv8tion.jda.api.entities.User User} will prevent the Menu
+	 * from being displayed!
+	 *
 	 * @param message
-	 *            The Message to display this Menu as
+	 *                The Message to display this Menu as
 	 */
 	public abstract void display(Message message);
 
+	public abstract void display(InteractionHook hook);
+
 	/**
-	 * Checks to see if the provided {@link User
-	 * User}
-	 * is valid to interact with this Menu.
-	 * <p>
+	 * Checks to see if the provided {@link User User} is valid to interact with this Menu. <p>
 	 *
-	 * This is a shortcut for {@link Menu#isValidUser(User, Guild)} where the
-	 * Guild
-	 * is {@code null}.
+	 * This is a shortcut for {@link Menu#isValidUser(User, Guild)} where the Guild is {@code null}.
 	 *
 	 * @param user
-	 *            The User to validate.
+	 *             The User to validate.
 	 *
 	 * @return {@code true} if the User is valid, {@code false} otherwise.
 	 *
@@ -149,72 +119,62 @@ public abstract class Menu
 
 	/**
 	 *
-	 * Checks to see if the provided {@link User
-	 * User}
-	 * is valid to interact with this Menu.
-	 * <p>
+	 * Checks to see if the provided {@link User User} is valid to interact with this Menu. <p>
 	 *
-	 * For a User to be considered "valid" to use a Menu, the following logic
-	 * (in order) is applied:
-	 * <ul>
-	 * <li>The User must not be a bot. If it is, this returns {@code false}
-	 * immediately.</li>
+	 * For a User to be considered "valid" to use a Menu, the following logic (in order) is applied: <ul> <li>The User
+	 * must not be a bot. If it is, this returns {@code false} immediately.</li>
 	 *
-	 * <li>If no users and no roles were specified in the builder for this Menu,
-	 * then this
-	 * will return {@code true}.</li>
+	 * <li>If no users and no roles were specified in the builder for this Menu, then this will return
+	 * {@code true}.</li>
 	 *
-	 * <li>If the User is among the users specified in the builder for this
-	 * Menu, this will
-	 * return {@code true}.</li>
+	 * <li>If the User is among the users specified in the builder for this Menu, this will return {@code true}.</li>
 	 *
-	 * <li>If the Guild is {@code null}, or if the User is not a member on the
-	 * Guild, this
-	 * will return {@code false}.</li>
+	 * <li>If the Guild is {@code null}, or if the User is not a member on the Guild, this will return
+	 * {@code false}.</li>
 	 *
-	 * <li>Finally, the determination will be if the User on the provided Guild
-	 * has any
-	 * of the builder-specified Roles.</li>
-	 * </ul>
+	 * <li>Finally, the determination will be if the User on the provided Guild has any of the builder-specified
+	 * Roles.</li> </ul>
 	 *
-	 * Custom-implementation-wise, it's highly recommended developers who might
-	 * override this
-	 * attempt to follow a similar logic for their Menus, as this provides a
-	 * full-proof guard
-	 * against exceptions when validating a User of a Menu.
+	 * Custom-implementation-wise, it's highly recommended developers who might override this attempt to follow a
+	 * similar logic for their Menus, as this provides a full-proof guard against exceptions when validating a User of a
+	 * Menu.
 	 *
 	 * @param user
-	 *            The User to validate.
+	 *              The User to validate.
 	 * @param guild
-	 *            The Guild to validate the User on.<br>
-	 *            Can be provided {@code} null safely.
+	 *              The Guild to validate the User on.<br> Can be provided {@code} null safely.
 	 *
 	 * @return {@code true} if the User is valid, {@code false} otherwise.
 	 */
 	protected boolean isValidUser(User user, @Nullable Guild guild)
 	{
 		if (user.isBot())
+		{
 			return false;
+		}
 		if (users.isEmpty() && roles.isEmpty())
+		{
 			return true;
+		}
 		if (users.contains(user))
+		{
 			return true;
-		if (guild == null || !guild.isMember(user))
+		}
+		if ((guild == null) || !guild.isMember(user))
+		{
 			return false;
+		}
 
 		return guild.getMember(user).getRoles().stream().anyMatch(roles::contains);
 	}
 
 	/**
-	 * An extendable frame for a chain-method builder that constructs a
-	 * specified type of
-	 * {@link io.github.readonly.menu.Menu Menu}.
-	 * <p>
+	 * An extendable frame for a chain-method builder that constructs a specified type of
+	 * {@link io.github.readonly.menu.Menu Menu}. <p>
 	 *
-	 * Conventionally, implementations of Menu should have a static nested class
-	 * called
-	 * {@code Builder}, which extends this superclass:
-	 * 
+	 * Conventionally, implementations of Menu should have a static nested class called {@code Builder}, which extends
+	 * this superclass:
+	 *
 	 * <pre><code>
 	 * public class MyMenu extends Menu
 	 * {
@@ -229,15 +189,9 @@ public abstract class Menu
 	 *
 	 * @author John Grosh
 	 *
-	 * @implNote
-	 *           Before 2.0 this were a separate class known as
-	 *           {@code MenuBuilder}.<br>
-	 *           Note that while the standard JDA-Utilities implementations of
-	 *           this and Menu are
-	 *           all handled as {@link MessageEmbed
-	 *           embeds}, there
-	 *           is no bias or advantage of implementing a custom Menu as a
-	 *           message without an embed.
+	 * @implNote Before 2.0 this were a separate class known as {@code MenuBuilder}.<br> Note that while the standard
+	 *               JDA-Utilities implementations of this and Menu are all handled as {@link MessageEmbed embeds},
+	 *               there is no bias or advantage of implementing a custom Menu as a message without an embed.
 	 */
 	@SuppressWarnings("unchecked")
 	public abstract static class Builder<T extends Builder<T, V>, V extends Menu>
@@ -249,28 +203,23 @@ public abstract class Menu
 		protected TimeUnit		unit	= TimeUnit.MINUTES;
 
 		/**
-		 * Builds the {@link io.github.readonly.menu.Menu Menu} corresponding to
-		 * this {@link io.github.readonly.menu.Menu.Builder Menu.Builder}.
-		 * <br>
-		 * After doing this, no modifications of the displayed Menu can be made.
+		 * Builds the {@link io.github.readonly.menu.Menu Menu} corresponding to this
+		 * {@link io.github.readonly.menu.Menu.Builder Menu.Builder}. <br> After doing this, no modifications of the
+		 * displayed Menu can be made.
 		 *
-		 * @return The built Menu of corresponding type to this
-		 *         {@link io.github.readonly.menu.Menu.Builder}.
+		 * @return The built Menu of corresponding type to this {@link io.github.readonly.menu.Menu.Builder}.
 		 */
 		public abstract V build();
 
 		/**
-		 * Sets the {@link io.github.readonly.common.waiter.EventWaiter
-		 * EventWaiter}
-		 * that will do {@link io.github.readonly.menu.Menu Menu} operations.
+		 * Sets the {@link io.github.readonly.common.waiter.EventWaiter EventWaiter} that will do
+		 * {@link io.github.readonly.menu.Menu Menu} operations.
 		 *
-		 * <p>
-		 * <b>NOTE:</b> All Menus will only work with an EventWaiter set!
-		 * <br>
-		 * Not setting an EventWaiter means the Menu will not work.
+		 * <p> <b>NOTE:</b> All Menus will only work with an EventWaiter set! <br> Not setting an EventWaiter means the
+		 * Menu will not work.
 		 *
 		 * @param waiter
-		 *            The EventWaiter
+		 *               The EventWaiter
 		 *
 		 * @return This builder
 		 */
@@ -281,12 +230,11 @@ public abstract class Menu
 		}
 
 		/**
-		 * Adds {@link net.dv8tion.jda.api.entities.User User}s that are allowed
-		 * to use the
+		 * Adds {@link net.dv8tion.jda.api.entities.User User}s that are allowed to use the
 		 * {@link io.github.readonly.menu.Menu Menu} that will be built.
 		 *
 		 * @param users
-		 *            The Users allowed to use the Menu
+		 *              The Users allowed to use the Menu
 		 *
 		 * @return This builder
 		 */
@@ -297,15 +245,12 @@ public abstract class Menu
 		}
 
 		/**
-		 * Sets {@link net.dv8tion.jda.api.entities.User User}s that are allowed
-		 * to use the
-		 * {@link io.github.readonly.menu.Menu Menu} that will be built.
-		 * <br>
-		 * This clears any Users already registered before adding the ones
-		 * specified.
+		 * Sets {@link net.dv8tion.jda.api.entities.User User}s that are allowed to use the
+		 * {@link io.github.readonly.menu.Menu Menu} that will be built. <br> This clears any Users already registered
+		 * before adding the ones specified.
 		 *
 		 * @param users
-		 *            The Users allowed to use the Menu
+		 *              The Users allowed to use the Menu
 		 *
 		 * @return This builder
 		 */
@@ -317,12 +262,11 @@ public abstract class Menu
 		}
 
 		/**
-		 * Adds {@link net.dv8tion.jda.api.entities.Role Role}s that are allowed
-		 * to use the
+		 * Adds {@link net.dv8tion.jda.api.entities.Role Role}s that are allowed to use the
 		 * {@link io.github.readonly.menu.Menu Menu} that will be built.
 		 *
 		 * @param roles
-		 *            The Roles allowed to use the Menu
+		 *              The Roles allowed to use the Menu
 		 *
 		 * @return This builder
 		 */
@@ -333,15 +277,12 @@ public abstract class Menu
 		}
 
 		/**
-		 * Sets {@link net.dv8tion.jda.api.entities.Role Role}s that are allowed
-		 * to use the
-		 * {@link io.github.readonly.menu.Menu Menu} that will be built.
-		 * <br>
-		 * This clears any Roles already registered before adding the ones
-		 * specified.
+		 * Sets {@link net.dv8tion.jda.api.entities.Role Role}s that are allowed to use the
+		 * {@link io.github.readonly.menu.Menu Menu} that will be built. <br> This clears any Roles already registered
+		 * before adding the ones specified.
 		 *
 		 * @param roles
-		 *            The Roles allowed to use the Menu
+		 *              The Roles allowed to use the Menu
 		 *
 		 * @return This builder
 		 */
@@ -353,19 +294,15 @@ public abstract class Menu
 		}
 
 		/**
-		 * Sets the timeout that the {@link io.github.readonly.menu.Menu Menu}
-		 * should
-		 * stay available.
+		 * Sets the timeout that the {@link io.github.readonly.menu.Menu Menu} should stay available.
 		 *
-		 * <p>
-		 * After this has expired, the a final action in the form of a
-		 * {@link java.lang.Runnable Runnable} may execute.
+		 * <p> After this has expired, the a final action in the form of a {@link java.lang.Runnable Runnable} may
+		 * execute.
 		 *
 		 * @param timeout
-		 *            The amount of time for the Menu to stay available
+		 *                The amount of time for the Menu to stay available
 		 * @param unit
-		 *            The {@link java.util.concurrent.TimeUnit TimeUnit} for the
-		 *            timeout
+		 *                The {@link java.util.concurrent.TimeUnit TimeUnit} for the timeout
 		 *
 		 * @return This builder
 		 */

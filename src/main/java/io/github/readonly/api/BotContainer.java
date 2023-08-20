@@ -62,15 +62,6 @@ public interface BotContainer
 	}
 
 	/**
-	 * Returns the created instance of {@link Bot} if it is available.
-	 *
-	 * @return The instance if available
-	 */
-	default Optional<?> getInstance() {
-		return Optional.empty();
-	}
-
-	/**
 	 * Returns the assigned logger to this {@link Bot}.
 	 *
 	 * @return The assigned logger

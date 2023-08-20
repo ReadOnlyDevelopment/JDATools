@@ -45,6 +45,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
@@ -91,6 +92,12 @@ public class EmbedMessageMenu extends Menu
 		paginate(channel, 1);
 	}
 
+	@Override
+	public void display(InteractionHook hook)
+	{
+		paginate(hook, 1);
+	}
+
 	/**
 	 * Begins pagination as a new {@link Message} in the provided {@link MessageChannel},
 	 * starting on whatever page number is provided.
@@ -111,6 +118,18 @@ public class EmbedMessageMenu extends Menu
 		}
 		MessageEditData msg = renderPage(pageNum);
 		initialize(channel.sendMessage(MessageCreateData.fromEditData(msg)), pageNum);
+	}
+
+	public void paginate(InteractionHook hook, int pageNum) {
+		if(pageNum<1)
+		{
+			pageNum = 1;
+		} else if (pageNum > guildMap.size())
+		{
+			pageNum = guildMap.size();
+		}
+		MessageEditData msg = renderPage(pageNum);
+		initialize(hook.editOriginal(msg), pageNum);
 	}
 
 	private void initialize(RestAction<Message> action, int pageNum)

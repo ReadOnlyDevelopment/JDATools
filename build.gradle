@@ -12,7 +12,7 @@ wrapper {
 	gradleVersion = '8.1.1'
 }
 
-def baseVersion = "4.0.7"
+def baseVersion = "4.0.8"
 def isSnapshot = false
 
 version = (isSnapshot) ? baseVersion + '-SNAPSHOT' : baseVersion
@@ -38,9 +38,7 @@ dependencies {
     api libs.guava
     api libs.guice
     api libs.commons.lang3
-    api libs.jackson.core
     api libs.jackson.databind
-    api libs.jackson.annotations
 }
 
 license {

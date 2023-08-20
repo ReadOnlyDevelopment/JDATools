@@ -46,6 +46,7 @@ import net.dv8tion.jda.api.events.message.GenericMessageEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
@@ -129,6 +130,19 @@ public class EmbedPaginator extends Menu
 	}
 
 	/**
+	 * Begins pagination on page 1 displaying this Pagination by editing the provided {@link InteractionHook}
+	 *
+	 * <p>Starting on another page is available via
+	 * {@link Paginator#paginate(InteractionHook, int) Paginator#paginate(InteractionHook, int)}
+	 *
+	 * @param  hook
+	 *         The InteractionHook to display the Menu in
+	 */
+	public void display(InteractionHook hook) {
+		paginate(hook, 1);
+	}
+
+	/**
 	 * Begins pagination as a new {@link Message
 	 * Message}
 	 * in the provided
@@ -152,6 +166,27 @@ public class EmbedPaginator extends Menu
 		}
 		MessageEditData msg = renderPage(pageNum);
 		initialize(channel.sendMessage(MessageCreateData.fromEditData(msg)), pageNum);
+	}
+
+	/**
+	 * Begins pagination by editing the provided
+	 * {@link InteractionHook}, starting on whatever page number is provided.
+	 *
+	 * @param  hook
+	 *         The InteractionHook to edit
+	 * @param  pageNum
+	 *         The page number to begin on
+	 */
+	public void paginate(InteractionHook hook, int pageNum) {
+		if(pageNum < 1)
+		{
+			pageNum = 1;
+		} else if (pageNum > embeds.size())
+		{
+			pageNum = embeds.size();
+		}
+		MessageEditData msg = renderPage(pageNum);
+		initialize(hook.editOriginal(msg), pageNum);
 	}
 
 	/**
